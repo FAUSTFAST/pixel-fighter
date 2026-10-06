@@ -1,0 +1,254 @@
+[
+  {
+    "asset": "ryu-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 286.5
+  },
+  {
+    "asset": "ryu-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 293.0
+  },
+  {
+    "asset": "ryu-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 307
+  },
+  {
+    "asset": "ryu-punch-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 290.5
+  },
+  {
+    "asset": "ryu-kick-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 295.0
+  },
+  {
+    "asset": "ryu-special-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 292.5
+  },
+  {
+    "asset": "ryu-reaction-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 265.0
+  },
+  {
+    "asset": "mei-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 294.5
+  },
+  {
+    "asset": "mei-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 303.5
+  },
+  {
+    "asset": "mei-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 301
+  },
+  {
+    "asset": "mei-punch-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 307.5
+  },
+  {
+    "asset": "mei-kick.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 292.5
+  },
+  {
+    "asset": "mei-special.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 286.5
+  },
+  {
+    "asset": "mei-reaction.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 269.0
+  },
+  {
+    "asset": "tank-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 295.5
+  },
+  {
+    "asset": "tank-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 304.5
+  },
+  {
+    "asset": "tank-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 292
+  },
+  {
+    "asset": "tank-punch.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 269.0
+  },
+  {
+    "asset": "tank-kick-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 290.5
+  },
+  {
+    "asset": "tank-special-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 295.5
+  },
+  {
+    "asset": "tank-reaction-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 279.5
+  },
+  {
+    "asset": "volt-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 286.5
+  },
+  {
+    "asset": "volt-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 305.5
+  },
+  {
+    "asset": "volt-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 297
+  },
+  {
+    "asset": "volt-punch-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 287.5
+  },
+  {
+    "asset": "volt-kick.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 285.5
+  },
+  {
+    "asset": "volt-special.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 288.5
+  },
+  {
+    "asset": "volt-reaction.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 282.0
+  },
+  {
+    "asset": "kaze-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 280.5
+  },
+  {
+    "asset": "kaze-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 301.0
+  },
+  {
+    "asset": "kaze-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 321
+  },
+  {
+    "asset": "kaze-punch.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 276.0
+  },
+  {
+    "asset": "kaze-kick.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 294.0
+  },
+  {
+    "asset": "kaze-special.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 267.0
+  },
+  {
+    "asset": "kaze-reaction.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 297.0
+  },
+  {
+    "asset": "sage-walk.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 278.0
+  },
+  {
+    "asset": "sage-stance.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 297.0
+  },
+  {
+    "asset": "sage-air.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 287
+  },
+  {
+    "asset": "sage-punch-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 273.5
+  },
+  {
+    "asset": "sage-kick-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 285.0
+  },
+  {
+    "asset": "sage-special-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 289.0
+  },
+  {
+    "asset": "sage-reaction-identity-v1.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 274.0
+  }
+]

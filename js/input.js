@@ -4,6 +4,8 @@
 (function () {
   const down = Object.create(null);      // 当前按住的物理键
   const pressed = Object.create(null);   // 本帧刚按下(边沿),消费后清除
+  let padDown = new Set();
+  const padPressed = new Set();
 
   window.addEventListener('keydown', (e) => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
@@ -11,73 +13,140 @@
     if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
     if (!down[k]) pressed[k] = true;   // 只有从未按到按下才算边沿
     down[k] = true;
+    recordDirectionEdge(k);
   });
   window.addEventListener('keyup', (e) => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     down[k] = false;
+    recordDirectionEdge(k);
   });
-  window.addEventListener('blur', () => { for (const k in down) down[k] = false; });
+  function clearKeys() {
+    for (const k in down) down[k] = false;
+    for (const k in pressed) pressed[k] = false;
+    padDown.clear();padPressed.clear();
+    window.Gamepads?.release();
+    if (typeof motionBuf !== 'undefined') {
+      motionBuf.p1 = [];
+      motionBuf.p2 = [];
+    }
+  }
+  window.addEventListener('blur', clearKeys);
+  // Browsers may keep the window focused while a tab is backgrounded.
+  document.addEventListener?.('visibilitychange', () => {
+    if (document.hidden) clearKeys();
+  });
 
   const Input = {
-    isDown(k) { return !!down[k]; },
+    clear:clearKeys,
+    isDown(k) { return !!down[k] || padDown.has(k); },
+    // 独立来源：手柄松开不会清掉仍按住的键盘按键。
+    setGamepadKeys(keys) {
+      const next = new Set(keys);
+      for (const k of next) if (!padDown.has(k) && !down[k]) padPressed.add(k);
+      padDown = next;
+    },
     // 消费型:读取后清除,保证一次按下只触发一次
     justPressed(k) {
-      if (pressed[k]) { pressed[k] = false; return true; }
-      return false;
+      const hit = !!pressed[k] || padPressed.has(k);
+      pressed[k] = false;padPressed.delete(k);return hit;
     },
     // 只看不消费
-    peekPressed(k) { return !!pressed[k]; },
+    peekPressed(k) { return !!pressed[k] || padPressed.has(k); },
     // 每帧末尾调用,清空未被消费的边沿
-    endFrame() { for (const k in pressed) pressed[k] = false; },
+    endFrame() { for (const k in pressed) pressed[k] = false;padPressed.clear(); },
   };
 
   // 两位玩家的按键映射
   Input.MAP = {
-    p1: { left:'a', right:'d', up:'w', down:'s', light:'f', heavy:'g', special:'h' },
-    p2: { left:'ArrowLeft', right:'ArrowRight', up:'ArrowUp', down:'ArrowDown', light:'j', heavy:'k', special:'l' },
+    p1: { left:'a', right:'d', up:'w', down:'s', light:'f', medium:'t', heavy:'g', lightKick:'v', mediumKick:'c', heavyKick:'b', throw:'r', special:'h', assist:'e', impact:'q', parry:'z', driveRush:'x' },
+    p2: { left:'ArrowLeft', right:'ArrowRight', up:'ArrowUp', down:'ArrowDown', light:'j', medium:';', heavy:'k', lightKick:'u', mediumKick:',', heavyKick:'i', throw:'o', special:'l', assist:'/', impact:'.', parry:"'", driveRush:'[' },
   };
+
+  Input.MODES={p1:'classic',p2:'classic'};
 
   // ---- 方向指令缓冲(搓招识别)----
-  // 为每个玩家记录最近若干帧的方向编号:
-  // 5=中立 2=下 6=右 3=右下(↘) 4=左 1=左下(↙)
+  // 方向按格斗游戏的数字键盘记法记录,并只在方向改变时入列。
+  // 5=中立 2=下 6=右 3=右下 4=左 1=左下 8=上。
   const motionBuf = { p1: [], p2: [] };
-  const MOTION_MAX = 18;   // 缓冲保留帧数
+  const motionFrame = { p1: 0, p2: 0 };
+  const MOTION_MAX = 32;
 
-  Input.recordMotion = function (who) {
+  function recordDirectionEdge(key) {
+    for(const who of ['p1','p2']) {
+      const m=Input.MAP[who];
+      if([m.left,m.right,m.up,m.down].includes(key))Input.recordMotion(who,false);
+    }
+  }
+  Input.recordMotion = function (who, advance=true) {
     const m = Input.MAP[who];
-    const l = down[m.left], r = down[m.right], d = down[m.down];
-    let dir = 5;
-    if (d && r) dir = 3;         // ↘
-    else if (d && l) dir = 1;    // ↙
-    else if (d) dir = 2;         // ↓
-    else if (r) dir = 6;         // →
-    else if (l) dir = 4;         // ←
+    const horizontal = Number(Input.isDown(m.right)) - Number(Input.isDown(m.left));
+    const vertical = Number(Input.isDown(m.up)) - Number(Input.isDown(m.down));
+    const dir = 5 + horizontal + vertical * 3;
     const buf = motionBuf[who];
-    buf.push(dir);
-    if (buf.length > MOTION_MAX) buf.shift();
+    if(advance)motionFrame[who]++;
+    if (!buf.length || buf[buf.length-1].dir !== dir) {
+      buf.push({ dir, frame: motionFrame[who], lastFrame: motionFrame[who] });
+      if (buf.length > MOTION_MAX) buf.shift();
+    } else buf[buf.length-1].lastFrame = motionFrame[who];
   };
 
-  // 检测"面向 facing 方向的 ↓↘→"(波动拳)。facing:1 右 / -1 左。
-  // 右向序列 ↓→ 经 ↘;左向则镜像为 ↓←。返回 true 时消费缓冲。
-  Input.checkQCF = function (who, facing) {
+  Input.clearMotions = function (who) {
+    if (who) motionBuf[who] = [];
+    else { motionBuf.p1 = []; motionBuf.p2 = []; }
+  };
+
+  // patterns 是相对朝向的方向序列;允许中间经过中立,每条指令有独立时限。
+  Input.checkMotion = function (who, facing, patterns) {
     const buf = motionBuf[who];
-    if (buf.length < 3) return false;
-    const fwd = facing >= 0 ? 6 : 4;         // 前方向
-    const diag = facing >= 0 ? 3 : 1;        // 前下斜
-    // 从最近往前找:需要出现 下 -> (斜) -> 前 的顺序
-    // 简化:最近 8 帧内存在 2,随后 3/1,随后 6/4
-    const recent = buf.slice(-10);
-    let sawDown = false, sawDiag = false;
-    for (const d of recent) {
-      if (!sawDown) { if (d === 2 || d === diag) sawDown = true; }
-      else if (!sawDiag) { if (d === diag || d === 2) sawDiag = true; }
-      else { if (d === fwd || d === diag) { motionBuf[who] = []; return true; } }
+    if (!buf.length) return null;
+    const forward = facing >= 0 ? 6 : 4;
+    const downForward = facing >= 0 ? 3 : 1;
+    const back = facing >= 0 ? 4 : 6;
+    const downBack = facing >= 0 ? 1 : 3;
+    const map = { f:forward, b:back, d:2, df:downForward, db:downBack, n:5 };
+
+    for (const pattern of patterns) {
+      const seq = pattern.dirs.map(d => map[d]);
+      // 允许方向指令后回到中立再按攻击键,但不跨过其他方向输入。
+      let end = buf.length - 1;
+      while (end >= 0 && buf[end].dir === 5 && motionFrame[who] - buf[end].frame <= pattern.window) end--;
+      if (end < 0 || buf[end].dir !== seq[seq.length-1] || motionFrame[who] - buf[end].frame > pattern.window) continue;
+      let at = end, first = end;
+      for (let s = seq.length - 2; s >= 0; s--) {
+        let found = -1;
+        for (let i = at - 1; i >= 0; i--) {
+          const when = s === 0 ? buf[i].lastFrame : buf[i].frame;
+          if (motionFrame[who] - when > pattern.window) break;
+          if (buf[i].dir === seq[s]) { found = i; break; }
+          if (buf[i].dir !== 5) break;
+        }
+        if (found < 0) { first = -1; break; }
+        first = found; at = found;
+      }
+      if (first >= 0 && motionFrame[who] - buf[first].lastFrame <= pattern.window) {
+        motionBuf[who] = [];
+        return pattern.name;
+      }
     }
-    // 宽松兜底:序列里同时含 2 和 fwd 且 2 在 fwd 之前
-    const iDown = recent.indexOf(2), iFwd = recent.lastIndexOf(fwd);
-    if (iDown !== -1 && iFwd !== -1 && iDown < iFwd) { motionBuf[who] = []; return true; }
+    return null;
+  };
+
+  // 蓄力允许斜下后蓄力、松开后 10 帧内完成前拳。
+  Input.checkCharge = function(who, facing) {
+    const buf=motionBuf[who], now=motionFrame[who];
+    const forward=facing>0?6:4, backs=facing>0?[4,1,7]:[6,3,9];
+    let at=buf.length-1;
+    if(at>=0 && buf[at].dir===5 && now-buf[at].frame<=6)at--;
+    if(at<0||buf[at].dir!==forward||now-buf[at].frame>10)return false;
+    const end=buf[at].frame;let held=0;
+    for(let i=at-1;i>=0;i--){
+      const b=buf[i];
+      if(b.dir===5&&end-b.frame<=5)continue;
+      if(!backs.includes(b.dir)||end-b.lastFrame>held+10)break;
+      held+=b.lastFrame-b.frame+1;
+      if(held>=30){Input.clearMotions(who);return true;}
+    }
     return false;
   };
-
   window.Input = Input;
 })();

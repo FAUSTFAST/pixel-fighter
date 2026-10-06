@@ -1,0 +1,822 @@
+{
+  "version": "identity-v1",
+  "reference": "Original <id>-v2.png plus reviewed <id>-stance.png; approvals apply to these exact bytes.",
+  "characters": {
+    "ryu": {
+      "name": "疾风",
+      "identity": "blue-ninja-burgundy-scarf",
+      "appearance": "蓝衣、深蓝裤、酒红围巾与腰带、黑发、银色护额、白色护腕绑腿、深色凉鞋",
+      "sheets": {
+        "stance": {
+          "file": "ryu-stance.png",
+          "sha256": "aca3fa5e212e96475e182201136bd04d0cb6e6f04f1391711e0e486ae34a02e3"
+        },
+        "air": {
+          "file": "ryu-air.png",
+          "sha256": "43e4b95877078b67254bd92f6e71283f0609fd990cdb9c8f70688c5a48a23df6",
+          "hips": [
+            [
+              170,
+              230
+            ],
+            [
+              494,
+              172
+            ],
+            [
+              802,
+              161
+            ],
+            [
+              1119,
+              194
+            ],
+            [
+              171,
+              551
+            ],
+            [
+              468,
+              511
+            ],
+            [
+              780,
+              488
+            ],
+            [
+              1117,
+              511
+            ],
+            [
+              175,
+              798
+            ],
+            [
+              474,
+              805
+            ],
+            [
+              789,
+              810
+            ],
+            [
+              1108,
+              804
+            ],
+            [
+              171,
+              1090
+            ],
+            [
+              469,
+              1097
+            ],
+            [
+              796,
+              1093
+            ],
+            [
+              1113,
+              1095
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "ryu-punch-identity-v1.png",
+          "sha256": "9dd86c2b383e9d60b7c30d58d8a800848b6f7b878f8f0ad1d7cba7f3f8f27191"
+        },
+        "kick": {
+          "file": "ryu-kick-identity-v1.png",
+          "sha256": "97615992a329238d89243a47204e86ab631caf20f27caa89e7380d8257bd0723",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "ryu-special-identity-v1.png",
+          "sha256": "2bc878063e3be5123507b6d6b2aeec360ca1333edf4f5142a15609c781405d27",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "ryu-reaction-identity-v1.png",
+          "sha256": "10701600b3f2ab5d88817f5e4c824e6543a3796d3150a0cb98802bf9d9ecade4",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "ryu-walk.png",
+          "sha256": "663eec219a85bba889ecac45d76a6f45f8f6e7c21beaa9d08cd01c4df11483ea",
+          "hipX": [
+            187,
+            501,
+            816,
+            1129,
+            202,
+            522,
+            826,
+            1127,
+            183,
+            494,
+            801,
+            1113,
+            187,
+            496,
+            799,
+            1122
+          ]
+        }
+      },
+      "standingHip": [
+        178,
+        182
+      ]
+    },
+    "mei": {
+      "name": "美琳",
+      "identity": "magenta-kungfu-black-ponytail",
+      "appearance": "黑色高马尾、金色发饰、玫红金边武术服、黑裤、银护腕、玫红靴",
+      "sheets": {
+        "stance": {
+          "file": "mei-stance.png",
+          "sha256": "ba519660b06d09725fd2124d087473877f2e4f972fa88286f3f952fa35d21459"
+        },
+        "air": {
+          "file": "mei-air.png",
+          "sha256": "ca1172893dd5920f5102e8928e2aedbcf131d3c66c605e8e95ed0567f66da118",
+          "hips": [
+            [
+              181,
+              261
+            ],
+            [
+              497,
+              176
+            ],
+            [
+              803,
+              167
+            ],
+            [
+              1118,
+              186
+            ],
+            [
+              172,
+              576
+            ],
+            [
+              501,
+              516
+            ],
+            [
+              802,
+              486
+            ],
+            [
+              1114,
+              502
+            ],
+            [
+              171,
+              808
+            ],
+            [
+              472,
+              805
+            ],
+            [
+              801,
+              813
+            ],
+            [
+              1111,
+              807
+            ],
+            [
+              177,
+              1096
+            ],
+            [
+              461,
+              1100
+            ],
+            [
+              806,
+              1100
+            ],
+            [
+              1114,
+              1101
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "mei-punch-identity-v1.png",
+          "sha256": "c826883211c999c4c965c494be6e80f950d5535e32fba33ead2e4ca670030028"
+        },
+        "kick": {
+          "file": "mei-kick.png",
+          "sha256": "215454f6b8bf15581d143d815c4bd4aac2183f80368ee70190b64a8197754f2d",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "mei-special.png",
+          "sha256": "0178c4643a149b72122f41f800c498705b617383af54e5cd18b4b1f9c75eca71",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "mei-reaction.png",
+          "sha256": "729c38f5eebeb4c7dfd594532ba650bb69e5b75f784e0c16d10eb341052e6b2c",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "mei-walk.png",
+          "sha256": "50c16c9c4d34d90ab6502206958000c7eae82f6c92890e9950ded569e41ff0b9",
+          "hipX": [
+            185,
+            510,
+            835,
+            1153,
+            208,
+            531,
+            845,
+            1144,
+            185,
+            506,
+            833,
+            1155,
+            190,
+            508,
+            833,
+            1140
+          ]
+        }
+      },
+      "standingHip": [
+        173,
+        188
+      ]
+    },
+    "tank": {
+      "name": "铁拳",
+      "identity": "human-boxer-red-gloves",
+      "appearance": "人类拳手、赤膊肌肉、黑色平头、红拳套、红褐裤、金腰带、黑金拳靴",
+      "sheets": {
+        "stance": {
+          "file": "tank-stance.png",
+          "sha256": "dc3e5efddb6be8020148a8eab2bca286877a10362acb4dd1d3018802a01bc924"
+        },
+        "air": {
+          "file": "tank-air.png",
+          "sha256": "c5d63c09b4ebca364dd678be6cdb5d7c72e1a67216b8efdfcff2bee240ff344a",
+          "hips": [
+            [
+              158,
+              236
+            ],
+            [
+              471,
+              157
+            ],
+            [
+              779,
+              144
+            ],
+            [
+              1095,
+              157
+            ],
+            [
+              167,
+              529
+            ],
+            [
+              466,
+              474
+            ],
+            [
+              802,
+              451
+            ],
+            [
+              1105,
+              481
+            ],
+            [
+              165,
+              791
+            ],
+            [
+              446,
+              789
+            ],
+            [
+              783,
+              790
+            ],
+            [
+              1110,
+              789
+            ],
+            [
+              141,
+              1078
+            ],
+            [
+              420,
+              1064
+            ],
+            [
+              796,
+              1062
+            ],
+            [
+              1110,
+              1079
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "tank-punch.png",
+          "sha256": "e3c14e3adb91c1418bb377a3fe21435cbd0d4f7f877abcf6a6814b6c46e3740d"
+        },
+        "kick": {
+          "file": "tank-kick-identity-v1.png",
+          "sha256": "5790ed421921838f92a50065a0579b56984864ec30b88d9ddd9244858e365299",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "tank-special-identity-v1.png",
+          "sha256": "d58e9de986f1d1f8f910a16328a8865d7554a78ed080fe2c63791f73f8346c84",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "tank-reaction-identity-v1.png",
+          "sha256": "4b10a4c3d63da746e5949d46fd6310d5ebb82b5065f3aac5efb2e192b5a2e439",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "tank-walk.png",
+          "sha256": "925bc50beb4e203e35c4eef94d14ca12be03033cf0f2c879ec5b382e2b2435d5",
+          "hipX": [
+            181,
+            498,
+            799,
+            1115,
+            183,
+            501,
+            806,
+            1113,
+            176,
+            479,
+            782,
+            1095,
+            180,
+            488,
+            795,
+            1116
+          ]
+        }
+      },
+      "standingHip": [
+        165,
+        175
+      ]
+    },
+    "volt": {
+      "name": "闪电",
+      "identity": "yellow-jacket-cyan-scarf",
+      "appearance": "黑色刺发、黄夹克、黑内衫、青蓝围巾、深蓝裤、黑手套与靴",
+      "sheets": {
+        "stance": {
+          "file": "volt-stance.png",
+          "sha256": "f4f363487be1c6d90bfbe795e898a689738db0d2586203a2e17434d70df706f1"
+        },
+        "air": {
+          "file": "volt-air.png",
+          "sha256": "5a451ee9e39c47cb8ca97ddd30f51dffec6eb1e0e486180f8f7c4c71f7ae6a48",
+          "hips": [
+            [
+              161,
+              255
+            ],
+            [
+              490,
+              184
+            ],
+            [
+              804,
+              181
+            ],
+            [
+              1120,
+              183
+            ],
+            [
+              171,
+              566
+            ],
+            [
+              500,
+              515
+            ],
+            [
+              815,
+              488
+            ],
+            [
+              1127,
+              511
+            ],
+            [
+              168,
+              818
+            ],
+            [
+              460,
+              825
+            ],
+            [
+              804,
+              829
+            ],
+            [
+              1113,
+              829
+            ],
+            [
+              172,
+              1090
+            ],
+            [
+              450,
+              1100
+            ],
+            [
+              803,
+              1104
+            ],
+            [
+              1106,
+              1110
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "volt-punch-identity-v1.png",
+          "sha256": "d083e8d8262157765c3a5058934f85540f1ca8c29b630853a66256c3b9a56385"
+        },
+        "kick": {
+          "file": "volt-kick.png",
+          "sha256": "62a5757a2348556e59ac6fb6ee7d055e789a139e64a96e8b5b298edd2124a9a3",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "volt-special.png",
+          "sha256": "aada8ca8c4136423022d73843984bf416f90f5fcb9d53b40b1afd74b4eda4e62",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "volt-reaction.png",
+          "sha256": "e26ed8813d139ee0ddbb1417ef02e7d7953af20f297a996a1838f74af9c39a50",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "volt-walk.png",
+          "sha256": "aa42ad0fe07d510f0ec8f9178a979db2872a02658368e678caeaa1c06887703b",
+          "hipX": [
+            167,
+            490,
+            816,
+            1133,
+            186,
+            520,
+            830,
+            1134,
+            172,
+            486,
+            801,
+            1125,
+            180,
+            497,
+            821,
+            1128
+          ]
+        }
+      },
+      "standingHip": [
+        163,
+        170
+      ]
+    },
+    "kaze": {
+      "name": "苍月",
+      "identity": "ivory-samurai-purple-ponytail",
+      "appearance": "紫马尾、象牙白外衣、藏蓝裤、紫腰带、黑护腕靴、一把银色佩刀",
+      "sheets": {
+        "stance": {
+          "file": "kaze-stance.png",
+          "sha256": "114d77771634669cfdcf9c63bb4d3f5ec09e22e0548eaa0303125f4c9314c16f"
+        },
+        "air": {
+          "file": "kaze-air.png",
+          "sha256": "b351960240d292bd85a5cc75957917259e3aa028ecda6e4a259d1e2fe281f739",
+          "hips": [
+            [
+              190,
+              269
+            ],
+            [
+              512,
+              199
+            ],
+            [
+              820,
+              177
+            ],
+            [
+              1140,
+              187
+            ],
+            [
+              171,
+              547
+            ],
+            [
+              506,
+              517
+            ],
+            [
+              810,
+              506
+            ],
+            [
+              1124,
+              514
+            ],
+            [
+              175,
+              807
+            ],
+            [
+              492,
+              830
+            ],
+            [
+              807,
+              813
+            ],
+            [
+              1123,
+              816
+            ],
+            [
+              175,
+              1115
+            ],
+            [
+              480,
+              1102
+            ],
+            [
+              811,
+              1108
+            ],
+            [
+              1124,
+              1109
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "kaze-punch.png",
+          "sha256": "34ff314ff71ef3f35bce026c9ecbb5f3fb95b11a0ecf3e43a3b2f6e16abfcc13"
+        },
+        "kick": {
+          "file": "kaze-kick.png",
+          "sha256": "4a07e2152e9cd63fe05322d0f5b246d423c2fbd2a603b66221de36284f3d419e",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "kaze-special.png",
+          "sha256": "778841b969a72ee89ee69c4614e8382b1f3c87629dbe1704ed0ee1520f471220",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "kaze-reaction.png",
+          "sha256": "497478579255fa29d23bb3e79a4ba7cc595a1e849e6056416cedf9944423fefe",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "kaze-walk.png",
+          "sha256": "6da0b991948d5641f7da03dff13fd6de936847750b08fde2e139b467062713a7",
+          "hipX": [
+            179,
+            497,
+            818,
+            1138,
+            205,
+            551,
+            850,
+            1140,
+            174,
+            471,
+            787,
+            1111,
+            182,
+            490,
+            807,
+            1152
+          ]
+        }
+      },
+      "standingHip": [
+        174,
+        185
+      ]
+    },
+    "sage": {
+      "name": "贤者",
+      "identity": "silver-hair-purple-mage",
+      "appearance": "银白长发、紫金长衣、酒红内衬、黑裤、黑金手套靴、空手施法",
+      "sheets": {
+        "stance": {
+          "file": "sage-stance.png",
+          "sha256": "ba846391aa246ce2618e377abd5f5854606f4a5c4c6d578e79aedf989f3c5bcc"
+        },
+        "air": {
+          "file": "sage-air.png",
+          "sha256": "1cd92e36eef86200287d8e387addabf0be0cc9c5ef45d3d3fd81ddb51e8879aa",
+          "hips": [
+            [
+              193,
+              239
+            ],
+            [
+              523,
+              165
+            ],
+            [
+              830,
+              164
+            ],
+            [
+              1141,
+              169
+            ],
+            [
+              176,
+              527
+            ],
+            [
+              501,
+              489
+            ],
+            [
+              805,
+              480
+            ],
+            [
+              1131,
+              484
+            ],
+            [
+              174,
+              798
+            ],
+            [
+              486,
+              798
+            ],
+            [
+              806,
+              805
+            ],
+            [
+              1130,
+              806
+            ],
+            [
+              184,
+              1093
+            ],
+            [
+              482,
+              1093
+            ],
+            [
+              813,
+              1090
+            ],
+            [
+              1129,
+              1093
+            ]
+          ],
+          "bodyScale": 1
+        },
+        "punch": {
+          "file": "sage-punch-identity-v1.png",
+          "sha256": "a2aa95442b90128b6a5a3eb6746f94c35b3e20c48366fbde95afeb576978ea4e"
+        },
+        "kick": {
+          "file": "sage-kick-identity-v1.png",
+          "sha256": "24f2cc6fceddfe9011424264cdc09c6da233aad346c5cdd578b7790cd35fb8e5",
+          "neutral": [
+            0,
+            7
+          ]
+        },
+        "special": {
+          "file": "sage-special-identity-v1.png",
+          "sha256": "74380093e938b36c114484a91ee9895b2246e060f70ed964d90f3edafb0fba0c",
+          "neutral": [
+            0,
+            3
+          ]
+        },
+        "reaction": {
+          "file": "sage-reaction-identity-v1.png",
+          "sha256": "24b283dea6230e29cfe6e344d7e0282ed7fb9da19469e05cdf40444970e5abb9",
+          "neutral": [
+            3,
+            15
+          ]
+        },
+        "walk": {
+          "file": "sage-walk.png",
+          "sha256": "23961efdfb3aa1d1f1006a6c2baaf2b5082752b322f08e0cc8fbf36797122af4",
+          "hipX": [
+            187,
+            502,
+            824,
+            1144,
+            194,
+            507,
+            828,
+            1145,
+            187,
+            508,
+            814,
+            1147,
+            189,
+            509,
+            825,
+            1143
+          ]
+        }
+      },
+      "standingHip": [
+        178,
+        175
+      ]
+    }
+  }
+}

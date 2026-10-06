@@ -1,0 +1,41 @@
+{
+  "mode": "built-in imagegen",
+  "jobs": [
+    {
+      "id": "ryu",
+      "direction": "forward",
+      "file": "ryu-walk-forward-v4",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/ryu-walk-forward-v3.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Repair this walking animation sheet while preserving the exact character face, hair, outfit, palette and clean pixel style. The bottom row has cut-off legs: reconstruct complete hips, legs and sandals for all four bottom-row frames. Keep their upper bodies and the established ninja costume.\nOutput a SQUARE 1:1 atlas, exactly FOUR equal columns and FOUR equal rows. Fit ALL SIXTEEN whole-body sprites fully inside their cells with 20-pixel transparent margins on ALL sides. Use smaller sprites if needed, never crop feet or heads. On a 1024 square, each standing character should be about 210 pixels tall inside each 256-pixel cell. Every frame MUST have the SAME head size and standing body height. Keep head and hips level across the ENTIRE loop, including the final row. Only ankles, feet, subtle knees and clothing hems move; no downward squat transition.\nRetain a coherent slow forward step-and-follow cycle, all facing RIGHT. Short low steps with at least one foot touching the same floor baseline in every frame; keep hands in guard. Each frame continues the last, including row boundaries; last frame returns to first stance. No weapons added.\nRemove ALL background, glow and coloured halos. Actual transparent alpha everywhere outside character silhouettes. Transparent gutters must separate all 16 figures. No text, checkerboard, labels or ground shadows."
+    },
+    {
+      "id": "ryu",
+      "direction": "backward",
+      "file": "ryu-walk-backward-v4",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/ryu-walk-backward-v3.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Repair this walking animation sheet while preserving the exact character face, hair, outfit, palette and clean pixel style. Separate any touching sprites, especially between adjacent rows. All 16 sprites must be independent with substantial transparent gutters.\nOutput a SQUARE 1:1 atlas, exactly FOUR equal columns and FOUR equal rows. Fit ALL SIXTEEN whole-body sprites fully inside their cells with 20-pixel transparent margins on ALL sides. Use smaller sprites if needed, never crop feet or heads. On a 1024 square, each standing character should be about 210 pixels tall inside each 256-pixel cell. Every frame MUST have the SAME head size and standing body height. Keep head and hips level across the ENTIRE loop, including the final row. Only ankles, feet, subtle knees and clothing hems move; no downward squat transition.\nRetain a coherent slow backward step-and-follow cycle, all facing RIGHT. Short low steps with at least one foot touching the same floor baseline in every frame; keep hands in guard. Each frame continues the last, including row boundaries; last frame returns to first stance. No weapons added.\nRemove ALL background, glow and coloured halos. Actual transparent alpha everywhere outside character silhouettes. Transparent gutters must separate all 16 figures. No text, checkerboard, labels or ground shadows."
+    },
+    {
+      "id": "mei",
+      "direction": "backward",
+      "file": "mei-walk-backward-v4",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/mei-walk-backward-v3.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Repair this walking animation sheet while preserving the exact character face, hair, outfit, palette and clean pixel style. The bottom two rows shrink and crouch. Correct them to the SAME standing body height, head size and nearly upright knees as row one. She must NOT crouch, kneel or become smaller.\nOutput a SQUARE 1:1 atlas, exactly FOUR equal columns and FOUR equal rows. Fit ALL SIXTEEN whole-body sprites fully inside their cells with 20-pixel transparent margins on ALL sides. Use smaller sprites if needed, never crop feet or heads. On a 1024 square, each standing character should be about 210 pixels tall inside each 256-pixel cell. Every frame MUST have the SAME head size and standing body height. Keep head and hips level across the ENTIRE loop, including the final row. Only ankles, feet, subtle knees and clothing hems move; no downward squat transition.\nRetain a coherent slow backward step-and-follow cycle, all facing RIGHT. Short low steps with at least one foot touching the same floor baseline in every frame; keep hands in guard. Each frame continues the last, including row boundaries; last frame returns to first stance. No weapons added.\nRemove ALL background, glow and coloured halos. Actual transparent alpha everywhere outside character silhouettes. Transparent gutters must separate all 16 figures. No text, checkerboard, labels or ground shadows."
+    },
+    {
+      "id": "volt",
+      "direction": "backward",
+      "file": "volt-walk-backward-v4",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/volt-walk-backward-v3.png"
+      ],
+      "prompt": "Use case: precise-object-edit. Repair this walking animation sheet while preserving the exact character face, hair, outfit, palette and clean pixel style. The bottom two rows shrink and crouch. Correct them to the SAME standing body height, head size and nearly upright knees as row one. He must NOT crouch, kneel or become smaller.\nOutput a SQUARE 1:1 atlas, exactly FOUR equal columns and FOUR equal rows. Fit ALL SIXTEEN whole-body sprites fully inside their cells with 20-pixel transparent margins on ALL sides. Use smaller sprites if needed, never crop feet or heads. On a 1024 square, each standing character should be about 210 pixels tall inside each 256-pixel cell. Every frame MUST have the SAME head size and standing body height. Keep head and hips level across the ENTIRE loop, including the final row. Only ankles, feet, subtle knees and clothing hems move; no downward squat transition.\nRetain a coherent slow backward step-and-follow cycle, all facing RIGHT. Short low steps with at least one foot touching the same floor baseline in every frame; keep hands in guard. Each frame continues the last, including row boundaries; last frame returns to first stance. No weapons added.\nRemove ALL background, glow and coloured halos. Actual transparent alpha everywhere outside character silhouettes. Transparent gutters must separate all 16 figures. No text, checkerboard, labels or ground shadows."
+    }
+  ]
+}

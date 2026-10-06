@@ -1,0 +1,22 @@
+{
+  "generator": "Built-in image_gen",
+  "prompt": "Use case: stylized-concept. Use input image ONLY as character identity/style reference. Create a NEW production locomotion animation sprite sheet for this EXACT same character. TRUE TRANSPARENT background. EXACTLY 8 columns by 4 rows, 32 full-body sprites, landscape 2:1 sheet. Equal square cells. All sprites face RIGHT including backward movement. Preserve face, costume, colors, body proportions, detailed arcade pixel style. No text, grid lines, shadows, effects, or duplicate poses. Each sprite fully inside its cell with 12% padding. Uniform body scale across ALL cells, root center at cell x50%, grounded foot baseline y88%; standing head around y18%. Animate IN PLACE, not traveling across cells. Row1 eight sequential forward-walk frames: contact, down, passing, up, opposite contact, down, passing, up. Clearly alternate supporting leg, heel-to-toe foot roll and small opposing arm swing; hands remain battle-ready. Row2 eight sequential BACKWARD defensive shuffle frames still facing RIGHT: rear foot reaches left, weight settles, front foot follows, narrow passing stance, next rear step, weight transfer, front follows, return. Different anatomical poses each frame, torso upright, guard raised. Row3 eight forward-jump poses: bent-knee anticipation, toe push-off extended legs, early ascent one knee lifting, ascent both knees tuck, apex relaxed tuck, descent unfolding legs, landing flexed knees, recovery upright. Row4 eight BACKWARD jump poses while STILL FACING RIGHT: backward-loaded crouch, push-off leaning left, rising guarded with leading knee tucked, tucked air pose, apex back arch subtle, downward legs extend, landing crouch, upright recovery. Jump pose roots stay in each cell; game provides airborne translation. Natural arcs and overlapping scarf/hair/coat motion. Genuine distinct drawn in-between poses, NOT scaled or rotated duplicates. Strict eight columns and four rows.",
+  "references": [
+    "mei-v2.png",
+    "tank-v2.png",
+    "volt-v2.png",
+    "kaze-v2.png",
+    "sage-v2.png",
+    "ryu-v2.png"
+  ],
+  "layout": {
+    "columns": 8,
+    "rows": 4,
+    "rowsInOrder": [
+      "walk-forward",
+      "walk-back",
+      "jump-forward",
+      "jump-back"
+    ]
+  }
+}

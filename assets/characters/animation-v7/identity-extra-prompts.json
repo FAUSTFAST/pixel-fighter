@@ -1,0 +1,41 @@
+{
+  "mode": "built-in imagegen",
+  "identities": {
+    "mei": {
+      "name": "美琳",
+      "identity": "The EXACT young woman in image 1: long BLACK high PONYTAIL tied with GOLD beads, MAGENTA sleeveless Chinese split-tail tunic with GOLD piping, BLACK fitted trousers, SILVER forearm bracers, magenta fingerless gloves and MAGENTA GOLD-trimmed boots. Same feminine face and athletic build, same exposed shoulders. Empty-handed kung fu: NO sword, NO fan, NO extra weapon, no white outfit."
+    },
+    "volt": {
+      "name": "闪电",
+      "identity": "The EXACT young man in image 1: BLACK spiky hair, short YELLOW jacket with rolled sleeves over fitted BLACK undershirt, BLUE/CYAN scarf, dark navy trousers, BLACK fingerless gloves, utility belt, BLACK buckle boots. Same lean youthful face and athletic build. Empty-handed punches and palm strikes: NO sword, NO armour, NO costume transformation."
+    },
+    "kaze": {
+      "name": "苍月",
+      "identity": "The EXACT swordsman in image 1: long PURPLE high ponytail, IVORY WHITE coat with dark navy trim, NAVY wide trousers with GOLD hem embroidery, PURPLE waist sash, BLACK bracers and dark boots. Same slender face and build. ONE consistent SILVER katana with dark scabbard at hip. Keep the same sword design throughout; sword may be drawn for special moves. NO teal hair, NO outfit change."
+    }
+  },
+  "jobs": [
+    {
+      "id": "mei",
+      "group": "punch",
+      "file": "mei-punch-identity-v1",
+      "reference": "mei-v2.png",
+      "prompt": "Use case: identity-preserve. Asset type: production 2D pixel fighting-game animation sprite sheet. Correct the game's costume consistency, preserving this character's original design.\nInput images: Image 1 is the ABSOLUTE identity and costume reference; Image 2 is the current standing animation, use its pixel rendering style and BODY PROPORTIONS. They show the SAME original game fighter 美琳. Do not borrow a character design from any other game.\nIdentity locked in EVERY cell: The EXACT young woman in image 1: long BLACK high PONYTAIL tied with GOLD beads, MAGENTA sleeveless Chinese split-tail tunic with GOLD piping, BLACK fitted trousers, SILVER forearm bracers, magenta fingerless gloves and MAGENTA GOLD-trimmed boots. Same feminine face and athletic build, same exposed shoulders. Empty-handed kung fu: NO sword, NO fan, NO extra weapon, no white outfit.\nCreate exactly 16 whole-body poses in an evenly spaced FOUR COLUMN by FOUR ROW square atlas. All sprites facing RIGHT, side/three-quarter battle view. Repeated character is the SAME person in the SAME outfit, face and hair. Fixed character scale and head size across all 16 cells; foot-floor height in each row fixed (including low and lying poses), horizontal pelvis origin consistent. Generous TRANSPARENT GUTTERS between every cell; keep all hair, scarf, hands, feet and clothing at least 20 pixels inside cell bounds. No sprites touching or crossing cell borders. Equal sized invisible cells, no labels or grid lines.\nAnimation order (strict reading order): TWO coherent 8-frame animations. Slots 0..7 in reading order (rows 1+2): quick forward jab/palm, sequence guard, windup, half extension, full CONTACT extension, contact hold, retract halfway, retract to guard, settled guard. Slots 8..15 (rows 3+4): heavy rear-hand palm/punch with hip rotation, same 8 stages. No sword in either sequence.\nStyle: match reference 2 hard-edged arcade pixel art, clean dark outline, limited colour shading, clearly readable face, clothing panels and limb silhouettes. Use reference colours EXACTLY, no lighting or palette change between actions. Natural shoulder/hip rotation and weight shift. Keep head size constant when crouching or lying. No background, shadows, particles, magic, aura, trails or other visual effects, no text. Actual transparent alpha background.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/mei-v2.png",
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/mei-stance.png"
+      ]
+    },
+    {
+      "id": "volt",
+      "group": "punch",
+      "file": "volt-punch-identity-v1",
+      "reference": "volt-v2.png",
+      "prompt": "Use case: identity-preserve. Asset type: production 2D pixel fighting-game animation sprite sheet. Correct the game's costume consistency, preserving this character's original design.\nInput images: Image 1 is the ABSOLUTE identity and costume reference; Image 2 is the current standing animation, use its pixel rendering style and BODY PROPORTIONS. They show the SAME original game fighter 闪电. Do not borrow a character design from any other game.\nIdentity locked in EVERY cell: The EXACT young man in image 1: BLACK spiky hair, short YELLOW jacket with rolled sleeves over fitted BLACK undershirt, BLUE/CYAN scarf, dark navy trousers, BLACK fingerless gloves, utility belt, BLACK buckle boots. Same lean youthful face and athletic build. Empty-handed punches and palm strikes: NO sword, NO armour, NO costume transformation.\nCreate exactly 16 whole-body poses in an evenly spaced FOUR COLUMN by FOUR ROW square atlas. All sprites facing RIGHT, side/three-quarter battle view. Repeated character is the SAME person in the SAME outfit, face and hair. Fixed character scale and head size across all 16 cells; foot-floor height in each row fixed (including low and lying poses), horizontal pelvis origin consistent. Generous TRANSPARENT GUTTERS between every cell; keep all hair, scarf, hands, feet and clothing at least 20 pixels inside cell bounds. No sprites touching or crossing cell borders. Equal sized invisible cells, no labels or grid lines.\nAnimation order (strict reading order): TWO coherent 8-frame animations. Slots 0..7 in reading order (rows 1+2): quick forward jab/palm, sequence guard, windup, half extension, full CONTACT extension, contact hold, retract halfway, retract to guard, settled guard. Slots 8..15 (rows 3+4): heavy rear-hand palm/punch with hip rotation, same 8 stages. No sword in either sequence.\nStyle: match reference 2 hard-edged arcade pixel art, clean dark outline, limited colour shading, clearly readable face, clothing panels and limb silhouettes. Use reference colours EXACTLY, no lighting or palette change between actions. Natural shoulder/hip rotation and weight shift. Keep head size constant when crouching or lying. No background, shadows, particles, magic, aura, trails or other visual effects, no text. Actual transparent alpha background.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/volt-v2.png",
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/volt-stance.png"
+      ]
+    }
+  ]
+}

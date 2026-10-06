@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>像素格斗 · 美术图鉴</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080d18;color:#d5dfed;font:14px system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:28px 24px}header{display:flex;align-items:center;justify-content:space-between;gap:20px}h1{font-size:23px;color:#f3d8a4;margin:0 0 7px}p{color:#91a2bb;margin:0 0 20px}a{color:#f3d8a4;text-decoration:none;border-bottom:1px solid #9b815a;padding-bottom:5px}nav{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}button{font:inherit;color:#b6c7db;background:#142033;border:1px solid #334259;border-radius:4px;padding:9px 15px;cursor:pointer}button[aria-pressed=true]{background:#c2a06b;color:#111824;border-color:#ebd5ae}button:focus-visible,a:focus-visible{outline:2px solid #80dbe6;outline-offset:3px}canvas{display:block;width:100%;height:auto;image-rendering:pixelated;margin:18px 0;border:1px solid #35445b}footer{color:#7d90aa;font-size:12px;line-height:1.7}
+</style>
+</head><body><main>
+<header><div><h1>像素格斗 · 美术图鉴</h1><p>六名斗士，七座舞台。切换场景与动作，查看新版像素美术。</p></div><div><button id="export">保存当前画面</button> <a href="./?v=motion60-1">进入游戏 →</a></div></header>
+<nav id="stages" aria-label="选择场景"></nav><nav id="poses" aria-label="选择动作"></nav>
+<nav aria-label="动画播放"><button id="slow" aria-pressed="false">慢速播放</button><button id="pause" aria-pressed="false">暂停动画</button><button id="step">下一帧</button><span id="load-status" role="status">正在载入移动图集…</span></nav>
+<label for="camera">横向镜头：左端 ← <input id="camera" type="range" min="-240" max="240" value="0" step="1"> → 右端</label>
+<canvas id="gallery" width="960" height="540" aria-label="角色与场景美术预览"></canvas>
+<footer>疾风 · 美琳 · 铁拳 · 闪电 · 苍月 · 贤者<br>游戏内：F2 选择经典 / 现代操作 · 游戏内出招表可逐帧查看全部动作</footer>
+</main><script src="js/utils.js"></script><script src="js/characters.js?v=motion60-1"></script><script src="js/styles.js?v=motion60-1"></script><script src="js/stages.js?v=motion60-1"></script><script src="js/combat-rules.js?v=motion60-1"></script><script src="js/combat-spacing.js?v=motion60-1"></script><script src="js/motion60.js?v=motion60-1"></script><script src="js/art-preview.js?v=motion60-1"></script></body></html>

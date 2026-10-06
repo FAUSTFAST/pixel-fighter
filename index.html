@@ -4,48 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pixel Fighter · 像素格斗</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    width: 100%; height: 100%;
-    background: #0a0a12;
-    overflow: hidden;
-    font-family: "Courier New", monospace;
-    color: #fff;
-    user-select: none;
-  }
-  #wrap {
-    width: 100vw; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-  }
-  #game {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    background: #000;
-    box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 0 2px #222;
-    max-width: 100%; max-height: 100%;
-  }
-  #hint {
-    position: fixed; bottom: 6px; left: 0; right: 0;
-    text-align: center; font-size: 11px; color: #556;
-    letter-spacing: 1px; pointer-events: none;
-  }
-</style>
+<link rel="stylesheet" href="css/ui.css?v=air-style1">
 </head>
 <body>
+  <header id="app-bar">
+    <div class="app-brand"><span class="brand-mark">PF</span><span>像素格斗<small>PIXEL FIGHTER</small></span></div>
+    <span id="scene-label">主菜单</span>
+    <nav aria-label="游戏工具"><button id="guide" aria-haspopup="dialog">出招表</button><button id="settings-open" aria-haspopup="dialog">设置 <kbd>F2</kbd></button></nav>
+  </header>
   <div id="wrap">
-    <canvas id="game" width="960" height="540"></canvas>
+    <canvas id="game" width="960" height="540" tabindex="0"></canvas>
   </div>
-  <div id="hint">P1: WASD 移动 · F/G 轻/重拳 · H 必杀 · P2: 方向键 · J/K 轻/重拳 · L 必杀 · ↓↘→+拳 搓招 · P 暂停/出招表 · M 音乐 N 音效 · Enter 确认 · Esc 返回</div>
+  <div id="hint">经典 / 现代双操作 · F2 设置 · P 暂停 · 页内出招表可查看所有角色连段</div>
 
-  <script src="js/input.js"></script>
-  <script src="js/audio.js"></script>
+  <script src="js/input.js?v=gamepad1"></script>
+  <script src="js/soundtracks.js?v=stage-music1"></script>
+  <script src="js/audio.js?v=stage-music1"></script>
   <script src="js/utils.js"></script>
-  <script src="js/characters.js"></script>
-  <script src="js/stages.js"></script>
-  <script src="js/fighter.js"></script>
-  <script src="js/ai.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/game.js"></script>
+  <script src="js/characters.js?v=air-style1"></script>
+  <script src="js/styles.js?v=combat2"></script><script src="js/stages.js?v=kick-throw1"></script>
+  <script src="js/combat-rules.js?v=combat2"></script>
+  <script src="js/combat-spacing.js?v=air-style1"></script>
+  <script src="js/arcade-animation.js?v=air-style1"></script>
+  <script src="js/motion60.js?v=air-style1"></script>
+  <script src="js/controls.js?v=combat2"></script>
+  <script src="js/fighter.js?v=air-style1"></script>
+  <script src="js/ai.js?v=air-style1"></script>
+  <script src="js/ui.js?v=combat2"></script>
+  <script src="js/gamepad.js?v=gamepad1"></script>
+  <script src="js/game.js?v=air-style1"></script>
+  <script src="js/settings.js?v=gamepad1"></script>
+  <script src="js/moves-page.js?v=air-style1"></script>
+  <script src="js/motion-gallery.js?v=air-style1"></script>
+  <script src="js/panels.js?v=air-style1"></script>
 </body>
 </html>

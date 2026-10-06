@@ -1,0 +1,8 @@
+{
+  "mode": "built-in imagegen",
+  "file": "ryu-walk-forward-v5.png",
+  "prompt": "Use case: precise-object-edit. This sheet currently contains THREE rows of four sprites, and an EMPTY black/transparent band beneath them. Fill that empty band with a NEW FOURTH ROW of FOUR complete standing ninja sprites, completing the walk loop. Output EXACTLY 16 sprites: four columns by FOUR rows. Slightly reduce ALL sprites uniformly so all FOUR rows fit fully on a SQUARE canvas with generous transparent margins. Each whole ninja from spiky hair to sandals must be visible. Keep the existing first twelve poses and same blue tunic, dark pants, burgundy scarf, white wrist/calf wraps and silver headband. The new last four poses are calm standing guard with tiny settling motions of the two feet and scarf, head and hip height the same as first row. NO kneeling, no crouching. Actual transparent alpha background, no glow, no text. Do not leave the fourth row empty. Count sixteen complete characters before finishing.",
+  "referenced_image_paths": [
+    "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/ryu-walk-forward-v4.png"
+  ]
+}

@@ -18,34 +18,19 @@
   const UI = {
     // ---------- 标题 ----------
     title(ctx, t) {
-      // 背景
-      const g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0,'#1a0a2a'); g.addColorStop(1,'#0a0a14');
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-      // 动态光束
-      ctx.save(); ctx.globalAlpha=0.15;
-      for(let i=0;i<6;i++){ctx.fillStyle=i%2?'#ff2a6a':'#2affd0';
-        const a=t*0.3+i; ctx.fillRect(W/2, H/2, 3, 400);
-        ctx.save();ctx.translate(W/2,H/2);ctx.rotate(a);ctx.fillRect(-1,-500,2,1000);ctx.restore();}
-      ctx.restore();
-
-      U.textOutline(ctx,'PIXEL FIGHTER', W/2, 180, 68, '#ffd166', '#7a2a00');
-      U.textOutline(ctx,'像 素 格 斗', W/2, 240, 40, '#5ad2ff', '#0a2a4a');
-
-      // 站两个预览小人对峙
-      drawPreview(ctx, CHARACTERS[0], W/2-160, 400, 3.0, t*3, 'idle');
-      ctx.save(); ctx.translate(W/2+160,0); ctx.scale(-1,1); // 镜像
-      drawPreview(ctx, CHARACTERS[2], 0, 400, 3.0, t*3+1, 'idle'); ctx.restore();
-
-      const blink = Math.sin(t*4)>-0.3;
-      if(blink) U.textOutline(ctx,'按 Enter 开始', W/2, 480, 28, '#fff', '#000');
-      U.text(ctx,'本地双人对战 · 电脑AI · 6 名角色 · 4 张地图', W/2, 520, 15, '#8899aa','center','normal');
+      STAGES[0].draw(ctx,t);
+      const shade=ctx.createLinearGradient(0,0,0,H);
+      shade.addColorStop(0,'#07122570');shade.addColorStop(.48,'#0a122740');shade.addColorStop(1,'#050916ed');
+      ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);
+      drawPreview(ctx, CHARACTERS[0], 200, 510, 2.5, t*3, 'idle');
+      ctx.save();ctx.translate(375,0);ctx.scale(-1,1);
+      drawPreview(ctx, CHARACTERS[2], 0, 510, 2.5, t*3+1, 'idle');ctx.restore();
     },
 
     // ---------- 模式选择 ----------
     mode(ctx, t, sel) {
       bg(ctx);
-      U.textOutline(ctx,'选择模式', W/2, 120, 44, '#ffd166', '#7a2a00');
+      U.textOutline(ctx,'选择模式', W/2, 120, 44, '#f9deb1', '#322438');
       const modes = [
         {k:'pvp', name:'双人对战', desc:'P1 vs P2 · 同键盘'},
         {k:'pve', name:'挑战电脑', desc:'P1 vs AI'},
@@ -95,14 +80,14 @@
       infoCard(ctx, 40, gy, CHARACTERS[sel.p1], '#5ad2ff', 'P1', ready.p1);
       infoCard(ctx, W-40-190, gy, CHARACTERS[sel.p2], '#ff5a8a', pve?'AI':'P2', ready.p2);
 
-      hintBar(ctx, pve ? 'P1: A/D 选择 F 确认 · Enter 直接开始' : 'P1: A/D 选 F 确认 · P2: ←/→ 选 J 确认');
+      hintBar(ctx, pve ? 'A/D 选人 · F 确认 · F2 切换经典 / 现代' : 'P1 A/D + F · P2 ←/→ + J · F2 切换操作模式');
     },
 
     // ---------- 地图选择 ----------
     stageSelect(ctx, t, sel) {
       bg(ctx);
       U.textOutline(ctx,'选择地图', W/2, 70, 40, '#ffd166', '#7a2a00');
-      const cols=2, cw=380, ch=180, gx=(W-cols*cw)/2, gy=120;
+      const cols=3, cw=290, ch=128, gx=(W-cols*cw)/2, gy=95;
       STAGES.forEach((s,i)=>{
         const cx=gx+(i%cols)*cw, cy=gy+Math.floor(i/cols)*ch;
         const on=sel===i;
@@ -122,23 +107,33 @@
 
     // ---------- 对战 HUD ----------
     hud(ctx, f1, f2, round, roundTime) {
-      // 血条
-      healthBar(ctx, 30, 30, 380, f1, false);
-      healthBar(ctx, W-30-380, 30, 380, f2, true);
-      // 名字
-      U.text(ctx, f1.name, 34, 24, 16, '#fff','left');
-      U.text(ctx, f2.name, W-34, 24, 16, '#fff','right');
-      // 能量槽
-      meterBar(ctx, 30, 66, 300, f1, false);
-      meterBar(ctx, W-30-300, 66, 300, f2, true);
-      // 回合胜点(圆点)
-      for(let i=0;i<2;i++){ctx.fillStyle=f1.wins>i?'#ffd166':'#333';
-        ctx.beginPath();ctx.arc(420+i*18,36,6,0,7);ctx.fill();}
-      for(let i=0;i<2;i++){ctx.fillStyle=f2.wins>i?'#ffd166':'#333';
-        ctx.beginPath();ctx.arc(W-420-i*18,36,6,0,7);ctx.fill();}
-      // 计时
-      ctx.fillStyle='#000a'; U.rr(ctx,W/2-40,18,80,44,8);
-      U.textOutline(ctx, Math.ceil(roundTime).toString(), W/2, 52, 32, '#fff','#000');
+      const training=!Number.isFinite(roundTime);
+      ctx.fillStyle='#0b1525dc';U.rr(ctx,18,12,408,94,5);U.rr(ctx,534,12,408,94,5);
+      ctx.fillStyle='#88cde5';ctx.fillRect(18,12,3,94);ctx.fillStyle='#eea0b9';ctx.fillRect(939,12,3,94);
+      U.text(ctx,'P1 '+(Input.MODES?.p1==='modern'?'M':'C'),32,32,9,'#88cde5','left');U.text(ctx,f1.name,72,33,17,'#eff4fa','left');
+      U.text(ctx,(window.GAME?.pve?'CPU':'P2 '+(Input.MODES?.p2==='modern'?'M':'C')),928,32,9,'#eea0b9','right');U.text(ctx,f2.name,888,33,17,'#eff4fa','right');
+      healthBar(ctx,32,44,378,f1,false);healthBar(ctx,550,44,378,f2,true);
+      U.text(ctx,Math.ceil(f1.hp)+' / '+f1.maxHp,410,32,11,'#c8d5e4','right');
+      U.text(ctx,Math.ceil(f2.hp)+' / '+f2.maxHp,550,32,11,'#c8d5e4','left');
+      driveBar(ctx,32,73,280,f1,false);driveBar(ctx,648,73,280,f2,true);
+      meterBar(ctx,32,94,280,f1,false);meterBar(ctx,648,94,280,f2,true);
+      U.text(ctx,'SA '+Math.floor(f1.meter/100)+' / 3',410,97,11,'#8fd1e7','right');
+      U.text(ctx,'SA '+Math.floor(f2.meter/100)+' / 3',550,97,11,'#8fd1e7','left');
+      ctx.fillStyle='#101a2cec';U.rr(ctx,438,12,84,94,5);
+      U.text(ctx,training?'TRAINING':'ROUND '+round,480,31,9,'#a5b9ce','center');
+      U.textOutline(ctx,training?'∞':Math.ceil(roundTime).toString(),480, 70,36,'#ffe0a2','#111725');
+      U.text(ctx,f1.burnout?'斗气耗尽':f1.drive.toFixed(1)+' DRIVE',410,80,9,f1.burnout?'#df9475':'#83e6b1','right');
+      U.text(ctx,f2.burnout?'斗气耗尽':f2.drive.toFixed(1)+' DRIVE',550,80,9,f2.burnout?'#df9475':'#83e6b1','left');
+      if(!training){
+        for(let i=0;i<2;i++){
+          ctx.fillStyle=f1.wins>i?'#88cde5':'#36445a';ctx.fillRect(449+i*12,87,7,5);
+          ctx.fillStyle=f2.wins>i?'#eea0b9':'#36445a';ctx.fillRect(492+i*12,87,7,5);
+        }
+      }else{
+        U.text(ctx,'无限时间',480,94,10,'#b6c5d8','center');
+        if(f1.trainingInvincible)U.text(ctx,'无敌',324,97,10,'#edc781','left');
+        if(f2.trainingInvincible)U.text(ctx,'无敌',636,97,10,'#edc781','right');
+      }
     },
 
     roundBanner(ctx, text, sub, t) {
@@ -202,51 +197,51 @@
     ctx.fillStyle='#ffcc55';
     if(flip)U.rr(ctx,x+w-bw,y,bw,22,3);else U.rr(ctx,x,y,bw,22,3);
     const hw=w*pct;
-    const grd=pct>0.3?'#3adb5a':'#db3a3a';
+    const grd=pct>0.3?'#eac376':'#df6573';
     ctx.fillStyle=grd;
     if(flip)U.rr(ctx,x+w-hw,y,hw,22,3);else U.rr(ctx,x,y,hw,22,3);
   }
+  function driveBar(ctx,x,y,w,f,flip){
+    const cell=(w-10)/6;
+    for(let i=0;i<6;i++){
+      const xx=flip?x+w-cell-i*(cell+2):x+i*(cell+2);
+      ctx.fillStyle='#273746';ctx.fillRect(xx,y,cell,5);
+      ctx.fillStyle=f.burnout?'#c58560':'#73dfac';ctx.fillRect(xx,y,cell*U.clamp(f.drive-i,0,1),5);
+    }
+  }
   function meterBar(ctx,x,y,w,f,flip){
-    const pct=f.meter/f.maxMeter;
-    ctx.fillStyle='#000';U.rr(ctx,x-1,y-1,w+2,12,3);
-    ctx.fillStyle='#111a2a';U.rr(ctx,x,y,w,10,2);
-    const mw=w*pct;
-    ctx.fillStyle=pct>=0.5?'#5ad2ff':'#3a6a8a';
-    if(flip)U.rr(ctx,x+w-mw,y,mw,10,2);else U.rr(ctx,x,y,mw,10,2);
-    if(pct>=0.5){ctx.fillStyle='#fff';ctx.globalAlpha=0.5+0.5*Math.sin(performance.now()/150);
-      const tx=flip?x+w-4:x; U.text(ctx,'必杀就绪',flip?x+w:x,y-2,10,'#5ad2ff',flip?'right':'left','bold');ctx.globalAlpha=1;}
+    const pct=U.clamp(f.meter/f.maxMeter,0,1);
+    ctx.fillStyle='#081322';ctx.fillRect(x,y,w,8);ctx.fillStyle='#8cbbe8';
+    ctx.fillRect(flip?x+w-w*pct:x,y,w*pct,8);
+    ctx.fillStyle='#101c2f';for(let i=1;i<3;i++)ctx.fillRect(x+w*i/3-1,y,2,8);
+    if(f.meter>=100)U.text(ctx,'SA'+Math.min(3,Math.floor(f.meter/100))+' 就绪',flip?x+w:x,y-3,9,'#bfd7ff',flip?'right':'left');
   }
 
   // ---------- 暂停/出招表覆盖层 ----------
   UI.pauseOverlay = function(ctx, f1, f2, pve) {
-    ctx.save();
-    ctx.fillStyle='rgba(0,0,0,0.74)'; ctx.fillRect(0,0,W,H);
-    ctx.fillStyle='#141420'; U.rr(ctx,130,60,700,420,14);
-    ctx.strokeStyle='#ffd166'; ctx.lineWidth=3; ctx.strokeRect(130,60,700,420);
-    U.textOutline(ctx,'PAUSED / 暂停',W/2,110,36,'#ffd166','#7a2a00');
-
-    // 上半区:双方角色与必杀
-    pauseChar(ctx,180,135,f1,'P1','#5ad2ff');
-    pauseChar(ctx,620,135,f2,pve?'AI':'P2','#ff5a8a');
-
-    U.text(ctx,'基础操作 / COMMAND LIST',W/2,170,20,'#fff','center');
-    const rows=[
-      ['移动 / 跳跃 / 下蹲','方向键或 WASD'],
-      ['轻拳 / 重拳','F/G 或 J/K'],
-      ['直接必杀','H / L  半管气以上'],
-      ['搓招必杀','↓ ↘ → + 拳  (面向左时镜像)'],
-      ['格挡','向后按住方向键'],
-      ['音乐 / 音效','M / N'],
-    ];
-    rows.forEach((r,i)=>{
-      const y=215+i*28;
-      U.text(ctx,r[0],310,y,15,'#99aabb','left','normal');
-      U.text(ctx,r[1],500,y,15,'#ffd166','left','bold');
+    ctx.save();ctx.fillStyle='rgba(3,7,18,.94)';ctx.fillRect(0,0,W,H);
+    U.textOutline(ctx,'暂停 · 角色出招表',W/2,42,26,'#ffd166','#182032');
+    const labelKey=k=>({' ':'空格',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'}[k]||k.toUpperCase());
+    ['p1','p2'].forEach((who,i)=>U.text(ctx,CombatControls.describe(who),28+i*470,68,10,'#bdcce0','left','normal'));
+    [f1,f2].forEach((f,index)=>{
+      const x=28+index*470;
+      ctx.fillStyle='#142033';U.rr(ctx,x,85,444,360,8);
+      U.text(ctx,(index===0?'P1':pve?'AI':'P2')+' · '+f.name+'  '+(f.def.style||''),x+14,112,17,f.def.fxColor||'#fff','left');
+      ['special','uppercut','rush','tech','skill','super1','super2','super','driveRush'].forEach((key,i)=>{
+        const m=f.def.moves[key];if(!m)return;
+        const y=136+i*34;
+        U.text(ctx,m.name||key,x+14,y,13,'#f3d6a1','left');
+        const binding=Input.MAP[index===0?'p1':'p2'];
+        const command={lightKick:'轻脚 '+labelKey(binding.lightKick),heavyKick:'重脚 '+labelKey(binding.heavyKick),throw:labelKey(binding.light)+'+'+labelKey(binding.lightKick)+' / '+labelKey(binding.throw)}[key]||(m.command||'').replace('H或L',binding.special.toUpperCase());
+        U.text(ctx,command,x+170,y,12,'#e3ecf7','left','normal');
+        // 出招表短注解，详细攻略放在页内弹窗。
+        const note=(m.detail||'').split('；')[0];
+        U.text(ctx,note.slice(0,33),x+14,y+15,10,'#9db0c8','left','normal');
+      });
     });
-    ctx.fillStyle='rgba(255,255,255,0.05)'; U.rr(ctx,235,390,490,42,8);
-    U.text(ctx,'搓招无气也能放弱化必杀;有半管气则释放全力必杀。',W/2,416,15,'#ccd','center','normal');
-    U.text(ctx,`音乐:${Audio2.isMusicOn()?'开':'关'}   音效:${Audio2.isSfxOn()?'开':'关'}`,W/2,455,15,'#5ad2ff','center','normal');
-    U.text(ctx,'按 P 继续 · Esc 回标题',W/2,510,18,'#fff','center');
+    U.text(ctx,'↓+脚打下段，需蹲防；↓+重脚扫腿击倒。后+投后摔；被抓7帧内按投拆投，指令投不可拆。',W/2,470,12,'#c8d3e0','center','normal');
+    U.text(ctx,'必杀免费 · OD 2 格斗气 · SA 100 / 200 / 300 · P 继续 / Esc 回首页',W/2,495,14,'#ffd166','center');
+    U.text(ctx,'F2 切换经典 / 现代 · 完整连段路线见「出招表」',W/2,520,12,'#91a5c0','center','normal');
     ctx.restore();
   };
 

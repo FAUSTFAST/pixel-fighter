@@ -1,0 +1,53 @@
+{
+  "mode": "built-in imagegen",
+  "references": [
+    {
+      "id": "ryu",
+      "file": "ryu-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/ryu-stance.png"
+      ]
+    },
+    {
+      "id": "mei",
+      "file": "mei-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/mei-stance.png"
+      ]
+    },
+    {
+      "id": "tank",
+      "file": "tank-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/tank-stance.png"
+      ]
+    },
+    {
+      "id": "volt",
+      "file": "volt-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/volt-stance.png"
+      ]
+    },
+    {
+      "id": "sage",
+      "file": "sage-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/sage-stance.png"
+      ]
+    },
+    {
+      "id": "kaze",
+      "file": "kaze-standing-reference-v1.png",
+      "prompt": "Use case: identity-preserve. Extract and faithfully redraw ONLY the TOP LEFT standing fighter from the reference sheet as ONE SINGLE full-body pixel-art character on a transparent background. Preserve exact face, build, costume, colours, hair and accessories. Same right-facing relaxed combat stance, both feet on one floor line. One person only, no grid, no extra poses, no crouching, no walking yet, no text, no effects, no shadow. Full head to soles entirely visible with clear transparent margin. Preserve original pixel-art detail and proportions.",
+      "referenced_image_paths": [
+        "/Users/mac/Documents/Codex/pixel-fighter/assets/characters/animation-v7/kaze-stance.png"
+      ]
+    }
+  ]
+}
