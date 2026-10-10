@@ -11,7 +11,7 @@ function harness(seed=1,extras={}){
     document:{...extras.document,hidden:false,addEventListener,getElementById:()=>({getContext:()=>ctx})},requestAnimationFrame:fn=>{frame=fn;},
     Audio2:{sfx:new Proxy({}, {get:()=>()=>{}}),music:{play(){},stop(){}},isMusicOn:()=>false,isSfxOn:()=>false}};
   s.window=s;vm.createContext(s);
-  for(const file of ['input','utils','characters','styles','stages','combat-rules','strike-art','strike-motion','combat-spacing',...(extras.art?['arcade-animation']:[]),'motion60','controls','fighter','ai','ui','game'])vm.runInContext(fs.readFileSync(path.join(root,'js',file+'.js'),'utf8'),s,{filename:file+'.js'});
+  for(const file of ['input','utils','characters','styles','stages','combat-rules','strike-art','strike-motion','combat-spacing',...(extras.art?['arcade-animation']:[]),'motion60','controls','fighter','ai','ui','game'])vm.runInContext(extras.sources?.[file]??fs.readFileSync(path.join(root,'js',file+'.js'),'utf8'),s,{filename:file+'.js'});
   const g=s.GAME;
   function fight(index=0,diff=.85,distance=600){
     Object.assign(g,{scene:'fight',roundState:'fight',pve:true,paused:false,training:false,roundTime:99,hitstop:0,stage:s.STAGES[0],projectiles:[],effects:[]});

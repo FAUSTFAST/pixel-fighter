@@ -38,8 +38,13 @@
 
 普通攻击保留当前 v8 的准备、接触、回收时间表。接触档通常整体前移 1 本地像素。
 闪电短拳的第二个接触档使用历史下一张伸掌原画，并整体后移 1 本地像素，
-让原画手指落在现有判定框内。未改变判定框或战斗端点。
+让原画手指落在当时的判定框内。恢复阶段未改变判定框或战斗端点。
 显示与像素接触检查使用完全相同的 PNG 对象，没有独立的隐藏攻击图像。
+
+后续接触漏判修复（`historical-contact-b3`）保留全部图集像素，并补充当前原画前侧拳脚
+的真实攻击范围。近战检测不再用较窄的身体推挤框提前排除伸出的手臂与腿，
+而是在攻击有效帧内核对双方真实不透明像素，并将命中特效放在接触处。
+推挤框、前摇、有效/收招时序、格挡、招架、无敌和伤害修正规则保持不变。
 
 ## 功能保护与接触边界
 
@@ -48,14 +53,21 @@
 将本目录配置合并到运行时目录中。三张使用该加载器的 HTML 页面更新缓存版本。
 
 `check-historical-art.cjs` 逐像素比较全部曝光档与直接执行 Git B 版裁剪器得到的画面，
-并检查 16 个战斗、输入、AI、UI、场景、动作采样等模块与修复前检查点字节一致。
+并检查 14 个战斗参数、输入、AI、UI、场景、动作采样等模块与修复前检查点字节一致。
+另检查 `game.js` 除 `resolveMelee` 外、`combat-spacing.js` 除 `geometry` 外
+均与检查点一致；这两个函数仅包含本次单独授权的接触修复。
 不能把 `js/fighter.js`、`js/game.js` 或整个项目替换为历史版本。
 
 `contact-contract.json` 锁定修复前 756 个有效普通攻击命中场景。
-1296 个双侧、地面/空中、六档距离的真实 PNG 测试全部通过，旧有有效命中全部保留。
-历史轮廓恢复后另有 32 个场景从挥空变为真实可见接触；这些边界变化如实报告，
+恢复阶段的 1296 个双侧、地面/空中、六档距离的真实 PNG 测试通过，旧有有效命中全部保留。
+当时历史轮廓恢复后另有 32 个场景从挥空变为真实可见接触；这些边界变化如实报告，
 不宣称全部命中结果与 v8 相同。伤害、硬直、攻击时序、连招修正、
 冲刺及击退参数均未修改。300 像素远距离测试保持挥空，每次普通攻击最多一次伤害。
+
+接触漏判修复的 `check-visible-strikes.cjs` 直接执行修复前提交与当前游戏：
+49 个确认有真实接触的漏判场景全部修复，修复前的 788 个有效命中全部保留，
+新增 109 个真实可见接触；另检查 60 组站防、蹲防、招架、无敌和训练免疫。
+前摇和收招期间的接触不造成伤害。判定包围范围调整，身体推挤和数值规则不变。
 
 ## 重建和验证
 
@@ -69,6 +81,7 @@ node scripts/check-stable-walk.cjs
 node scripts/check-body-motion.cjs
 node scripts/check-animation-consistency.cjs
 node scripts/check-contact.cjs
+node scripts/check-visible-strikes.cjs
 node scripts/check-startup.cjs
 node scripts/check-combo-balance.cjs
 node scripts/check-dash.cjs
@@ -76,6 +89,8 @@ node scripts/check-double-jump.cjs
 node scripts/check-ai.cjs
 node scripts/render-historical-roster.cjs
 python3 scripts/encode-historical-roster-gif.py
+node scripts/render-contact-alignment.cjs
+python3 scripts/encode-contact-alignment.py
 ```
 
 旧试点构建入口 `restore-historical-locomotion.cjs` 也会调用完整构建，
@@ -95,7 +110,8 @@ GIF 半速播放并检查解码帧一致性。另在隔离的真实 Firefox 中�
 ## 版本保护
 
 修复前检查点：`before-art-fix`，提交 `4b986c26edfb686e1a48f52f50adcdefd52acd48`。
-当前分支：`fix-art-style`。完整修复内容在该分支独立维护。
+画风修复最初在 `fix-art-style` 分支独立维护，现已合入 `main`。
+接触漏判修复继续在主分支维护。
 已有完整文件夹备份保留，不再另建备份。
 如需查看修复前游戏，可用 `git worktree add --detach 新目录 before-art-fix`，
 不会丢弃当前工作或回退分支。检查点之外的被忽略输出和旧 `review.png`

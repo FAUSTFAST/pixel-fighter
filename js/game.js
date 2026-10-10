@@ -279,8 +279,16 @@
     if (!hb) return;
     if (attacker.attackHasHit) return;
     const db = defender.bodyBox;
-    if (!U.overlap(hb, db)) return;
-    if(attacker.attack.physicalContact&&window.DrawnAnimation?.touches&&!DrawnAnimation.touches(attacker,defender,hb))return;
+    let contact=null;
+    if(attacker.attack.physicalContact&&window.DrawnAnimation?.contactPoint&&DrawnAnimation.has(attacker.def.id)&&DrawnAnimation.has(defender.def.id)){
+      // The narrow body rectangle is a movement pushbox. It must not discard
+      // visible hits on an extended hand / leg before the real PNG is checked.
+      contact=DrawnAnimation.contactPoint(attacker,defender,hb);
+      if(!contact)return;
+    }else{
+      if (!U.overlap(hb, db)) return;
+      if(attacker.attack.physicalContact&&window.DrawnAnimation?.touches&&!DrawnAnimation.touches(attacker,defender,hb))return;
+    }
     if (defender.state==='ko' || defender.invuln > 0 || defender.trainingInvincible) return;
     if(hb.grab&&defender.isThrowInvulnerable())return;
 
@@ -302,8 +310,8 @@
     attacker.contactFrame = attacker.stateT;
 
     // 特效 + 定格 + 震屏 + 攒气
-    const hx=U.clamp(hb.x+hb.w/2,Math.max(hb.x,db.x),Math.min(hb.x+hb.w,db.x+db.w));
-    const hy=U.clamp(hb.y+hb.h/2,Math.max(hb.y,db.y),Math.min(hb.y+hb.h,db.y+db.h));
+    const hx=contact?.x??U.clamp(hb.x+hb.w/2,Math.max(hb.x,db.x),Math.min(hb.x+hb.w,db.x+db.w));
+    const hy=contact?.y??U.clamp(hb.y+hb.h/2,Math.max(hb.y,db.y),Math.min(hb.y+hb.h,db.y+db.h));
     spawnHit(hx, hy, hb.type!=='light', res.blocked);
     if(res.parried)G.effects.push({kind:'text',x:hx,y:hy,t:0,life:35,vy:-1,text:'PARRY',color:'#85bfff',size:22});
     else registerCombatText(attacker,hx,hy,res.dmg,res.blocked,false);

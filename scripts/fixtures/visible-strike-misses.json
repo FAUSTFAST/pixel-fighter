@@ -1,0 +1,642 @@
+{
+  "baselineCommit": "eae41e1111de55962b8529f90b80f919c6b7a89d",
+  "cases": [
+    {
+      "character": "ryu",
+      "kind": "lightKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 459.91003005259205,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "lightKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 289.6899699474079,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "mediumKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 10,
+      "visibleRegion": {
+        "x": 461.2060480841472,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "mediumKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 10,
+      "visibleRegion": {
+        "x": 288.39395191585277,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "heavyKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 17,
+      "visibleRegion": {
+        "x": 463.7499999999999,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "heavyKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 17,
+      "visibleRegion": {
+        "x": 285.85000000000014,
+        "y": 309.85,
+        "w": 50.400000000000006,
+        "h": 48.300000000000004
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "light",
+      "facing": 1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 442.3699849737039,
+        "y": 290.95,
+        "w": 50.400000000000006,
+        "h": 50.400000000000006
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "light",
+      "facing": -1,
+      "distance": 160,
+      "frame": 6,
+      "visibleRegion": {
+        "x": 307.56998497370404,
+        "y": 290.95,
+        "w": 50.400000000000006,
+        "h": 50.400000000000006
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "medium",
+      "facing": 1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 446.9531555221638,
+        "y": 301.45,
+        "w": 50.400000000000006,
+        "h": 37.800000000000004
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "medium",
+      "facing": -1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 302.64684447783617,
+        "y": 301.45,
+        "w": 50.400000000000006,
+        "h": 37.800000000000004
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "heavy",
+      "facing": 1,
+      "distance": 160,
+      "frame": 11,
+      "visibleRegion": {
+        "x": 447.74259259259253,
+        "y": 301.45,
+        "w": 50.400000000000006,
+        "h": 37.800000000000004
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "heavy",
+      "facing": -1,
+      "distance": 160,
+      "frame": 11,
+      "visibleRegion": {
+        "x": 301.85740740740744,
+        "y": 301.45,
+        "w": 50.400000000000006,
+        "h": 37.800000000000004
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "lightKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 470.41003005259205,
+        "y": 314.04999999999995,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "lightKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 279.1899699474079,
+        "y": 314.04999999999995,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "sweep",
+      "facing": 1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 445.38333333333327,
+        "y": 416.95,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "sweep",
+      "facing": -1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 304.21666666666675,
+        "y": 416.95,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "lowKick",
+      "facing": 1,
+      "distance": 200,
+      "frame": 9,
+      "visibleRegion": {
+        "x": 503.1460180315553,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "lowKick",
+      "facing": -1,
+      "distance": 200,
+      "frame": 9,
+      "visibleRegion": {
+        "x": 246.45398196844474,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "lowMediumKick",
+      "facing": 1,
+      "distance": 200,
+      "frame": 13,
+      "visibleRegion": {
+        "x": 504.4420360631105,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "lowMediumKick",
+      "facing": -1,
+      "distance": 200,
+      "frame": 13,
+      "visibleRegion": {
+        "x": 245.15796393688953,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "sweep",
+      "facing": 1,
+      "distance": 200,
+      "frame": 20,
+      "visibleRegion": {
+        "x": 506.3499999999999,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "tank",
+      "kind": "sweep",
+      "facing": -1,
+      "distance": 200,
+      "frame": 20,
+      "visibleRegion": {
+        "x": 243.2500000000001,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 44.1
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "lowKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 6,
+      "visibleRegion": {
+        "x": 456.55157776108194,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "lowKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 6,
+      "visibleRegion": {
+        "x": 293.0484222389181,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "lowMediumKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 10,
+      "visibleRegion": {
+        "x": 457.4531555221638,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "lowMediumKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 10,
+      "visibleRegion": {
+        "x": 292.14684447783617,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "sweep",
+      "facing": 1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 457.98333333333323,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "volt",
+      "kind": "sweep",
+      "facing": -1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 291.61666666666673,
+        "y": 410.65,
+        "w": 50.400000000000006,
+        "h": 33.6
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "light",
+      "facing": 1,
+      "distance": 160,
+      "frame": 6,
+      "visibleRegion": {
+        "x": 448.0013148009015,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 18.900000000000002
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "light",
+      "facing": -1,
+      "distance": 160,
+      "frame": 6,
+      "visibleRegion": {
+        "x": 301.59868519909844,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 18.900000000000002
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "medium",
+      "facing": 1,
+      "distance": 160,
+      "frame": 8,
+      "visibleRegion": {
+        "x": 455.35315552216383,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 16.8
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "medium",
+      "facing": -1,
+      "distance": 160,
+      "frame": 8,
+      "visibleRegion": {
+        "x": 294.2468444778362,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 16.8
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "heavy",
+      "facing": 1,
+      "distance": 160,
+      "frame": 13,
+      "visibleRegion": {
+        "x": 456.14259259259256,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 16.8
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "heavy",
+      "facing": -1,
+      "distance": 160,
+      "frame": 13,
+      "visibleRegion": {
+        "x": 293.45740740740746,
+        "y": 305.65,
+        "w": 50.400000000000006,
+        "h": 16.8
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lightKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 448.75262960180316,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lightKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 7,
+      "visibleRegion": {
+        "x": 300.84737039819686,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "mediumKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 9,
+      "visibleRegion": {
+        "x": 449.654207362885,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "mediumKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 9,
+      "visibleRegion": {
+        "x": 299.945792637115,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "heavyKick",
+      "facing": 1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 450.36111111111103,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "heavyKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 15,
+      "visibleRegion": {
+        "x": 299.23888888888894,
+        "y": 330.85,
+        "w": 50.400000000000006,
+        "h": 39.9
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lowKick",
+      "facing": 1,
+      "distance": 200,
+      "frame": 8,
+      "visibleRegion": {
+        "x": 484.24601803155525,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lowKick",
+      "facing": -1,
+      "distance": 200,
+      "frame": 8,
+      "visibleRegion": {
+        "x": 265.3539819684447,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lowMediumKick",
+      "facing": 1,
+      "distance": 200,
+      "frame": 11,
+      "visibleRegion": {
+        "x": 485.54203606311046,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "lowMediumKick",
+      "facing": -1,
+      "distance": 200,
+      "frame": 11,
+      "visibleRegion": {
+        "x": 264.05796393688956,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "sweep",
+      "facing": 1,
+      "distance": 200,
+      "frame": 17,
+      "visibleRegion": {
+        "x": 487.4499999999999,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "kaze",
+      "kind": "sweep",
+      "facing": -1,
+      "distance": 200,
+      "frame": 17,
+      "visibleRegion": {
+        "x": 262.1500000000001,
+        "y": 402.25,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "light",
+      "facing": 1,
+      "distance": 125,
+      "frame": 5,
+      "visibleRegion": {
+        "x": 441.7013148009015,
+        "y": 286.75,
+        "w": 50.400000000000006,
+        "h": 42
+      }
+    },
+    {
+      "character": "ryu",
+      "kind": "light",
+      "facing": -1,
+      "distance": 125,
+      "frame": 5,
+      "visibleRegion": {
+        "x": 307.89868519909845,
+        "y": 286.75,
+        "w": 50.400000000000006,
+        "h": 42
+      }
+    },
+    {
+      "character": "mei",
+      "kind": "lowMediumKick",
+      "facing": -1,
+      "distance": 160,
+      "frame": 10,
+      "visibleRegion": {
+        "x": 304.7468444778362,
+        "y": 416.95,
+        "w": 50.400000000000006,
+        "h": 27.3
+      }
+    }
+  ]
+}

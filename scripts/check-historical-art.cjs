@@ -3,6 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const {nativeHarness,createCanvas,root}=require('./native-game-art.cjs'),{Image}=require('@napi-rs/canvas');
 const catalog=require('./effective-animation-catalog.cjs').effectiveCatalog();
 const reference=JSON.parse(fs.readFileSync(path.join(root,'assets/characters/art-restoration/roster-source.json')));
+const checkpoint='4b986c26edfb686e1a48f52f50adcdefd52acd48';
 const old=file=>execFileSync('git',['show',reference.commit+':'+file],{cwd:root,maxBuffer:16*1024*1024});
 (async()=>{
  const native=nativeHarness(91);await native.s.DrawnAnimation.loading;const art=native.s.DrawnAnimation;assert.equal(art.status,'ready');
@@ -37,9 +38,16 @@ const old=file=>execFileSync('git',['show',reference.commit+':'+file],{cwd:root,
    }
   }
  }
- const unchanged=['assets/characters/animation-v8/manifest.json','js/characters.js','js/fighter.js','js/game.js','js/input.js','js/controls.js','js/combat-rules.js','js/combat-spacing.js','js/ai.js','js/ui.js','js/panels.js','js/stages.js','js/settings.js','js/strike-art.js','js/strike-motion.js','js/motion60.js'];
- for(const file of unchanged)assert.ok(fs.readFileSync(path.join(root,file)).equals(execFileSync('git',['show','before-art-fix:'+file],{cwd:root,maxBuffer:16*1024*1024})),file+' gameplay changed');
- assert.equal(execFileSync('git',['diff','before-art-fix','--name-only','--','assets/characters/animation-v7','assets/characters/animation-v8'],{cwd:root}).toString(),'');
- const result={passed:true,sourceCommit:reference.commit,characters:6,clips:132,comparedNativeFrames:compared,originalDrawings:drawings,originalSheets:originalFiles.size,unchangedModules:unchanged.length,proof:'pixel equality with Git B renderer and PNGs, unchanged gameplay, exact original neutral registration'};
+ const unchanged=['assets/characters/animation-v8/manifest.json','js/characters.js','js/fighter.js','js/input.js','js/controls.js','js/combat-rules.js','js/ai.js','js/ui.js','js/panels.js','js/stages.js','js/settings.js','js/strike-art.js','js/strike-motion.js','js/motion60.js'];
+ for(const file of unchanged)assert.ok(fs.readFileSync(path.join(root,file)).equals(execFileSync('git',['show',checkpoint+':'+file],{cwd:root,maxBuffer:16*1024*1024})),file+' gameplay changed');
+ // The separately authorized visible-contact fix changes only melee resolution
+ // and its geometry. Protect all other mechanics and movement in these files.
+ for(const [file,start,end] of [['js/game.js','  function resolveMelee(','  function updateProjectiles('],['js/combat-spacing.js','  function geometry(','  function travelAt(']]){
+  const baseline=execFileSync('git',['show',checkpoint+':'+file],{cwd:root}).toString(),current=fs.readFileSync(path.join(root,file),'utf8');
+  const outside=code=>{const a=code.indexOf(start),b=code.indexOf(end,a);assert.ok(a>=0&&b>a);return code.slice(0,a)+code.slice(b);};
+  assert.equal(outside(current),outside(baseline),file+' changed outside visible contact');
+ }
+ assert.equal(execFileSync('git',['diff',checkpoint,'--name-only','--','assets/characters/animation-v7','assets/characters/animation-v8'],{cwd:root}).toString(),'');
+ const result={passed:true,sourceCommit:reference.commit,characters:6,clips:132,comparedNativeFrames:compared,originalDrawings:drawings,originalSheets:originalFiles.size,unchangedModules:unchanged.length,limitedContactChanges:['resolveMelee','geometry'],proof:'pixel equality with Git B renderer and PNGs; unchanged combat parameters, movement, input and UI; authorized visible-contact fix only'};
  fs.mkdirSync(path.join(root,'output/art-restoration/full'),{recursive:true});fs.writeFileSync(path.join(root,'output/art-restoration/full/historical-art-check.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));
 })().catch(error=>{console.error(error);process.exitCode=1;});

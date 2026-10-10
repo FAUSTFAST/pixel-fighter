@@ -64,6 +64,15 @@
       // A small envelope around the authored fist / toe / blade. The far edge
       // is the visible limb, never the old enlarged invisible reach rectangle.
       const w=56,h=m.level==='low'?26:30,far=contact.x;
+      const drawn=window.DrawnAnimation?.contactGeometry?.(m,t,air);
+      if(drawn){
+        // Include the established envelope so confirmed routes keep working,
+        // and the real exposed limb so a changed pose cannot fall outside it.
+        // Actual opaque-pixel contact is still mandatory before dealing damage.
+        const near=Math.min(far-w,drawn.near),edge=Math.max(far,drawn.far);
+        const top=Math.min(contact.y-h/2,drawn.y-drawn.h/2),bottom=Math.max(contact.y+h/2,drawn.y+drawn.h/2);
+        return {near,far:edge,center:(near+edge)/2,y:(top+bottom)/2,w:edge-near,h:bottom-top,physical:true};
+      }
       return {near:far-w,far,center:far-w/2,y:contact.y,w,h,physical:true};
     }
     const center=width/2+(m.reach||0),half=m.hw||0;

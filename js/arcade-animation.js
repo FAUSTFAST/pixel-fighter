@@ -1,6 +1,6 @@
 // Fixed authored pixel frames: no bitmap deformation or interpolated drawings.
 (function(){
-  const ROOT='assets/characters/animation-v8/',VERSION='historical-roster-b2',IDENTITY_VERSION='identity-v1',RES=2;
+  const ROOT='assets/characters/animation-v8/',VERSION='historical-contact-b3',IDENTITY_VERSION='identity-v1',RES=2;
   const RESTORED_ROOT='assets/characters/art-restoration/',HISTORICAL_COMMIT='aadfccb3140210730936c185ad2fc82647404dd1';
   const identities=Object.freeze({ryu:'blue-ninja-burgundy-scarf',mei:'magenta-kungfu-black-ponytail',tank:'human-boxer-red-gloves',volt:'yellow-jacket-cyan-scarf',kaze:'ivory-samurai-purple-ponytail',sage:'silver-hair-purple-mage'});
   const ready=new Map(),failures=[];
@@ -165,18 +165,46 @@
     const anim=fighter.sampleAnimation().animation,selected=selection(fighter.def,anim);
     return selected&&renderSprite(selected.sprite,anim);
   }
-  function touches(attacker,defender,box){
-    if(!ready.has(attacker.def.id)||!ready.has(defender.def.id))return true;
+  // Measure the leading fist / foot / blade in the exact currently exposed PNG.
+  // Keep body pushboxes separate: an extended arm is hittable without becoming
+  // a larger obstacle to walking. Nothing here changes the drawing itself.
+  function contactGeometry(move,time,air=false){
+    const profile=move.physicalContact;if(!profile||!ready.has(profile.id))return null;
+    const selected=selection({id:profile.id},{name:profile.kind,attack:move,phase:StrikeMotion.phase(move,time),airborne:air,reach:1});
+    if(!selected)return null;
+    const bands={jab:[-46,-23],heavy:[-46,-23],kick:[-42,-10],lowKick:[-14,1],airPunch:[-65,-18],airKick:[-65,-8]};
+    const band=bands[selected.clip];if(!band)return null;
+    const sprite=selected.sprite;
+    if(!sprite.strikeBounds)sprite.strikeBounds={};
+    if(!(selected.clip in sprite.strikeBounds)){
+      const pixels=mask(sprite),width=sprite.canvas.width,height=sprite.canvas.height;let far=-Infinity;
+      for(let y=0;y<height;y++){
+        const ly=sprite.y+(y+.5)/RES;if(ly<band[0]||ly>band[1])continue;
+        for(let x=0;x<width;x++)if(pixels[(y*width+x)*4+3]>96)far=Math.max(far,sprite.x+(x+1)/RES);
+      }
+      let top=Infinity,bottom=-Infinity;
+      const near=Math.max(0,far-14);
+      for(let y=0;y<height;y++){
+        const ly=sprite.y+(y+.5)/RES;if(ly<band[0]||ly>band[1])continue;
+        for(let x=0;x<width;x++)if(sprite.x+(x+1)/RES>near&&pixels[(y*width+x)*4+3]>96){top=Math.min(top,sprite.y+y/RES);bottom=Math.max(bottom,sprite.y+(y+1)/RES);}
+      }
+      sprite.strikeBounds[selected.clip]=Number.isFinite(top)&&far>near?{near:near*4.2,far:far*4.2,y:(top+bottom)*2.1,w:(far-near)*4.2,h:(bottom-top)*4.2,center:(near+far)*2.1,physical:true}:null;
+    }
+    return sprite.strikeBounds[selected.clip];
+  }
+  function contactPoint(attacker,defender,box){
+    if(!ready.has(attacker.def.id)||!ready.has(defender.def.id))return {x:box.x+box.w/2,y:box.y+box.h/2};
     const a=collisionSprite(attacker),b=collisionSprite(defender);
-    if(!a||!b)return true;
+    if(!a||!b)return {x:box.x+box.w/2,y:box.y+box.h/2};
     // Sample the actual opaque pixels at the striking extremity. One world
     // pixel tolerance allows the pixel grid edges to meet without a visible gap.
-    for(let y=box.y;y<box.y+box.h;y+=2)for(let x=box.x;x<box.x+box.w;x+=2){
+    for(let y=box.y;y<box.y+box.h;y++)for(let x=box.x;x<box.x+box.w;x++){
       if(!solid(a,(x-attacker.x)*attacker.facing/4.2,(y-attacker.y)/4.2))continue;
-      for(const dx of [-1,0,1])if(solid(b,(x+dx-defender.x)*defender.facing/4.2,(y-defender.y)/4.2))return true;
+      for(const dx of [-1,0,1])if(solid(b,(x+dx-defender.x)*defender.facing/4.2,(y-defender.y)/4.2))return {x:x+dx/2,y};
     }
-    return false;
+    return null;
   }
+  function touches(attacker,defender,box){return !!contactPoint(attacker,defender,box);}
   const loading=fetch(ROOT+'manifest.json?v='+VERSION).then(r=>{if(!r.ok)throw new Error('动作目录加载失败');return r.json();}).then(async manifest=>{
     if(manifest.identityVersion!==IDENTITY_VERSION||Object.keys(identities).some(id=>!manifest.characters?.[id]))throw new Error('角色形象目录版本不匹配');
     const response=await fetch(RESTORED_ROOT+'manifest.json?v='+VERSION);
@@ -188,5 +216,5 @@
     for(const id of Object.keys(identities))Object.assign(manifest.characters[id],restored.characters[id]);
     await Promise.all(Object.entries(manifest.characters).map(([id,clips])=>prepareCharacter(id,clips).catch(error=>{failures.push(id);console.warn(error);})));status=ready.size===6?'ready':'fallback';
   }).catch(error=>{status='fallback';console.warn(error);});
-  window.DrawnAnimation={draw,selection,touches,collisionSprite,solid,loading,sprite:(id,clip,index)=>ready.get(id)?.[clip]?.sprites[index],version:8,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};
+  window.DrawnAnimation={draw,selection,touches,contactPoint,contactGeometry,collisionSprite,solid,loading,sprite:(id,clip,index)=>ready.get(id)?.[clip]?.sprites[index],version:8,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};
 })();
