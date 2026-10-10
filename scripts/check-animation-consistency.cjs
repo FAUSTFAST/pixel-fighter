@@ -5,7 +5,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const manifest = JSON.parse(read('assets/characters/animation-v8/manifest.json'));
+const manifest = require('./effective-animation-catalog.cjs').effectiveCatalog();
 const lock = JSON.parse(read('assets/characters/animation-v7/identity-lock.json'));
 const context = vm.createContext({console, document: {}, __manifest: manifest});
 context.window = context;

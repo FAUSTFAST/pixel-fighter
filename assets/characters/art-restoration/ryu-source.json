@@ -1,0 +1,279 @@
+{
+  "commit": "aadfccb3140210730936c185ad2fc82647404dd1",
+  "identityVersion": "identity-v1",
+  "character": "ryu",
+  "sourceRoot": "assets/characters/animation-v7/",
+  "clips": {
+    "idle": {
+      "owner": "ryu",
+      "identity": "blue-ninja-burgundy-scarf",
+      "revision": "aca3fa5e212e9647",
+      "sheet": "ryu-stance",
+      "scale": 0.1706485,
+      "frames": [
+        {
+          "rect": [
+            40,
+            38,
+            260,
+            293
+          ],
+          "seed": 47852,
+          "root": 177.5,
+          "ground": 331.0,
+          "slot": 0
+        },
+        {
+          "rect": [
+            349,
+            35,
+            262,
+            297
+          ],
+          "seed": 44403,
+          "root": 491.0,
+          "ground": 331.0,
+          "slot": 1
+        },
+        {
+          "rect": [
+            664,
+            45,
+            260,
+            286
+          ],
+          "seed": 57257,
+          "root": 804.5,
+          "ground": 331.0,
+          "slot": 2
+        },
+        {
+          "rect": [
+            979,
+            38,
+            259,
+            293
+          ],
+          "seed": 48792,
+          "root": 1118.0,
+          "ground": 331.0,
+          "slot": 3
+        }
+      ]
+    },
+    "walk": {
+      "owner": "ryu",
+      "identity": "blue-ninja-burgundy-scarf",
+      "revision": "663eec219a85bba8",
+      "sheet": "ryu-walk",
+      "scale": 0.1745201,
+      "frames": [
+        {
+          "rect": [
+            49,
+            46,
+            254,
+            282
+          ],
+          "seed": 57899,
+          "root": 174.25,
+          "ground": 328,
+          "slot": 0
+        },
+        {
+          "rect": [
+            363,
+            46,
+            244,
+            281
+          ],
+          "seed": 58213,
+          "root": 488.25,
+          "ground": 327,
+          "slot": 1
+        },
+        {
+          "rect": [
+            673,
+            46,
+            263,
+            282
+          ],
+          "seed": 58528,
+          "root": 803.25,
+          "ground": 328,
+          "slot": 2
+        },
+        {
+          "rect": [
+            983,
+            46,
+            253,
+            282
+          ],
+          "seed": 58829,
+          "root": 1116.25,
+          "ground": 328,
+          "slot": 3
+        },
+        {
+          "rect": [
+            47,
+            349,
+            267,
+            288
+          ],
+          "seed": 437859,
+          "root": 189.25,
+          "ground": 637,
+          "slot": 4
+        },
+        {
+          "rect": [
+            370,
+            347,
+            208,
+            283
+          ],
+          "seed": 435664,
+          "root": 509.25,
+          "ground": 630,
+          "slot": 5
+        },
+        {
+          "rect": [
+            683,
+            350,
+            200,
+            281
+          ],
+          "seed": 439728,
+          "root": 813.25,
+          "ground": 631,
+          "slot": 6
+        },
+        {
+          "rect": [
+            980,
+            349,
+            252,
+            286
+          ],
+          "seed": 438788,
+          "root": 1114.25,
+          "ground": 635,
+          "slot": 7
+        }
+      ]
+    },
+    "backwalk": {
+      "owner": "ryu",
+      "identity": "blue-ninja-burgundy-scarf",
+      "revision": "663eec219a85bba8",
+      "sheet": "ryu-walk",
+      "scale": 0.1745201,
+      "frames": [
+        {
+          "rect": [
+            45,
+            659,
+            261,
+            287
+          ],
+          "seed": 826586,
+          "root": 170.25,
+          "ground": 946,
+          "slot": 8
+        },
+        {
+          "rect": [
+            356,
+            661,
+            227,
+            285
+          ],
+          "seed": 829414,
+          "root": 481.25,
+          "ground": 946,
+          "slot": 9
+        },
+        {
+          "rect": [
+            651,
+            659,
+            284,
+            289
+          ],
+          "seed": 827198,
+          "root": 788.25,
+          "ground": 948,
+          "slot": 10
+        },
+        {
+          "rect": [
+            973,
+            659,
+            247,
+            287
+          ],
+          "seed": 827514,
+          "root": 1100.25,
+          "ground": 946,
+          "slot": 11
+        },
+        {
+          "rect": [
+            39,
+            953,
+            272,
+            285
+          ],
+          "seed": 1195262,
+          "root": 174.25,
+          "ground": 1238,
+          "slot": 12
+        },
+        {
+          "rect": [
+            360,
+            953,
+            215,
+            285
+          ],
+          "seed": 1195580,
+          "root": 483.25,
+          "ground": 1238,
+          "slot": 13
+        },
+        {
+          "rect": [
+            658,
+            953,
+            213,
+            283
+          ],
+          "seed": 1195874,
+          "root": 786.25,
+          "ground": 1236,
+          "slot": 14
+        },
+        {
+          "rect": [
+            973,
+            951,
+            261,
+            287
+          ],
+          "seed": 1193682,
+          "root": 1109.25,
+          "ground": 1238,
+          "slot": 15
+        }
+      ]
+    }
+  },
+  "sha256": {
+    "ryu-stance.png": "aca3fa5e212e96475e182201136bd04d0cb6e6f04f1391711e0e486ae34a02e3",
+    "ryu-walk.png": "663eec219a85bba889ecac45d76a6f45f8f6e7c21beaa9d08cd01c4df11483ea"
+  }
+}

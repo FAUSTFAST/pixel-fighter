@@ -3,7 +3,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {nativeHarness,createCanvas,root}=require('./native-game-art.cjs');
 (async()=>{
  const h=nativeHarness();await h.s.DrawnAnimation.loading;const art=h.s.DrawnAnimation;assert.equal(art.status,'ready');assert.equal(h.s.BodyMotion,undefined);
- const m=JSON.parse(fs.readFileSync(path.join(root,'assets/characters/animation-v8/manifest.json')));
+ const m=require('./effective-animation-catalog.cjs').effectiveCatalog();
  let rawFrameChecks=0,plantedRuns=0,maxSoleDrift=0;
  for(const c of h.s.CHARACTERS)for(const [name,clip] of Object.entries(m.characters[c.id])){
   assert.equal(clip.authored,true);
@@ -30,14 +30,28 @@ const {nativeHarness,createCanvas,root}=require('./native-game-art.cjs');
   }
   assert.ok(n>0,'support sole must visibly touch the floor');return sum/n;
  }
- for(const c of h.s.CHARACTERS)for(const name of ['walk','backwalk'])for(const half of [0,1]){
-  const dir=name==='walk'?1:-1,side=half===0?-dir:dir,positions=[];
-  for(let i=half*8;i<half*8+8;i++)for(const hold of [0,.25,.5,.75]){
-   const p=(i+hold)/16,sprite=art.selection(c,{name,phase:p}).sprite;
-   positions.push(p*c.stride*dir+sole(sprite,side)*4.2);
+ // B's original foot lifts occur at different times than the newer drawings.
+ // Measure each actual planted interval and its native PNG sole, preserving
+ // the same 4.2-world-pixel exposure bound rather than imposing another gait.
+ for(const c of h.s.CHARACTERS)for(const name of ['walk','backwalk']){
+  const clip=m.characters[c.id][name],dir=name==='walk'?1:-1;
+  const intervals=new Set(clip.frames.slice(0,16).map(f=>f.support.interval));
+  for(const interval of intervals){
+   const positions=[];
+   for(let i=0;i<16;i++){
+    const meta=clip.frames[i];if(meta.support.interval!==interval)continue;
+    const sprite=art.sprite(c.id,name,i),p=sprite.canvas.getContext('2d').getImageData(0,0,sprite.canvas.width,sprite.canvas.height);
+    const xs=[];const {left,right,row}=meta.support;
+    assert.equal(row,meta.ground-meta.rect[1],'planted native pixels must meet the floor');
+    for(let x=left;x<=right;x++)if(p.data[(row*p.width+x)*4+3]>96)xs.push(sprite.x+(x+.5)/2);
+    assert.ok(xs.length>0,'original boot sole must remain opaque');
+    const soleX=meta.support.measurement==='toe'?Math.max(...xs):xs.reduce((a,b)=>a+b,0)/xs.length;
+    for(const hold of [0,.25,.5,.75])positions.push((i+hold)/16*c.stride*dir+soleX*4.2);
+   }
+   const drift=Math.max(...positions)-Math.min(...positions);assert.ok(drift<4.3,`${c.id}/${name}/${interval}: historical sole drift ${drift}`);
+   maxSoleDrift=Math.max(maxSoleDrift,drift);plantedRuns++;
   }
-  const drift=Math.max(...positions)-Math.min(...positions);assert.ok(drift<4.3,`${c.id}/${name}: sole drift ${drift}`);maxSoleDrift=Math.max(maxSoleDrift,drift);plantedRuns++;
  }
- const result={passed:true,rawFrameChecks,plantedRuns,maxSoleDrift:+maxSoleDrift.toFixed(3),rendering:'exact PNG identity, no runtime deformed copies',note:'Discrete 16-pose exposure steps are 4.2 world pixels.'};
+ const result={passed:true,rawFrameChecks,plantedRuns,maxSoleDrift:+maxSoleDrift.toFixed(3),rendering:'exact PNG identity, no runtime deformed copies',note:'Sixteen discrete exposures are 4.2 world pixels; Every character reuses eight verified B-version drawings per direction.'};
  fs.mkdirSync(path.join(root,'output/drawn-frames'),{recursive:true});fs.writeFileSync(path.join(root,'output/drawn-frames/check-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));
 })().catch(e=>{console.error(e);process.exitCode=1;});

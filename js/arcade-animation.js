@@ -1,15 +1,16 @@
 // Fixed authored pixel frames: no bitmap deformation or interpolated drawings.
 (function(){
-  const ROOT='assets/characters/animation-v8/',VERSION='style-unified1',IDENTITY_VERSION='identity-v1',RES=2;
+  const ROOT='assets/characters/animation-v8/',VERSION='historical-roster-b2',IDENTITY_VERSION='identity-v1',RES=2;
+  const RESTORED_ROOT='assets/characters/art-restoration/',HISTORICAL_COMMIT='aadfccb3140210730936c185ad2fc82647404dd1';
   const identities=Object.freeze({ryu:'blue-ninja-burgundy-scarf',mei:'magenta-kungfu-black-ponytail',tank:'human-boxer-red-gloves',volt:'yellow-jacket-cyan-scarf',kaze:'ivory-samurai-purple-ponytail',sage:'silver-hair-purple-mage'});
   const ready=new Map(),failures=[];
   const labels={idle:'待机',walk:'前进步法',backwalk:'后退步法',crouch:'下蹲',guard:'站立防御',guardLow:'蹲防',jump:'前跳',backjump:'后跳',airPunch:'空中拳',airKick:'空中脚',jab:'前手拳',heavy:'重拳 / 斩击',kick:'站立踢击',lowKick:'低踢 / 扫腿',cast:'发射动作',rise:'上升必杀',rush:'突进必杀',throw:'投技',head:'上段受击',body:'腹部受击',fall:'倒地',getup:'起身'};
   const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
   let status='loading',poseCount=0;
-  function loadImage(name,revision){
+  function loadImage(name,revision,sourceRoot=ROOT){
     return new Promise((resolve,reject)=>{
       const image=new Image();image.onload=()=>resolve(image);
-      image.onerror=()=>reject(new Error('图集加载失败：'+name));image.src=ROOT+name+'.png?v='+revision;
+      image.onerror=()=>reject(new Error('图集加载失败：'+name));image.src=sourceRoot+name+'.png?v='+revision;
     });
   }
   function isolate(source,meta,scale){
@@ -42,6 +43,8 @@
         !/^[a-f0-9]{16}$/.test(clip.revision)||!Number.isFinite(clip.scale)||clip.scale<=0||
         !Array.isArray(clip.frames)||clip.frames.length<4||clip.frames.length>64||clip.authored!==true)
         throw new Error('固定逐帧图集形象不匹配：'+id+'/'+name);
+      if(clip.sourceRoot&&(clip.sourceRoot!==RESTORED_ROOT||clip.historicalCommit!==HISTORICAL_COMMIT))
+        throw new Error('历史画风参考不匹配：'+id+'/'+name);
       if(['walk','backwalk'].includes(name)&&
         (clip.cycleFrames!==16||clip.direction!==(name==='walk'?1:-1)||clip.stopVariants?.length!==16))
         throw new Error('步法 / 收脚逐帧目录不完整：'+id+'/'+name);
@@ -49,8 +52,8 @@
     // Decode one sheet at a time per character, release full-resolution pixels after
     // baking small native-pixel sprites. Do not retain dozens of huge source canvases.
     for(const sheetName of new Set(Object.values(clips).map(c=>c.sheet))){
-      const revision=entries.find(([,clip])=>clip.sheet===sheetName)[1].revision;
-      const image=await loadImage(sheetName,revision),canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
+      const sourceClip=entries.find(([,clip])=>clip.sheet===sheetName)[1];
+      const image=await loadImage(sheetName,sourceClip.revision,sourceClip.sourceRoot),canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
       const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0);
       const source={width:image.width,height:image.height,data:ctx.getImageData(0,0,image.width,image.height).data};
       const cache=new Map();
@@ -130,8 +133,8 @@
         sequence('fall')||sequence('idle')||sequence('walk');if(anim.grounded===false)index=Math.min(index,2);if(anim.grabbed)index=0;
       }else sequence(type==='body'||type==='low'?'body':'head')||sequence('idle')||sequence('walk');
     }else {
-      // Fixed neutral drawing.
-      index=0;
+      // Each B-version stance keeps its original fixed breath sequence.
+      index=clips.idle.breath?clips.idle.breath[Math.min(7,Math.floor(p*8))]:0;
     }
     const data=clips[clip];
     if(!data||data.owner!==def.id||data.identity!==identities[def.id]||!data.frames?.length||!data.sprites?.length)return null;
@@ -176,6 +179,13 @@
   }
   const loading=fetch(ROOT+'manifest.json?v='+VERSION).then(r=>{if(!r.ok)throw new Error('动作目录加载失败');return r.json();}).then(async manifest=>{
     if(manifest.identityVersion!==IDENTITY_VERSION||Object.keys(identities).some(id=>!manifest.characters?.[id]))throw new Error('角色形象目录版本不匹配');
+    const response=await fetch(RESTORED_ROOT+'manifest.json?v='+VERSION);
+    if(!response.ok)throw new Error('历史画风目录加载失败');
+    const restored=await response.json();
+    if(restored.identityVersion!==IDENTITY_VERSION||restored.sourceCommit!==HISTORICAL_COMMIT||
+      Object.keys(restored.characters||{}).length!==6||Object.keys(identities).some(id=>
+        !restored.characters[id]||Object.keys(restored.characters[id]).sort().join(',')!==Object.keys(labels).sort().join(',')))throw new Error('历史画风恢复范围不匹配');
+    for(const id of Object.keys(identities))Object.assign(manifest.characters[id],restored.characters[id]);
     await Promise.all(Object.entries(manifest.characters).map(([id,clips])=>prepareCharacter(id,clips).catch(error=>{failures.push(id);console.warn(error);})));status=ready.size===6?'ready':'fallback';
   }).catch(error=>{status='fallback';console.warn(error);});
   window.DrawnAnimation={draw,selection,touches,collisionSprite,solid,loading,sprite:(id,clip,index)=>ready.get(id)?.[clip]?.sprites[index],version:8,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};

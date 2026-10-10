@@ -37,7 +37,7 @@ for(const c of s.CHARACTERS){
   results.push({character:c.id,startups:Object.fromEntries(keys.map(k=>[k,c.moves[k].startup]))});
 }
 // Read the real animation catalog and resource timing, without decoding PNGs.
-s.__manifest=JSON.parse(fs.readFileSync(path.join(root,'assets/characters/animation-v8/manifest.json'),'utf8'));
+s.__manifest=require('./effective-animation-catalog.cjs').effectiveCatalog();
 s.__timing=JSON.parse(fs.readFileSync(path.join(root,'assets/characters/animation-v7/attack-timing.json'),'utf8'));
 const source=fs.readFileSync(path.join(root,'js/arcade-animation.js'),'utf8');
 vm.runInContext(source.slice(0,source.indexOf('  const loading=fetch('))+`
