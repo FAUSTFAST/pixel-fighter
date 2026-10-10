@@ -131,6 +131,32 @@
             799,
             1122
           ]
+        },
+        "walkForward": {
+          "file": "ryu-walk-forward-v5.png",
+          "sha256": "143b65bb26cfb942ba7b46b38efd6de212c1075bba5115ac26c76069e823df58",
+          "grid": [
+            4,
+            3
+          ],
+          "count": 12,
+          "neutral": [
+            0,
+            11
+          ]
+        },
+        "walkBackward": {
+          "file": "ryu-walk-backward-v4.png",
+          "sha256": "04af5785dc011afde4de252addc49e4f306c2df83d480d7267d14d7f8029506b",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
         }
       },
       "standingHip": [
@@ -266,6 +292,32 @@
             508,
             833,
             1140
+          ]
+        },
+        "walkForward": {
+          "file": "mei-walk-forward-v3.png",
+          "sha256": "90d523cd6b93918d68d14ff86250ead76edc2a6bcf064e032e650da6f2f14d1b",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
+        },
+        "walkBackward": {
+          "file": "mei-walk-backward-v4.png",
+          "sha256": "a60d14a100ee2491b4f044cddc5e20eb88c439d41d10759ed5b61b18d891b65e",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
           ]
         }
       },
@@ -403,6 +455,32 @@
             795,
             1116
           ]
+        },
+        "walkForward": {
+          "file": "tank-walk-forward-v3.png",
+          "sha256": "58c553ab18064092e88e2af82b39f1434e0353fdd2024e66619b1c418269c64f",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
+        },
+        "walkBackward": {
+          "file": "tank-walk-backward-v3.png",
+          "sha256": "94fc01a507212c5cfeb6b5bedcdc1bc591f56417addea4902e479f182e862a1f",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
         }
       },
       "standingHip": [
@@ -538,6 +616,32 @@
             497,
             821,
             1128
+          ]
+        },
+        "walkForward": {
+          "file": "volt-walk-forward-v3.png",
+          "sha256": "64fd0030afa5ac97808644de66b24de3f60d89b15d5a057c6c693d575b445f65",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
+        },
+        "walkBackward": {
+          "file": "volt-walk-backward-v4.png",
+          "sha256": "e3fc955800ef122b5fe71e111da9ea7a96c09e73f93663800d3bbbae43b943dd",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
           ]
         }
       },
@@ -675,6 +779,32 @@
             807,
             1152
           ]
+        },
+        "walkForward": {
+          "file": "kaze-walk-forward-v3.png",
+          "sha256": "ffccf5e003e34081db27451105677dd95fb68a8a87b1c0f313ea319b3d4806a5",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
+        },
+        "walkBackward": {
+          "file": "kaze-walk-backward-v3.png",
+          "sha256": "fd7ad408d517bb652cbf9ff28f9b25b9502f3338b120e35595b2487c3f5963bc",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
         }
       },
       "standingHip": [
@@ -810,6 +940,32 @@
             509,
             825,
             1143
+          ]
+        },
+        "walkForward": {
+          "file": "sage-walk-forward-v3.png",
+          "sha256": "a9424d947ce6c54aa1023d054c5760263c905d96516b4a5b4b58c3cf57e49356",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
+          ]
+        },
+        "walkBackward": {
+          "file": "sage-walk-backward-v3.png",
+          "sha256": "e67624cf671943104c90610bcce0b95d6be974ba189ee97f7165bd0b11503af8",
+          "grid": [
+            4,
+            4
+          ],
+          "count": 16,
+          "neutral": [
+            0,
+            15
           ]
         }
       },

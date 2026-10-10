@@ -39,7 +39,7 @@
     </div></section>
     <section id="keys-settings"><h2>经典 / 现代操作</h2><div class="control-mode-grid">${['p1','p2'].map(w=>`<label class="control-mode-card">${w.toUpperCase()} 操作方式<select id="control-${w}"><option value="classic">经典 · 六键拳脚与搓招</option><option value="modern">现代 · 简化必杀与辅助连段</option></select></label>`).join('')}</div>
       <p class="settings-help">经典：轻中重拳脚＋指令技。现代：轻中重攻击，方向＋SP 必杀；按住辅助连按轻／中／重，逐段推进专属连段。现代手动搓招为全伤害，快捷必杀为 80%。</p>
-      <p class="settings-help">普通必杀免费；OD 强化消耗 2 格斗气。SA1 / SA2 / SA3 消耗 100 / 200 / 300。斗气冲刺自由发动 1 格，普通技取消 3 格。</p><div id="gamepad-settings"></div><h2>键盘按键</h2><p>点击按键后，按下新的键。两名玩家的按键不能重复。</p><p class="settings-help">菜单操作仍用 WASD / 方向键；Enter 确认，P 暂停，M / N 音乐及音效，F2 打开设置。</p>
+      <p class="settings-help">双击前方向前冲，双击后方向后撤步，中间松开方向；普通冲刺免费，使用下方自定义方向键或手柄。普通必杀免费；OD 强化消耗 2 格斗气。SA1 / SA2 / SA3 消耗 100 / 200 / 300。斗气冲刺自由发动 1 格，普通技取消 3 格。</p><div id="gamepad-settings"></div><h2>键盘按键</h2><p>点击按键后，按下新的键。两名玩家的按键不能重复。</p><p class="settings-help">菜单操作仍用 WASD / 方向键；Enter 确认，P 暂停，M / N 音乐及音效，F2 打开设置。</p>
       <div id="settings-keys"></div><p id="settings-message" role="status" aria-live="polite"></p>
     </section></div><footer><div class="settings-status"><span id="settings-save">声音与按键自动保存到本机</span><span id="train-status" role="status" aria-live="polite" hidden></span></div><div class="settings-actions"><button id="settings-home" class="quiet-button">返回首页</button><button id="settings-reset" class="quiet-button">恢复默认</button><span class="action-spacer"></span><button id="settings-done">完成</button><button id="train-apply" class="primary-button" hidden>应用并继续训练</button></div></footer>`;
   document.body.appendChild(dialog);
@@ -91,7 +91,7 @@
     Audio2.setMasterVol(values.volume/100);Audio2.setSfxOn(values.sfx);Audio2.setMusicOn(values.music);
     if(values.music)Audio2.music.play(previewing?musicSelect.value:sceneTrack());
     else if(previewing){previewing=false;dialog.querySelector('#music-preview-status').textContent='背景音乐已关闭。';dialog.querySelector('#music-preview').textContent='试听配乐';}
-    document.getElementById('hint').textContent=['p1','p2'].map(CombatControls.describe).join(' ｜ ')+' ｜ P 暂停 · F2 设置';
+    document.getElementById('hint').textContent=['p1','p2'].map(CombatControls.describe).join(' ｜ ')+' ｜ 双击前 / 后冲刺 · 空中再按跳跃键二段跳 · P 暂停 · F2 设置';
   }
   function renderKeys(){
     const host=dialog.querySelector('#settings-keys');host.replaceChildren();
@@ -121,7 +121,7 @@
     if(host.hidden)return;
     const difficulties='<option value="0.6">简单电脑</option><option value="0.85">普通电脑</option><option value="1">困难电脑</option>';
     if(!GAME.training){
-      host.innerHTML='<h2>电脑对战</h2><label class="match-row">电脑难度<select id="match-difficulty">'+difficulties+'</select></label><p class="settings-help">调整后立即生效。</p>';
+      host.innerHTML='<h2>电脑对战</h2><label class="match-row">电脑难度<select id="match-difficulty">'+difficulties+'</select></label><p class="settings-help">简单：反应较慢，短连段、较多破绽。普通：走位试探、命中确认与对空。困难：更快反应、资源连段与收招惩罚，仍有失误空间。调整后立即生效。</p>';
       const select=host.querySelector('select');select.value=String(GAME.difficulty);
       select.addEventListener('change',()=>GameControl.setDifficulty(Number(select.value)));return;
     }
@@ -136,7 +136,7 @@
         <label class="match-row">无敌<input id="train-${who}-invincible" type="checkbox"></label></fieldset>`).join('')}</div>
       <div class="training-environment"><label class="match-row">训练地图<select id="train-stage">${stages}</select></label>
       <label class="match-row">对手行为<select id="train-opponent"><option value="dummy">站立木桩 · 只挨打</option>${difficulties}</select></label></div>
-      <p class="settings-help">血量 1–999，SA 能量 0–300，斗气 0–6（0 进入耗尽）。资源正常消耗。无敌会免疫攻击与投技。应用后重置双方位置、血量和能量。</p>
+      <p class="settings-help">简单电脑偏向短连段，普通加入确认与对空，困难更擅长惩罚与资源连段。血量 1–999，SA 能量 0–300，斗气 0–6（0 进入耗尽）。资源正常消耗。无敌会免疫攻击与投技。应用后重置双方位置、血量和能量。</p>
       `;
     for(const who of ['p1','p2']){
       const o=GAME.trainingOptions[who];

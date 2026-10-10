@@ -3,3 +3,4 @@ __pycache__/
 *.py[cod]
 assets/characters/animation-v7/catalog-cache.json
 assets/characters/animation-v7/manifest.pending.json
+output/

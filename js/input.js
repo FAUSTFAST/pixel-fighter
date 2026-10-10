@@ -21,6 +21,7 @@
     recordDirectionEdge(k);
   });
   function clearKeys() {
+    Input.resetSerial++;
     for (const k in down) down[k] = false;
     for (const k in pressed) pressed[k] = false;
     padDown.clear();padPressed.clear();
@@ -28,6 +29,7 @@
     if (typeof motionBuf !== 'undefined') {
       motionBuf.p1 = [];
       motionBuf.p2 = [];
+      directionState.p1=directionState.p2=5;
     }
   }
   window.addEventListener('blur', clearKeys);
@@ -37,6 +39,7 @@
   });
 
   const Input = {
+    resetSerial:0,
     clear:clearKeys,
     isDown(k) { return !!down[k] || padDown.has(k); },
     // 独立来源：手柄松开不会清掉仍按住的键盘按键。
@@ -69,6 +72,7 @@
   // 5=中立 2=下 6=右 3=右下 4=左 1=左下 8=上。
   const motionBuf = { p1: [], p2: [] };
   const motionFrame = { p1: 0, p2: 0 };
+  const directionState = { p1: 5, p2: 5 };
   const MOTION_MAX = 32;
 
   function recordDirectionEdge(key) {
@@ -82,10 +86,11 @@
     const horizontal = Number(Input.isDown(m.right)) - Number(Input.isDown(m.left));
     const vertical = Number(Input.isDown(m.up)) - Number(Input.isDown(m.down));
     const dir = 5 + horizontal + vertical * 3;
+    const fresh=dir!==directionState[who];directionState[who]=dir;
     const buf = motionBuf[who];
     if(advance)motionFrame[who]++;
     if (!buf.length || buf[buf.length-1].dir !== dir) {
-      buf.push({ dir, frame: motionFrame[who], lastFrame: motionFrame[who] });
+      buf.push({ dir, frame: motionFrame[who], lastFrame: motionFrame[who],fresh });
       if (buf.length > MOTION_MAX) buf.shift();
     } else buf[buf.length-1].lastFrame = motionFrame[who];
   };
@@ -93,6 +98,17 @@
   Input.clearMotions = function (who) {
     if (who) motionBuf[who] = [];
     else { motionBuf.p1 = []; motionBuf.p2 = []; }
+  };
+
+  // 两次纯水平方向之间必须松开；只消费新的第二次按下，长按不连冲。
+  // 按首个边沿计时，防止长时间走路后松开再按被当成双击。
+  Input.checkDoubleTap = function(who,facing,windowFrames=18){
+    const buf=motionBuf[who],now=motionFrame[who];
+    const [first,neutral,last]=buf.slice(-3);
+    if(!last||!first.fresh||!last.fresh||![4,6].includes(last.dir)||neutral.dir!==5||first.dir!==last.dir||
+       now-last.frame>1||now-first.frame>windowFrames)return null;
+    Input.clearMotions(who);
+    return last.dir===(facing>0?6:4)?'forward':'back';
   };
 
   // patterns 是相对朝向的方向序列;允许中间经过中立,每条指令有独立时限。

@@ -40,15 +40,16 @@
   function collect(f,it,who){
     Input.recordMotion(who);
     if(!it.modern||!it.assisting){if(f.bufferedAttack?.opts.assist)f.bufferedAttack=null;f.assistRoute=null;}
-    let request=null;
+    let request=null,claimed=false;
     if(it.throw){f.throwInputFrames=8;if(f.grabbedBy)f.grabbedBy.escapeThrow(window.GAME);else f.queueAttack('throw',{back:it.move===-f.facing});Input.clearMotions(who);}
-    else if(it.impact)f.queueAttack('impact');
-    else if(it.driveRush||(f.attackContact&&f.attack?.category==='normal'&&it.parryPressed)||((it.parryHeld||f.attackContact&&f.attack?.category==='normal')&&Input.checkMotion(who,f.facing,[{name:'driveRush',dirs:['f','n','f'],window:20}]))){f.queueAttack('driveRush');it.parryHeld=false;}
+    else if(it.impact){f.queueAttack('impact');claimed=true;}
+    else if(it.driveRush||(f.attackContact&&f.attack?.category==='normal'&&it.parryPressed)||((it.parryHeld||f.attackContact&&f.attack?.category==='normal')&&Input.checkMotion(who,f.facing,[{name:'driveRush',dirs:['f','n','f'],window:20}]))){f.queueAttack('driveRush');it.parryHeld=false;claimed=true;Input.clearMotions(who);}
     else if(it.modern&&(it.special||it.heavy)&&it.held.special&&it.held.heavy){
       request={kind:it.down?'super':it.move===-f.facing?'super2':'super1',opts:{shortcut:true}};
     }else if(it.modern&&it.special){
       request={kind:it.down&&it.move===-f.facing?'skill':it.down?'tech':it.move===f.facing?'uppercut':it.move===-f.facing?'rush':'special',opts:{shortcut:true,od:it.assisting,strength:2}};
     }else if(it.modern&&it.assisting&&['light','medium','heavy'].some(k=>it[k])){
+      claimed=true;
       f.queueAssist(['heavy','medium','light'].find(k=>it[k]));
     }else if(!it.parryHeld){
       request=motion(f,it,who);
@@ -62,6 +63,8 @@
       }
     }
     if(request){f.assistRoute=null;f.queueAttack(request.kind,request.opts);}
+    const dash=Input.checkDoubleTap(who,f.facing);
+    if(dash&&!claimed&&!request&&!it.throw&&!it.parryHeld&&!it.up&&!it.down)f.queueDash(dash);
     for(const key of [...attacks,'special','throw','impact','driveRush'])it[key]=false;
     // 交给角色处理移动 / 跳跃 / 招架，攻击已经进入同一预输入队列。
     return it;

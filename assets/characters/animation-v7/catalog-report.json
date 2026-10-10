@@ -42,6 +42,18 @@
     "sourceHeight": 265.0
   },
   {
+    "asset": "ryu-walk-forward-v5.png",
+    "status": "cataloged",
+    "frames": 12,
+    "sourceHeight": 334.0
+  },
+  {
+    "asset": "ryu-walk-backward-v4.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 284.0
+  },
+  {
     "asset": "mei-walk.png",
     "status": "cataloged",
     "frames": 16,
@@ -82,6 +94,18 @@
     "status": "cataloged",
     "frames": 16,
     "sourceHeight": 269.0
+  },
+  {
+    "asset": "mei-walk-forward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 246.0
+  },
+  {
+    "asset": "mei-walk-backward-v4.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 298.5
   },
   {
     "asset": "tank-walk.png",
@@ -126,6 +150,18 @@
     "sourceHeight": 279.5
   },
   {
+    "asset": "tank-walk-forward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 273.5
+  },
+  {
+    "asset": "tank-walk-backward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 244.5
+  },
+  {
     "asset": "volt-walk.png",
     "status": "cataloged",
     "frames": 16,
@@ -166,6 +202,18 @@
     "status": "cataloged",
     "frames": 16,
     "sourceHeight": 282.0
+  },
+  {
+    "asset": "volt-walk-forward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 277.5
+  },
+  {
+    "asset": "volt-walk-backward-v4.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 297.0
   },
   {
     "asset": "kaze-walk.png",
@@ -210,6 +258,18 @@
     "sourceHeight": 297.0
   },
   {
+    "asset": "kaze-walk-forward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 251.5
+  },
+  {
+    "asset": "kaze-walk-backward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 246.5
+  },
+  {
     "asset": "sage-walk.png",
     "status": "cataloged",
     "frames": 16,
@@ -250,5 +310,17 @@
     "status": "cataloged",
     "frames": 16,
     "sourceHeight": 274.0
+  },
+  {
+    "asset": "sage-walk-forward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 261.5
+  },
+  {
+    "asset": "sage-walk-backward-v3.png",
+    "status": "cataloged",
+    "frames": 16,
+    "sourceHeight": 280.5
   }
 ]

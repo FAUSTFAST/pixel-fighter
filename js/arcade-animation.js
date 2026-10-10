@@ -1,6 +1,6 @@
-// v7: authored arcade poses, fixed skeleton origins, no per-frame morphing.
+// Fixed authored pixel frames: no bitmap deformation or interpolated drawings.
 (function(){
-  const ROOT='assets/characters/animation-v7/',VERSION='air-style1',IDENTITY_VERSION='identity-v1',RES=2;
+  const ROOT='assets/characters/animation-v8/',VERSION='style-unified1',IDENTITY_VERSION='identity-v1',RES=2;
   const identities=Object.freeze({ryu:'blue-ninja-burgundy-scarf',mei:'magenta-kungfu-black-ponytail',tank:'human-boxer-red-gloves',volt:'yellow-jacket-cyan-scarf',kaze:'ivory-samurai-purple-ponytail',sage:'silver-hair-purple-mage'});
   const ready=new Map(),failures=[];
   const labels={idle:'待机',walk:'前进步法',backwalk:'后退步法',crouch:'下蹲',guard:'站立防御',guardLow:'蹲防',jump:'前跳',backjump:'后跳',airPunch:'空中拳',airKick:'空中脚',jab:'前手拳',heavy:'重拳 / 斩击',kick:'站立踢击',lowKick:'低踢 / 扫腿',cast:'发射动作',rise:'上升必杀',rush:'突进必杀',throw:'投技',head:'上段受击',body:'腹部受击',fall:'倒地',getup:'起身'};
@@ -13,20 +13,16 @@
     });
   }
   function isolate(source,meta,scale){
-    const [sx,sy,w,h]=meta.rect,mask=new Uint8Array(w*h),queue=new Int32Array(w*h);
+    const [sx,sy,w,h]=meta.rect;
     if(sx<0||sy<0||w<1||h<1||sx+w>source.width||sy+h>source.height)throw new Error('图帧边界越界');
     const seed=(Math.floor(meta.seed/source.width)-sy)*w+meta.seed%source.width-sx;
     if(seed<0||seed>=w*h)throw new Error('图帧起点越界');
-    let read=0,write=1;queue[0]=seed;mask[seed]=1;
-    const alpha=p=>source.data[((sy+Math.floor(p/w))*source.width+sx+p%w)*4+3];
-    const visit=p=>{if(!mask[p]&&alpha(p)>64){mask[p]=1;queue[write++]=p;}};
-    while(read<write){const p=queue[read++],x=p%w,y=Math.floor(p/w);if(x)visit(p-1);if(x<w-1)visit(p+1);if(y)visit(p-w);if(y<h-1)visit(p+w);}
+    // Authored frame rectangles contain one complete drawing. Preserve every
+    // painted pixel, including hair strands / cloth tips outside the main body.
     const raw=document.createElement('canvas');raw.width=w;raw.height=h;
     const context=raw.getContext('2d'),pixels=context.createImageData(w,h);
     for(let p=0;p<w*h;p++){
       const x=p%w,y=Math.floor(p/w);
-      const edge=mask[p]||(x&&mask[p-1])||(x<w-1&&mask[p+1])||(y&&mask[p-w])||(y<h-1&&mask[p+w]);
-      if(!edge)continue;
       const offset=((sy+y)*source.width+sx+x)*4;
       for(let c=0;c<4;c++)pixels.data[p*4+c]=source.data[offset+c];
     }
@@ -44,7 +40,11 @@
       if(!labels[name]||clip.owner!==id||clip.identity!==identities[id]||
         !clip.sheet.startsWith(id+'-')||!/^[a-z0-9-]+$/.test(clip.sheet)||
         !/^[a-f0-9]{16}$/.test(clip.revision)||!Number.isFinite(clip.scale)||clip.scale<=0||
-        !Array.isArray(clip.frames)||!(['walk','backwalk'].includes(name)?[8]:[4,8]).includes(clip.frames.length))throw new Error('角色图集形象不匹配：'+id+'/'+name);
+        !Array.isArray(clip.frames)||clip.frames.length<4||clip.frames.length>64||clip.authored!==true)
+        throw new Error('固定逐帧图集形象不匹配：'+id+'/'+name);
+      if(['walk','backwalk'].includes(name)&&
+        (clip.cycleFrames!==16||clip.direction!==(name==='walk'?1:-1)||clip.stopVariants?.length!==16))
+        throw new Error('步法 / 收脚逐帧目录不完整：'+id+'/'+name);
     }
     // Decode one sheet at a time per character, release full-resolution pixels after
     // baking small native-pixel sprites. Do not retain dozens of huge source canvases.
@@ -94,17 +94,28 @@
       else clip=pose==='light'||anim.name==='light'?'jab':'heavy';
       if(!clips[clip])return null;
       index=attackIndex(clips[clip].frames.length,p,clip);
+      // Preparation, contact and recovery are separate fixed drawings.
+      if(clips[clip].timeline){
+        index=clips[clip].timeline.findIndex(end=>p<end);if(index<0)index=clips[clip].frames.length-1;
+      }
       if(m.hitFrames?.length>1&&p>=.32&&p<=.58){
         // Each multi-hit burst has a distinct extension / retraction, keeping the
         // game hit timestamps unchanged. Super moves share the matching new base art.
-        index=anim.reach<.92?(clips[clip].frames.length>4?2:0):(clips[clip].frames.length>4?3:1);
+        index=clips[clip].timeline?(anim.reach<.92?3:4):anim.reach<.92?(clips[clip].frames.length>4?2:0):(clips[clip].frames.length>4?3:1);
       }
-    }else if(anim.name==='walk'||anim.name==='backwalk')sequence(anim.name)||sequence('walk');
+
+    }else if(anim.name==='dashForward'||anim.name==='dashBack'){
+      // One quick, authored step cycle; then plant the feet during recovery.
+      if(anim.dashPhase<1){clip=anim.name==='dashBack'?'backwalk':'walk';index=Math.min(15,Math.floor(anim.dashPhase*16));}
+      else sequence('idle',0)||sequence('walk',0);
+    }else if(anim.name==='walk'||anim.name==='backwalk'){
+      clip=anim.name;const data=clips[clip],cycle=Math.min(15,Math.floor(p*16));
+      index=anim.gaitSettle>0?data.stopVariants[cycle][Math.min(3,Math.floor(anim.gaitSettle*4))]:cycle;
+    }
     else if(anim.name==='jump'||anim.name==='backjump'){
       clip=anim.name;
-      // Slot 0 is grounded anticipation. Extend on ascent, tuck at the apex,
-      // then open the legs on descent; never hold a floor crouch in midair.
-      index=p<.36?1:p<.68?2:3;
+      // Select fixed ascent, tucked apex and descent drawings by vertical phase.
+      index=Math.min(7,1+Math.floor(p*7));
     }
     else if(['airPunch','airKick'].includes(anim.name))sequence(anim.name);
     else if(anim.name==='crouch'){clip=clips.crouch?'crouch':clips.idle?'idle':'walk';index=clips[clip]?Math.min(clips[clip].frames.length-1,Math.floor((anim.elapsed??12)/3)):0;}
@@ -119,7 +130,8 @@
         sequence('fall')||sequence('idle')||sequence('walk');if(anim.grounded===false)index=Math.min(index,2);if(anim.grabbed)index=0;
       }else sequence(type==='body'||type==='low'?'body':'head')||sequence('idle')||sequence('walk');
     }else {
-      const breath=[0,0,1,2,3,3,2,1];index=breath[Math.min(7,Math.floor(p*8))];
+      // Fixed neutral drawing.
+      index=0;
     }
     const data=clips[clip];
     if(!data||data.owner!==def.id||data.identity!==identities[def.id]||!data.frames?.length||!data.sprites?.length)return null;
@@ -128,15 +140,43 @@
   }
   function draw(ctx,def,anim,flash=false){
     const selected=selection(def,anim);if(!selected)return false;
-    const f=selected.sprite;
+    const f=renderSprite(selected.sprite,anim);
     if(flash&&!f.flash){const c=document.createElement('canvas');c.width=f.canvas.width;c.height=f.canvas.height;const paint=c.getContext('2d');paint.drawImage(f.canvas,0,0);paint.globalCompositeOperation='source-atop';paint.fillStyle='rgba(255,242,223,0.24)';paint.fillRect(0,0,c.width,c.height);f.flash=c;}
     ctx.save();ctx.imageSmoothingEnabled=false;
     if(f.flip)ctx.scale(-1,1);
     ctx.drawImage(flash?f.flash:f.canvas,f.flip?-f.x-f.w:f.x,f.y,f.w,f.h);ctx.restore();return true;
   }
+  // Every pose is a fixed PNG drawing. Rendering and collision use that exact
+  // bitmap; there is no mesh, pixel warp, morph, skeleton tween or frame blend.
+  function renderSprite(source){return source;}
+  function mask(sprite){
+    if(!sprite.alpha)sprite.alpha=sprite.canvas.getContext('2d',{willReadFrequently:true}).getImageData(0,0,sprite.canvas.width,sprite.canvas.height).data;
+    return sprite.alpha;
+  }
+  function solid(sprite,x,y){
+    if(sprite.flip)x=-x;
+    const px=Math.floor((x-sprite.x)*RES),py=Math.floor((y-sprite.y)*RES);
+    return px>=0&&py>=0&&px<sprite.canvas.width&&py<sprite.canvas.height&&mask(sprite)[(py*sprite.canvas.width+px)*4+3]>96;
+  }
+  function collisionSprite(fighter){
+    const anim=fighter.sampleAnimation().animation,selected=selection(fighter.def,anim);
+    return selected&&renderSprite(selected.sprite,anim);
+  }
+  function touches(attacker,defender,box){
+    if(!ready.has(attacker.def.id)||!ready.has(defender.def.id))return true;
+    const a=collisionSprite(attacker),b=collisionSprite(defender);
+    if(!a||!b)return true;
+    // Sample the actual opaque pixels at the striking extremity. One world
+    // pixel tolerance allows the pixel grid edges to meet without a visible gap.
+    for(let y=box.y;y<box.y+box.h;y+=2)for(let x=box.x;x<box.x+box.w;x+=2){
+      if(!solid(a,(x-attacker.x)*attacker.facing/4.2,(y-attacker.y)/4.2))continue;
+      for(const dx of [-1,0,1])if(solid(b,(x+dx-defender.x)*defender.facing/4.2,(y-defender.y)/4.2))return true;
+    }
+    return false;
+  }
   const loading=fetch(ROOT+'manifest.json?v='+VERSION).then(r=>{if(!r.ok)throw new Error('动作目录加载失败');return r.json();}).then(async manifest=>{
     if(manifest.identityVersion!==IDENTITY_VERSION||Object.keys(identities).some(id=>!manifest.characters?.[id]))throw new Error('角色形象目录版本不匹配');
     await Promise.all(Object.entries(manifest.characters).map(([id,clips])=>prepareCharacter(id,clips).catch(error=>{failures.push(id);console.warn(error);})));status=ready.size===6?'ready':'fallback';
   }).catch(error=>{status='fallback';console.warn(error);});
-  window.DrawnAnimation={draw,selection,loading,version:7,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};
+  window.DrawnAnimation={draw,selection,touches,collisionSprite,solid,loading,sprite:(id,clip,index)=>ready.get(id)?.[clip]?.sprites[index],version:8,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};
 })();

@@ -73,6 +73,7 @@
     // 位置/血量重置
     resetFighter(G.f1, 300, 1);
     resetFighter(G.f2, 660, -1);
+    G.ai?.reset();
     G.projectiles = []; G.effects = [];
     G.combo.P1 = { count:0, timer:0 };
     G.combo.P2 = { count:0, timer:0 };
@@ -89,9 +90,13 @@
     f.hitstun=0; f.blockstun=0; f.attack=null; f.attackHasHit=false; f.onGround=true; f.koFall=0;
     f.drive=6;f.burnout=false;f.driveRegenDelay=0;f.driveBoost=0;f.parrying=false;f.parryFrames=0;f.assistRoute=null;f.attackContact=false;f.repeatChain=0;f.juggleHits=0;
     f.invuln=0; f.pendingRush=false; f.bufferedAttack=null; f.attackConnected=false;
+    f.dash=null;f.bufferedDash=null;
     f.blocking=false; f.crouching=false; f.comboHits=0; f.comboDamage=0; f.trail=[];
+    f.comboActive=false;f.comboMoves=0;f.comboMoveScales=[];f.comboPenalty=0;f.comboLightStarter=false;
+    f.lastDamageScale=1;f.lastHitDamage=0;f.pendingComboPenalty=0;f.pushbackSource=null;
     f._hpGhost=1; f.flashT=0; f.armorLeft=0; f.counterTriggered=false; f.moveLabelT=0;
     f.walkPhase=0;f.stepPhase=0;f.gaitDirection=1;f.gaitMoving=false;f.gaitSettling=0;f.gaitSettleFrom=0;f.gaitSettleTo=0;f.gaitSettleDuration=8;f.drawnFrame=null; f.moveBlend=0; f.moveLean=0; f.airFrames=0; f.landingFrames=0;
+    f.jumpsUsed=0;f.jumpDirection=0;f.airJumpEffect=null;
     f.reaction=null;f.getupFrames=0;f.reactionDuration=20;f.animationFrame=0;f.grabbedBy=null;f.throwSequence=null;f.throwRotation=0;f.throwInputFrames=0;f.knockedDown=false;
   }
 
@@ -179,10 +184,10 @@
     updateProjectiles();
 
     // 身体互推(防重叠)
-    resolveBodies(f1, f2);
+    resolveBodies(f1, f2,previousX1,previousX2);
+    updateCamera(previousX1,previousX2);
     f1.updateGait(f1.x-previousX1);
     f2.updateGait(f2.x-previousX2);
-    updateCamera();
 
     // 近战命中结算
     resolveMelee(f1, f2);
@@ -212,7 +217,7 @@
   }
 
   function faceEachOther(a, b) {
-    const lock = f => !f.onGround||f.attack||f.grabbedBy||f.throwSequence||f.blockstun>0||ATTACK_STATES.includes(f.state)||['hit','ko'].includes(f.state);
+    const lock = f => !f.onGround||f.attack||f.dash||f.grabbedBy||f.throwSequence||f.blockstun>0||ATTACK_STATES.includes(f.state)||['hit','ko'].includes(f.state);
     const dx=b.x-a.x;
     // At a jump crossover, keep the previous facing until the bodies clearly pass.
     if(Math.abs(dx)<4)return;
@@ -224,20 +229,39 @@
   // 检测本帧新进入的动作,播放对应起手音(挥空/跳跃/必杀)
   function emitActionSound(f, prevState) {
     if (f.state === prevState) return;
-    if (f.state === 'jump') { Audio2.sfx.jump(); return; }
-    if(f.attack?.category==='normal'||f.attackKind==='throw'){Audio2.sfx.whiff();return;}
+    if (f.state === 'jump') return; // 每次起跳（包括第二跳）由 tryJump 播放音效。
+    // 普通技挥击声在第一有效帧播放，准备动作先留出可读的前摇。
+    if(f.attack?.category==='normal'||f.attack?.normalThrow)return;
     if(ATTACK_STATES.includes(f.state)){if(f.attack?.projectile)Audio2.sfx.fireball();else Audio2.sfx.special();}
   }
 
-  function resolveBodies(a, b) {
+  function resolveBodies(a, b,previousA=a.x,previousB=b.x) {
     if(a.grabbedBy||b.grabbedBy)return;
     const ab = a.bodyBox, bb = b.bodyBox;
     if (U.overlap(ab, bb) && a.state!=='ko' && b.state!=='ko') {
       const direction=a.x<=b.x?1:-1;
-      const overlap=(a.width+b.width)/2-Math.abs(a.x-b.x);
+      let overlap=(a.width+b.width)/2-Math.abs(a.x-b.x);
       if(overlap<=0)return;
+      // Committed attacks / dashes stop at the other body. Their approach must
+      // not shove a motionless opponent before a hit or block actually occurs.
+      for(const [f,previous,toward] of [[a,previousA,direction],[b,previousB,-direction]]){
+        const advance=Math.max(0,(f.x-previous)*toward);
+        if((f.attack||f.dash)&&advance>0){
+          f.x-=toward*Math.min(advance,overlap);
+          if(f.attack?.travelDistance)f.attack.travelBlocked=true;
+          if(f.attack?.stepDistance)f.attack.stepBlocked=true;
+          if(f.dash)f.dash.travelBlocked=true;
+          f.vx=0;
+          overlap=(a.width+b.width)/2-Math.abs(a.x-b.x);
+          if(overlap<1e-7)return;
+        }
+      }
       if(a.attack?.travelDistance&&a.facing===direction)a.attack.travelBlocked=true;
       if(b.attack?.travelDistance&&b.facing===-direction)b.attack.travelBlocked=true;
+      if(a.attack?.stepDistance&&a.facing===direction)a.attack.stepBlocked=true;
+      if(b.attack?.stepDistance&&b.facing===-direction)b.attack.stepBlocked=true;
+      if(a.dash?.dir===direction)a.dash.travelBlocked=true;
+      if(b.dash?.dir===-direction)b.dash.travelBlocked=true;
       // 完整分离并让场边另一侧承担余量，防止长突进把身体挤穿或推出舞台。
       const ax=a.x,bx=b.x;
       a.x=U.clamp(a.x-direction*overlap/2,-150,1110);
@@ -256,7 +280,9 @@
     if (attacker.attackHasHit) return;
     const db = defender.bodyBox;
     if (!U.overlap(hb, db)) return;
+    if(attacker.attack.physicalContact&&window.DrawnAnimation?.touches&&!DrawnAnimation.touches(attacker,defender,hb))return;
     if (defender.state==='ko' || defender.invuln > 0 || defender.trainingInvincible) return;
+    if(hb.grab&&defender.isThrowInvulnerable())return;
 
     attacker.attackHasHit = true;
     const fromDir = attacker.facing;
@@ -303,18 +329,12 @@
       if(p.dead||p.t<p.armFrames)continue;
       const target = p.owner === G.f1 ? G.f2 : G.f1;
       if (target.state==='ko' || target.invuln > 0 || target.trainingInvincible) continue;
-      if (U.overlap(p.box, target.bodyBox)) {
-        const dir = p.dir;
-        const blocked=target.blocking&&target.facing===-dir&&target.onGround&&(p.level!=='low'||target.crouching);
-        const res = target.takeHit({dmg:p.dmg,kb:p.kb,hitstun:p.hitstun,type:'special',projectile:true,knockdown:p.knockdown,level:p.level,reaction:p.reaction,blockstun:p.blockstun,scaleFloor:p.scaleFloor}, dir, blocked);
-        if(res.ignored)continue;
-        if(p.owner.attackId===p.attackId){p.owner.attackContact=true;p.owner.attackConnected=!res.blocked;p.owner.contactFrame=p.owner.stateT;}
-        if(!res.blocked)p.owner.meter=Math.min(p.owner.maxMeter,p.owner.meter+(p.meterGain??10));
+      const res = p.hitTarget(target);
+      if (res) {
         spawnHit(p.x, p.y, true, res.blocked);
         registerCombatText(p.owner, p.x, p.y, res.dmg, res.blocked, p.weak);
         G.hitstop = 6; G.shake = 10;
         if (res.blocked) Audio2.sfx.block(); else Audio2.sfx.hitSpecial();
-        p.dead = true;
       }
       // 飞行道具对撞消解
       for (const q of G.projectiles) {
@@ -368,12 +388,20 @@
   }
 
   // 镜头只横移，双方始终留在画面内；屏幕边界防止彼此无限拉开。
-  function updateCamera(){
+  function updateCamera(previousA=G.f1.x,previousB=G.f2.x){
     const a=G.f1,b=G.f2,lo=-150,hi=1110,maxGap=740;
     a.x=U.clamp(a.x,lo,hi);b.x=U.clamp(b.x,lo,hi);
     if(Math.abs(a.x-b.x)>maxGap){
-      const center=U.clamp((a.x+b.x)/2,lo+maxGap/2,hi-maxGap/2);
-      const sign=a.x<b.x?-1:1;a.x=center+sign*maxGap/2;b.x=center-sign*maxGap/2;
+      const sign=a.x<b.x?-1:1,awayA=(a.x-previousA)*sign>0||a.dash?.dir===sign,awayB=(b.x-previousB)*-sign>0||b.dash?.dir===-sign;
+      // Apply the same screen stop to walking and knockback as to backdash:
+      // one moving fighter cannot drag the stationary fighter along the floor.
+      if(awayA&&!awayB)a.x=b.x+sign*maxGap;
+      else if(awayB&&!awayA)b.x=a.x-sign*maxGap;
+      else{
+        const center=U.clamp((a.x+b.x)/2,lo+maxGap/2,hi-maxGap/2);
+        a.x=center+sign*maxGap/2;b.x=center-sign*maxGap/2;
+      }
+      if(awayA&&a.dash)a.dash.travelBlocked=true;if(awayB&&b.dash)b.dash.travelBlocked=true;
     }
     const target=U.clamp((a.x+b.x)/2-480,-240,240);
     const delta=target-G.cameraX;
@@ -409,9 +437,15 @@
       ctx.fillStyle='#0b1525cc';ctx.fillRect(18,506,924,25);
       [G.f1,G.f2].forEach((f,i)=>{
         const mode=Input.MODES[i?'p2':'p1']==='modern'?'现代':'经典';
-        const next=f.attackContact&&f.stateT-f.contactFrame<=10&&f.attack?.cancellable?'取消窗口':f.attack?'动作 '+f.stateT+'F':'自由行动';
+        const m=f.attack;
+        const hasRoute=m?.category==='normal'?(m.cancellable||m.cancelInto?.length||m.chainInto?.length):m?.category==='special'&&!m.grab;
+        const phase=m?(f.stateT<m.startup?'前摇 '+f.stateT+'/'+m.startup+'F':f.stateT<m.startup+m.active?'有效 '+(f.stateT-m.startup+1)+'/'+m.active+'F':'收招 '+(f.stateT-m.startup-m.active+1)+'/'+m.recovery+'F'):'自由行动';
+        const next=f.dash?(f.dash.kind==='forward'?'前冲':'后撤步')+' · 剩余 '+(f.dash.frames-f.stateT)+'F':f.hasCancelWindow()&&hasRoute?'取消窗口':phase;
         const target=i?G.f1:G.f2;
-        U.text(ctx,mode+' · '+next+' · '+(f.drawnFrame?'绘制 '+f.drawnFrame+'/'+f.drawnFrameCount:'轨道 '+((f.animationFrame||0)+1)+'/60')+' · '+target.comboHits+' HIT / '+target.comboDamage+' DMG',i?928:32,523,11,i?'#efadc2':'#97d8ef',i?'right':'left');
+        const blocked=f.attackContact&&!f.attackConnected;
+        const advantage=f.attack&&!f.attack.noHit&&!f.attack.grab?CombatRules.advantage(f.attack,blocked,f.attackContact?f.contactFrame:f.attack.startup):null;
+        const combo=target.comboHits?(target.comboActive?'连段 ':'断连 ')+target.comboHits+'H / '+target.comboDamage+'D · '+Math.round(target.lastDamageScale*100)+'%':'等待命中';
+        U.text(ctx,mode+' · '+next+(advantage===null?'':' · '+(blocked?'防御 ':'命中 ')+(advantage>=0?'+':'')+advantage+'F')+' · '+combo,i?928:32,523,11,i?'#efadc2':'#97d8ef',i?'right':'left');
       });
     }
 

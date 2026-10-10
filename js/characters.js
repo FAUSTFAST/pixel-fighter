@@ -432,7 +432,7 @@
     const id=Object.keys(deco).find(k=>deco[k]===charDraw)||'ryu';
     const def=CHARACTERS.find(c=>c.id===id);
     if(motion?.animation&&window.Motion60?.draw(ctx,def,motion.animation,palette.skin!==def.palette.skin))return;
-    if(!motion?.animation&&window.DrawnAnimation?.version===7&&window.DrawnAnimation.draw(ctx,def,{name:state||'idle',phase:((prog||0)%1+1)%1,frame:0,attack:def.moves[state]},palette.skin!==def.palette.skin))return;
+    if(!motion?.animation&&window.DrawnAnimation?.version>=7&&window.DrawnAnimation.draw(ctx,def,{name:state||'idle',phase:((prog||0)%1+1)%1,frame:0,attack:def.moves[state]},palette.skin!==def.palette.skin))return;
     if(combatArt[id]?.ready && ['lightKick','heavyKick','lowKick','throw','weaponThrow'].includes(state)){
       const row={lightKick:0,heavyKick:1,lowKick:2,throw:3,weaponThrow:3}[state];
       const m=CHARACTERS.find(c=>c.id===id).moves[state==='weaponThrow'?'throw':state];

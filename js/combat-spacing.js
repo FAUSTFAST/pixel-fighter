@@ -3,14 +3,18 @@
 (function(){
   const movement={ryu:[2.55,1.9],mei:[2.9,2.2],tank:[2.1,1.55],volt:[3.1,2.35],kaze:[2.7,2.05],sage:[2.3,1.7]};
   const jumpTravel={ryu:4.37,mei:4.9875,tank:3.4675,volt:5.3675,kaze:4.655,sage:3.8475};
+  // 普通冲刺：总帧数、位移帧数、距离。收招也算动作，不能提前出招。
+  const dash={ryu:[19,13,136,23,15,108],mei:[17,12,148,21,14,116],tank:[22,15,118,26,17,92],volt:[16,11,158,20,13,124],kaze:[20,14,140,24,16,112],sage:[21,14,128,25,16,100]};
   const rushDistance={ryu:{rush:205,tech:155},mei:{special:230,rush:265,super1:250,super2:240,super:350},tank:{rush:220,super2:310},volt:{rush:300,super1:330,super:380},kaze:{rush:270}};
   for(const c of CHARACTERS){
     [c.walkForward,c.walkBackward]=movement[c.id];
     c.jumpTravel=jumpTravel[c.id];
+    const [ff,fm,fd,bf,bm,bd]=dash[c.id];
+    c.dashes={forward:{frames:ff,travelStart:0,travelEnd:fm,travelDistance:fd},back:{frames:bf,travelStart:0,travelEnd:bm,travelDistance:bd}};
     // One grounded step-and-follow cycle. Backward steps are shorter, not a
-    // reversed forward run; actual travelled distance drives the 16 drawn poses.
-    c.stride=c.id==='tank'?90:c.id==='volt'?112:104;
-    c.strideBackward=c.id==='tank'?70:82;
+    // reversed forward run; actual travelled distance drives continuously sampled planted feet.
+    c.stride=67.2;
+    c.strideBackward=67.2;
     c.walkAcceleration=c.id==='tank'?.48:.65;
     for(const [kind,m] of Object.entries(c.moves)){
       m.animationFrames=60;
@@ -46,10 +50,22 @@
         m.travelEnd=m.startup+m.active;
       }
       if(kind==='driveRush'){m.travelDistance=185;m.travelStart=1;m.travelEnd=15;m.moveSpeed=0;}
+      if(m.category==='normal'){
+        const kick=/Kick|sweep/.test(kind),clip=m.level==='low'?'lowKick':kick?'kick':kind==='light'?'jab':'heavy';
+        m.physicalContact={id:c.id,kind,clip,kick};
+        m.stepDistance={light:2.5,medium:6,heavy:10,lightKick:5,mediumKick:8,heavyKick:12,lowKick:3,lowMediumKick:6,sweep:9}[kind];
+      }
     }
   }
   // 共享几何：判定框、动画终点、效果范围、出招表使用相同计算。
-  function geometry(m,width=68){
+  function geometry(m,width=68,t=m.startup,air=false){
+    const contact=window.StrikeMotion?.contact(m,t,air);
+    if(contact){
+      // A small envelope around the authored fist / toe / blade. The far edge
+      // is the visible limb, never the old enlarged invisible reach rectangle.
+      const w=56,h=m.level==='low'?26:30,far=contact.x;
+      return {near:far-w,far,center:far-w/2,y:contact.y,w,h,physical:true};
+    }
     const center=width/2+(m.reach||0),half=m.hw||0;
     return {near:center-half,far:center+half,center,y:(m.hy||0)*2,w:half*2,h:(m.hh||0)*2};
   }
@@ -59,5 +75,10 @@
     // 半余弦速度：蹬地加速 → 中段全速 → 落脚制动；积分精确等于配置距离。
     return m.travelDistance*(p-Math.sin(p*Math.PI*2)/(Math.PI*2));
   }
-  window.CombatSpacing={geometry,travelAt};
+  function maxReach(m,width=68){
+    if(!m.physicalContact)return geometry(m,width).far;
+    let far=0;for(let t=m.startup;t<m.startup+m.active;t++)far=Math.max(far,geometry(m,width,t).far);
+    return far;
+  }
+  window.CombatSpacing={geometry,travelAt,maxReach};
 })();

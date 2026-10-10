@@ -5,18 +5,19 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const manifest = JSON.parse(read('assets/characters/animation-v7/manifest.json'));
+const manifest = JSON.parse(read('assets/characters/animation-v8/manifest.json'));
 const lock = JSON.parse(read('assets/characters/animation-v7/identity-lock.json'));
 const context = vm.createContext({console, document: {}, __manifest: manifest});
 context.window = context;
-for (const file of ['utils', 'characters', 'styles', 'combat-rules', 'combat-spacing', 'motion60']) {
+for (const file of ['utils', 'characters', 'styles', 'combat-rules', 'strike-art', 'strike-motion', 'combat-spacing', 'motion60']) {
   vm.runInContext(read(`js/${file}.js`), context, {filename: `${file}.js`});
 }
 // Exercise the production selector with catalog metadata. PNG decoding is
-// independently handled by the asset catalog; fake sprites avoid a DOM dependency.
+// independently checked by native-art tests; fake sprites avoid a DOM dependency.
 const renderer = read('js/arcade-animation.js');
 new vm.Script(renderer);
 vm.runInContext(renderer.slice(0, renderer.indexOf('  const loading=fetch(')) + `
+  // Selection-only test; native raster / foot planting are checked separately.
   for(const [id,clips] of Object.entries(__manifest.characters)){
     for(const clip of Object.values(clips))clip.sprites=clip.frames.map(()=>({}));
     ready.set(id,clips);
@@ -38,18 +39,10 @@ for (const def of context.CHARACTERS) {
   const clips = manifest.characters[def.id];
   assert.equal(Object.keys(clips).length, 22);
   const approved = lock.characters[def.id];
-  const stance = clips.idle;
-  const base = stance.frames[0];
-  const target = [(approved.standingHip[0]-base.root)*stance.scale,
-    (approved.standingHip[1]-base.ground)*stance.scale];
-  for (const name of ['jump', 'backjump', 'airPunch', 'airKick']) {
-    const clip = clips[name];
-    assert.equal(clip.scale, stance.scale);
-    for (const f of clip.frames) {
-      const hip = approved.sheets.air.hips[f.slot];
-      assert.ok(Math.abs((hip[0]-f.root)*clip.scale-target[0]) < .002);
-      assert.ok(Math.abs((hip[1]-f.ground)*clip.scale-target[1]) < .002);
-    }
+  for(const [name,clip] of Object.entries(clips)){
+    assert.equal(clip.authored,true);assert.equal(clip.scale,.5);
+    for(const f of clip.frames){assert.equal(f.root%192,96);assert.equal(f.ground%160,144);}
+    if(['walk','backwalk'].includes(name)){assert.equal(clip.cycleFrames,16);assert.equal(clip.stopVariants.length,16);}
   }
   const names = ['idle','walk','backwalk','jump','backjump','airPunch','airKick','landing',
     'crouch','block','parry','ko','getup', ...Object.keys(def.moves),
@@ -66,7 +59,7 @@ for (const def of context.CHARACTERS) {
     if(name==='landing')assert.ok(selected.index<=1,'Deep squat on ordinary landing');
     selections++;
   }
-  for (const [vy,expected] of [[-def.jump,1],[0,2],[def.jump*.8,3]]) {
+  for (const [vy,expected] of [[-def.jump,1],[0,4],[def.jump*.8,7]]) {
     const anim=context.Motion60.sample(def,'jump',0,{air:true,vy,jumpDirection:1});
     assert.equal(context.DrawnAnimation.selection(def,anim).index,expected);
   }
@@ -77,10 +70,10 @@ for (const def of context.CHARACTERS) {
     assert.match(context.DrawnAnimation.selection(def,anim).clip,/^air(Punch|Kick)$/);
   }
   const cast=context.DrawnAnimation.selection(def,{name:'special',attack:{projectile:true},phase:.4});
-  assert.equal(cast.clip,'cast');assert.equal(cast.index,2);
+  assert.equal(cast.clip,'cast');assert.equal(cast.index,3);
   const airCast=context.DrawnAnimation.selection(def,{name:'special',attack:{projectile:true},airborne:true,phase:.4});
   assert.equal(airCast.clip,'airPunch');
 }
 console.log(JSON.stringify({characters:6,clips:132,selections,
-  checks:['syntax','identity','aerial hip registration','jump phases','landing','air normals','projectile release'],
+  checks:['syntax','identity','fixed PNG anchor registration','jump phases','landing','air normals','projectile release'],
   result:'passed',limitation:'Does not verify browser rendering or image aesthetics.'}));

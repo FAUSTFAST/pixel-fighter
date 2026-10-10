@@ -1,4 +1,4 @@
-// 60 Hz 动作时间轴：优先播放新绘制姿势；旧动作直接选帧，不做网格变形。
+// 60 Hz 动作时间轴：原画姿势结合逐帧胯肩发力；判定与画面共用动作时间。
 // 动画采样与起手 / 有效 / 收招分离；轻拳不会被强制延长为一秒。
 (function(){
   const COUNT=60,TAU=Math.PI*2;
@@ -13,6 +13,12 @@
     const idle=base(0),guard=base(6),hit=base(7);
     if(name==='idle')return [key(0,idle),key(.5,base(1),{lift:.55,twist:.3}),key(1,idle)];
     if(name==='walk'||name==='backwalk')return Array.from({length:9},(_,i)=>key(i/8,move((name==='backwalk'?8:0)+i%8),{lean:name==='walk'?.7:-.45,lift:Math.sin(i/8*TAU)*.25}));
+    if(name==='dashForward'||name==='dashBack'){
+      const back=name==='dashBack',start=back?8:0;
+      return [key(0,move(start),{sink:1}),key(.12,move(start+1),{sink:1.5,lean:back?-1.7:2.4}),
+        key(.3,move(start+3),{lean:back?-1.7:2.4}),key(.5,move(start+5),{lean:back?-1.3:1.8}),
+        key(.7,move(start+7),{sink:1}),key(1,idle)];
+    }
     if(name==='jump'||name==='backjump')return [key(0,move(name==='backjump'?24:16),{sink:1.5}),key(.09,move(name==='backjump'?25:17)),key(.25,move(name==='backjump'?26:18)),key(.45,move(name==='backjump'?27:19),{lean:name==='backjump'?-1:1}),key(.64,move(name==='backjump'?28:20)),key(.83,move(name==='backjump'?29:21)),key(1,move(name==='backjump'?31:23),{sink:1.1})];
     if(name==='getup')return [key(0,base(7),{lean:-3,sink:2}),key(.35,base(4),{sink:2}),key(.7,base(4)),key(1,idle)];
     if(name==='landing')return [key(0,base(4),{sink:1.5}),key(.35,base(4),{sink:2.2}),key(1,idle)];
@@ -72,7 +78,8 @@
         p=.32+.26*(t-m.startup)/Math.max(1,m.active-1);
         // 多段攻击每一击都有小幅回收再发力，避免保持伸直姿势滑行。
       }else p=.59+.41*(t-m.startup-m.active)/Math.max(1,m.recovery);
-    }else if(fighter?.getupFrames>0){name='getup';p=1-fighter.getupFrames/18;}
+    }else if(fighter?.dash){name=fighter.state;p=clamp(fighter.stateT/fighter.dash.frames);}
+    else if(fighter?.getupFrames>0){name='getup';p=1-fighter.getupFrames/18;}
     else if(fighter?.state==='ko'){name='ko';p=clamp(fighter.stateT/60);}
     else if(motion.reaction&&(fighter?.hitstun>0||fighter?.blockstun>0||fighter?.grabbedBy||state==='hit'||state==='ko')){
       name='react:'+motion.reaction;p=clamp((motion.attackT||0)/Math.max(1,motion.reactionDuration));
@@ -88,7 +95,8 @@
       f.reach=1-wave*.16;f.twist+=wave*(def.id==='mei'?2.1:1);f.lean-=wave*.6;
     }
     if(name==='react:electric'){f.twist+=Math.sin(f.frame*1.9)*(1-p)*.7;}
-    f.elapsed=fighter?.stateT||0;f.grounded=fighter?.onGround;f.crouching=!!fighter?.crouching;f.grabbed=!!fighter?.grabbedBy;
+    f.gaitSettle=motion.gaitSettle||0;f.elapsed=fighter?.stateT||0;f.grounded=fighter?.onGround;f.crouching=!!fighter?.crouching;f.grabbed=!!fighter?.grabbedBy;
+    if(fighter?.dash)f.dashPhase=clamp(fighter.stateT/fighter.dash.travelEnd);
     f.reactionDir=motion.reactionDir||-1;f.airborne=!!(fighter&&!fighter.onGround&&m&&!m.launch);
     return f;
   }
@@ -117,7 +125,7 @@
   }
   function drawEffects(ctx,f){
     const m=f.attack;if(!m)return;
-    const g=CombatSpacing.geometry(m,f.width),t=f.stateT,active=t>=m.startup&&t<m.startup+m.active;
+    const t=f.stateT,g=CombatSpacing.geometry(m,f.width,t,!f.onGround&&!m.launch),active=t>=m.startup&&t<m.startup+m.active;
     if(t>=m.startup+m.active)return;
     const color=m.effect==='drive'?'#65ffb7':f.def.fxColor;
     ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.facing,1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;

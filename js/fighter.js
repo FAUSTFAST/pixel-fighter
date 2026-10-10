@@ -10,6 +10,7 @@
   const SIZE = 2;           // 人物与战斗判定同步放大
   const SCALE = 2.1 * SIZE;
   const MOVE_SPEED = 1.3; // 旧定义的回退值，新角色使用独立前后步速。
+  const AIR_JUMP_SCALE = 0.8; // 第二跳稍低，最高点仍留在战斗画面内。
   const ATTACK_STATES = window.ATTACK_STATES || ['light','heavy','special','uppercut','rush','tech','skill','super'];
 
   class Projectile {
@@ -33,6 +34,7 @@
       this.baseY=this.y;this.vy=cfg.projVy||0;this.gravity=cfg.projGravity||0;
       this.amplitude=cfg.projAmplitude||28;this.bounce=!!cfg.projBounce;
       this.knockdown=!!cfg.knockdown;this.level=cfg.level;this.blockstun=cfg.blockstun;this.armFrames=cfg.armFrames||0;this.attackId=owner.attackId;this.meterGain=cfg.meterGain;this.scaleFloor=cfg.scaleFloor;
+      this.comboMeta={owner,attackId:this.attackId,kind:owner.attackKind,lightStarter:cfg.lightStarter,starterScaling:cfg.starterScaling,damagePenalty:cfg.damagePenalty};
       if(cfg.projRadius)this.r=cfg.projRadius*SIZE;
       if(cfg.projGround)this.y=GROUND-this.r;this.baseY=this.y;
     }
@@ -42,6 +44,20 @@
       if(this.shape==='crescent')near=0;
       if(this.shape==='flame')near=-this.r*1.6;
       return {x:this.x+(this.dir>0?near:-far),y:this.y-height/2,w:far-near,h:height};
+    }
+    hitTarget(target) {
+      if (this.dead || this.t < this.armFrames || target.state === 'ko' || target.invuln > 0 || target.trainingInvincible) return null;
+      if (!U.overlap(this.box, target.bodyBox)) return null;
+      const blocked = target.blocking && target.facing === -this.dir && target.onGround && (this.level !== 'low' || target.crouching);
+      const result = target.takeHit({...this.comboMeta,dmg:this.dmg,kb:this.kb,hitstun:this.hitstun,type:'special',projectile:true,knockdown:this.knockdown,level:this.level,reaction:this.reaction,blockstun:this.blockstun,scaleFloor:this.scaleFloor}, this.dir, blocked);
+      if (result.ignored) return null;
+      if (this.owner.attackId === this.attackId) {
+        this.owner.attackContact = true; this.owner.attackConnected = !result.blocked;
+        this.owner.contactFrame = this.owner.stateT;
+      }
+      if (!result.blocked) this.owner.meter = Math.min(this.owner.maxMeter, this.owner.meter + (this.meterGain ?? 10));
+      this.dead = true;
+      return result;
     }
     update() {
       this.x += this.vx; this.t += 1; this.life--;
@@ -126,16 +142,21 @@
       this.moveLean = 0;
       this.airFrames = 0;
       this.jumpDirection = 0;
+      this.jumpsUsed = 0;
+      this.airJumpEffect = null;
       this.landingFrames = 0;
       this.trail = [];
       this.armorLeft=0;this.counterTriggered=false;this.moveLabelT=0;
       this.attack = null;            // 当前招式对象
       this.pendingRush = false;
       this.bufferedAttack = null;
+      this.dash=null;this.bufferedDash=null;
       this.attackConnected = false;
       this.contactFrame = 0;
       this.comboHits = 0;
       this.comboDamage = 0;
+      this.comboActive=false;this.comboMoves=0;this.comboMoveScales=[];this.comboPenalty=0;this.comboLightStarter=false;
+      this.lastDamageScale=1;this.lastHitDamage=0;this.pendingComboPenalty=0;this.pushbackSource=null;
       this.attackHasHit = false;     // 本次攻击是否已命中(避免多次)
       this.hitstun = 0;              // 受击硬直剩余帧
       this.blockstun = 0;
@@ -164,25 +185,45 @@
       if (prog < m.startup || prog >= m.startup + m.active) return null;
       if (m.projectile || m.noHit || (m.counter && !this.counterTriggered)) return null; // 飞行道具在生成时处理
       const front = this.facing;
-      const geometry=CombatSpacing.geometry(m,this.width);
+      const geometry=CombatSpacing.geometry(m,this.width,this.stateT,!this.onGround&&!m.launch);
       const cx = this.x + front * geometry.center;
       const wk=1;
       return {
-        x: cx - m.hw * SIZE/2, y: this.y + (m.hy - m.hh/2) * SIZE, w: m.hw * SIZE, h: m.hh * SIZE,
-        dmg: Math.round(m.dmg * wk), kb: m.hitFrames && this.stateT>=m.hitFrames[m.hitFrames.length-1] ? (m.finalKb??m.kb) : m.kb, hitstun: m.hitstun, type: m.type, grab:!!m.grab,
+        x: cx - geometry.w/2, y: this.y + geometry.y-geometry.h/2, w: geometry.w, h: geometry.h,
+        dmg: m.dmg * wk, kb: m.hitFrames && this.stateT>=m.hitFrames[m.hitFrames.length-1] ? (m.finalKb??m.kb) : m.kb, hitstun: m.hitstun, type: m.type, grab:!!m.grab,
+        owner:this,attackId:this.attackId,kind:this.attackKind,lightStarter:m.lightStarter,starterScaling:m.starterScaling,damagePenalty:m.damagePenalty,
         groundCombo:!m.knockdown||!!m.hitFrames&&prog<m.hitFrames[m.hitFrames.length-1],level:m.level,knockdown:!!m.knockdown&&(!m.hitFrames||prog>=m.hitFrames[m.hitFrames.length-1]),normalThrow:!!m.normalThrow,blockstun:m.blockstun,scaleFloor:m.scaleFloor,driveDamage:m.category==='drive'?1:.25,reaction:m.reaction,launch:!!m.launch,
       };
     }
 
     canAct() {
       return this.hitstun <= 0 && this.blockstun <= 0 && !this.stunned &&
+             !this.dash &&
              !['ko','hit','grabbed'].includes(this.state) &&
              !ATTACK_STATES.includes(this.state);
     }
 
     queueAttack(kind, opts = {}) {
+      this.bufferedDash=null;
       if(this.state!=='ko'&&!this.grabbedBy)this.bufferedAttack={kind,opts,frames:opts.assist?45:8};
     }
+    queueDash(kind){
+      if(!this.onGround||this.state==='ko'||this.grabbedBy||!this.def.dashes[kind])return;
+      this.bufferedAttack=null;this.assistRoute=null;
+      this.bufferedDash={kind,frames:6,inputSerial:window.Input?.resetSerial};
+    }
+    startDash(kind){
+      if(!this.canAct()||!this.onGround||this.throwSequence)return false;
+      const config=this.def.dashes[kind];if(!config)return false;
+      this.dash={...config,kind,dir:this.facing*(kind==='forward'?1:-1),travelBlocked:false};
+      this.bufferedDash=null;this.attack=null;this.pendingRush=false;
+      this.parrying=this.blocking=this.crouching=false;this.vx=this.vy=0;
+      this.driveBoost=0;this.pendingComboPenalty=0;this.trail=[];
+      this.state=kind==='forward'?'dashForward':'dashBack';this.stateT=0;
+      this.moveLabel=kind==='forward'?'前冲':'后撤步';this.moveLabelT=config.frames+12;
+      Audio2.sfx.whiff();return true;
+    }
+    isThrowInvulnerable(){return this.dash?.kind==='back';}
     queueAssist(button){
       const route=this.def.assistCombos[button];
       if(!route||this.state==='ko')return;
@@ -199,18 +240,21 @@
       if(this.drive<=.001)this.burnout=true;
       return true;
     }
+    hasCancelWindow(){
+      return !!this.attack&&this.attackContact&&this.stateT>=this.contactFrame&&this.stateT-this.contactFrame<=(this.attack.cancelWindow??10);
+    }
     canStartAttack(kind) {
       const next=this.def.moves[kind];
       if(!next||this.grabbedBy||this.hitstun>0||this.blockstun>0||this.stunned||this.state==='ko')return false;
       if(next.groundOnly&&!this.onGround&&!(next.category==='super'&&this.attack?.launch&&this.attackContact))return false;
       if(this.canAct())return true;
       if(this.attack&&this.attackKind==='driveRush'&&this.stateT>=3)return next.category==='normal';
-      if(!this.attackContact||this.stateT-this.contactFrame>10)return false;
+      if(!this.hasCancelWindow())return false;
       if(next.grab||next.counter||this.attack?.grab)return false;
       if(kind==='driveRush')return this.attack?.category==='normal'&&this.attack.cancellable;
       if(this.attack?.category==='normal'){
         if(next.category==='special'||next.category==='super')return this.attack.cancellable;
-        if(next.category==='normal')return (this.attack.cancelInto||[]).includes(kind)||(['light','lightKick','lowKick'].includes(this.attackKind)&&kind===this.attackKind&&this.repeatChain<3);
+        if(next.category==='normal')return (this.attack.cancelInto||[]).includes(kind)||((this.attack.chainInto||[]).includes(kind)&&this.repeatChain<(this.attack.chainLimit||3));
       }
       if(this.attack?.category==='special'&&next.category==='super')return next.saLevel===3||this.attack.od&&next.saLevel===2;
       return false;
@@ -230,6 +274,30 @@
       this.vx+=U.clamp(target-this.vx,-step,step);
     }
 
+    tryJump(move) {
+      if (!this.canAct() || this.grabbedBy || this.throwSequence) return false;
+      // 只有主动起跳才能接第二跳；上升必杀或被挑空不提供额外跳跃。
+      const second = !this.onGround;
+      if (second && (this.state !== 'jump' || this.jumpsUsed !== 1)) return false;
+      const speed = this.def.jumpTravel || this.def.walk * MOVE_SPEED;
+      this.vy = -this.def.jump * (second ? AIR_JUMP_SCALE : 1);
+      // 第二跳可立即改变方向；不输入方向时沿用原来的水平惯性。
+      if (!second || move) this.vx = move * speed;
+      this.onGround = false;
+      this.jumpsUsed = second ? 2 : 1;
+      this.airFrames = 0;
+      this.jumpDirection = Math.sign(this.vx * this.facing);
+      this.landingFrames = 0;
+      this.blocking = this.crouching = this.parrying = false;
+      this.state = 'jump'; this.stateT = 0;
+      if (second) {
+        this.airJumpEffect = { x: this.x, y: this.y, frames: 16 };
+        this.moveLabel = '二段跳'; this.moveLabelT = 24;
+      }
+      Audio2.sfx.jump();
+      return true;
+    }
+
     startAttack(kind, opts={}) {
       if(opts.assist&&opts.assist.index>0&&this.attack?.hitFrames&&this.stateT<this.attack.hitFrames.at(-1))return false;
       if(opts.assist&&opts.assist.index>0&&this.attackContact&&!this.attackConnected&&(opts.od||CombatRules.isSuper(kind))){this.assistRoute=null;this.bufferedAttack=null;return false;}
@@ -238,25 +306,32 @@
         this.bufferedAttack=null;this.assistRoute=null;return false;
       }
       const source=this.def.moves[kind],m={...source};
+      const cancelling=this.hasCancelWindow();
+      const targetCancel=cancelling&&this.attack.category==='normal'&&(this.attack.cancelInto||[]).includes(kind);
+      const lightChain=cancelling&&(this.attack.chainInto||[]).includes(kind);
       const cost=m.cost||0;
       if(this.meter<cost){this.moveLabel='SA 不足 · 需要 '+cost/100+' 级';this.moveLabelT=45;this.bufferedAttack=null;this.assistRoute=null;return false;}
       const driveCost=kind==='driveRush'?(this.attack?.category==='normal'?3:1):m.driveCost||(opts.od&&m.category==='special'?2:0);
       if(driveCost&&!this.spendDrive(driveCost)){this.bufferedAttack=null;this.assistRoute=null;return false;}
       this.meter-=cost;
       if(m.category==='special'){
-        const strength=Math.max(1,Math.min(3,opts.strength||2)),shift=strength===1?-2:strength===3?2:0;
-        m.startup=Math.max(2,m.startup+shift);m.recovery=Math.max(6,m.recovery+shift);
-        m.hitFrames=m.hitFrames?.map(t=>Math.max(2,t+shift));m.shots=m.shots?.map(t=>Math.max(2,t+shift));
+        const strength=Math.max(1,Math.min(3,opts.strength||2)),recoveryShift=strength===1?-2:strength===3?2:0;
+        const shift=strength===1&&kind==='uppercut'?-1:recoveryShift;
+        CombatRules.retimeStartup(m,shift);m.recovery=Math.max(6,m.recovery+recoveryShift);
         if(m.travelDistance){m.travelStart=Math.max(1,m.startup-4);m.travelEnd=m.startup+m.active;m.travelDistance*=strength===1?.9:strength===3?1.1:1;}
         m.dmg*=strength===1?.88:strength===3?1.12:1;
         if(m.projSpeed)m.projSpeed*=strength===1?.85:strength===3?1.15:1;
-        if(opts.od){m.od=true;m.dmg*=1.2;m.hitstun+=6;m.blockstun+=3;if(kind==='uppercut')m.invincible=m.startup+5;}
+        if(opts.od){m.od=true;m.dmg*=1.2;m.hitstun+=m.odHitstunBonus??6;m.blockstun+=3;if(kind==='uppercut')m.invincible=m.startup+5;}
       }
       if(opts.shortcut&&(m.category==='special'||m.category==='super'))m.dmg*=.8;
       if(m.category==='super'){m.scaleFloor=[0,.3,.4,.5][m.saLevel];if(this.attack?.launch){this.y=GROUND;this.vy=0;this.onGround=true;}}
-      if(this.driveBoost>0&&m.category==='normal'){m.hitstun+=4;m.blockstun=(m.blockstun||10)+4;this.driveBoost=0;}
-      if(kind==='driveRush')this.driveBoost=90;
-      this.repeatChain=this.attackKind===kind&&this.attack?this.repeatChain+1:1;
+      m.damagePenalty=targetCancel?.1:0;
+      if(this.driveBoost>0&&m.category==='normal'){
+        m.hitstun+=4;m.blockstun=(m.blockstun||10)+4;this.driveBoost=0;
+        m.damagePenalty+=this.pendingComboPenalty;this.pendingComboPenalty=0;
+      }
+      if(kind==='driveRush'){this.driveBoost=90;this.pendingComboPenalty=cancelling?.15:0;}
+      this.repeatChain=lightChain?this.repeatChain+1:1;
       this.bufferedAttack=null;this.attackConnected=false;this.attackContact=false;this.attackId++;
       this.blocking=this.crouching=this.parrying=false;
       this.reaction=null;this.attack=m;this.attackKind=kind;this.throwBack=!!opts.back;this.attackHasHit=false;this._specialWeak=false;
@@ -271,12 +346,13 @@
     // 输入意图:{move:-1/0/1, up, down, light, heavy, special, block}
     handleIntent(intent, game) {
       if (this.state === 'ko') return;
+      if(this.canAct())this.endCombo();
 
       if(intent.throw){this.throwInputFrames=8;if(this.grabbedBy)this.grabbedBy.escapeThrow(game);else this.queueAttack('throw',{back:intent.move===-this.facing});}
       if(this.grabbedBy)return;
 
       if(intent.throw){}
-      else if (intent.command) this.queueAttack(intent.command, { motion:true });
+      else if (intent.command) this.queueAttack(intent.command, { motion:true, ...intent.commandOptions });
       else if (intent.special) this.queueAttack('special');
       else if (intent.heavyKick) this.queueAttack(intent.down?'sweep':'heavyKick');
       else if (intent.lightKick) this.queueAttack(intent.down?'lowKick':'lightKick');
@@ -285,6 +361,10 @@
       else if (intent.heavy) this.queueAttack('heavy');
       else if (intent.light) this.queueAttack('light');
       if (this.bufferedAttack && this.startAttack(this.bufferedAttack.kind, this.bufferedAttack.opts)) return;
+      if(intent.dash&&!intent.up&&!intent.parryHeld)this.queueDash(intent.dash);
+      if(intent.up||intent.parryHeld)this.bufferedDash=null;
+      if(this.bufferedDash?.inputSerial!==window.Input?.resetSerial)this.bufferedDash=null;
+      if(this.bufferedDash&&this.startDash(this.bufferedDash.kind))return;
       if (!this.canAct()) return;
 
       this.blocking=false;this.crouching=false;
@@ -294,18 +374,9 @@
         this.parrying=true;this.state='parry';this.vx=0;return;
       }
       this.parrying=false;
+      // up 是再次按下的边沿，按住跳跃不会自动消耗第二跳。
+      if (intent.up && this.tryJump(intent.move)) return;
       if (this.onGround) {
-        // 起跳
-        if (intent.up) {
-          this.vy = -this.def.jump;
-          this.vx = intent.move * (this.def.jumpTravel||this.def.walk*MOVE_SPEED);
-          this.onGround = false;
-          this.airFrames = 0;
-          this.jumpDirection = Math.sign(intent.move*this.facing);
-          this.landingFrames = 0;
-          this.setState('jump');
-          return;
-        }
         // 下蹲(可格挡下段/减速)
         if (intent.down) {
           this.blocking=!!intent.block;this.crouching = true;
@@ -336,13 +407,21 @@
     }
 
     // 受击
+    endCombo(){
+      // Leave the last damage result visible. A combo ends when a defensive
+      // action can actually be entered, including the exact hitstun boundary.
+      this.comboActive=false;
+    }
     takeHit(hit, fromDir, blocked) {
+      if(hit.grab&&this.isThrowInvulnerable())return {dmg:0,blocked:false,ignored:true};
       if (this.invuln > 0 || this.trainingInvincible) return { dmg: 0, blocked: false, ignored: true };
       if(this.parrying&&!hit.grab&&!this.burnout){
         this.drive=Math.min(6,this.drive+.4);this.moveLabel=this.parryFrames<=2?'精准招架':'招架';this.moveLabelT=35;
         return {dmg:0,blocked:true,parried:true};
       }
       this.bufferedAttack=null;this.assistRoute=null;this.attackConnected=false;this.attackContact=false;this.parrying=false;
+      this.pendingComboPenalty=0;this.driveBoost=0;
+      this.dash=null;this.bufferedDash=null;this.trail=[];
       const counter=this.attack?.counter && this.stateT>=3 && this.stateT<=18 && !this.counterTriggered;
       if(counter&&!hit.grab&&!hit.projectile){
         this.counterTriggered=true;this.attackHasHit=true;this.stateT=this.attack.startup;
@@ -356,26 +435,39 @@
         return {dmg:damage,blocked:false,armored:true};
       }
       if (blocked) {
+        this.endCombo();
         const chip=this.burnout&&hit.type==='special'?Math.max(1,Math.round(hit.dmg*.15)):0;
         this.hp = Math.max(0, this.hp - chip);
         this.blockstun=(hit.blockstun||Math.round(hit.hitstun*.5))+(this.burnout?4:0);
         if(!this.burnout){this.drive=Math.max(0,this.drive-(hit.driveDamage||.2));this.driveRegenDelay=100;if(this.drive===0)this.burnout=true;}
         this.attack=null;this.pendingRush=false;
         this.vx = fromDir * (hit.kb * 0.4);
+        this.pushbackSource=hit.owner||this.foe;
         this.meter = Math.min(this.maxMeter, this.meter + 4);
         this.flashT = 4;
         this.reaction=this.crouching?'guardLow':'guard';this.reactionDir=fromDir*this.facing;this.reactionDuration=this.blockstun;
         this.state='block';this.stateT=0;
         return { dmg: chip, blocked: true };
       }
-      const continuing=this.hitstun>0||this.state==='hit'&&!this.onGround;
-      this.comboHits=continuing?this.comboHits+1:1;
-      if (this.comboHits === 1) this.comboDamage = 0;
-      const damage = Math.max(1, Math.round(hit.dmg * Math.max(hit.scaleFloor||.2,1-(this.comboHits-1)*.10)));
+      if(!this.comboActive){
+        this.comboHits=0;this.comboDamage=0;this.comboMoves=0;this.comboMoveScales=[];
+        this.comboLightStarter=!!hit.lightStarter;this.comboPenalty=hit.starterScaling||0;
+      }
+      let move=hit.owner&&hit.attackId!=null?this.comboMoveScales.find(m=>m.owner===hit.owner&&m.attackId===hit.attackId):null;
+      if(!move){
+        this.comboMoves++;
+        if(this.comboMoves>1)this.comboPenalty+=hit.damagePenalty||0;
+        const scale=this.comboMoves===1?1:CombatRules.damageScale(this.comboMoves,this.comboLightStarter,this.comboPenalty,hit.scaleFloor??.1);
+        move={owner:hit.owner,attackId:hit.attackId,scale};this.comboMoveScales.push(move);
+      }
+      this.comboActive=true;this.comboHits++;
+      const damage = Math.max(1, Math.round(hit.dmg * move.scale));
+      this.lastDamageScale=move.scale;this.lastHitDamage=damage;
       this.comboDamage += damage;
       this.hp = Math.max(0, this.hp - damage);
       this.hitstun = hit.hitstun;
       this.vx = fromDir * hit.kb;
+      this.pushbackSource=hit.owner||this.foe;
       this.reaction=hit.grab?'throw':hit.launch?'launch':hit.knockdown?(hit.level==='low'?'sweep':'knockdown'):!this.onGround?'air':hit.reaction|| (hit.type==='light'?'head':'heavy');
       this.reactionDir=fromDir*this.facing;this.reactionDuration=Math.max(1,hit.hitstun);
       this.vy=hit.launch?-10:hit.knockdown?-7:this.onGround?0:-4;
@@ -392,6 +484,7 @@
     }
 
     startKO(dir) {
+      this.dash=null;this.bufferedDash=null;
       this.reaction='knockdown';this.reactionDuration=60;
       this.state = 'ko'; this.stateT = 0;
       this.vx = dir * 5; this.vy = -8; this.onGround = false;
@@ -399,10 +492,13 @@
     }
 
     beginThrow(target,game){
+      if(target.isThrowInvulnerable())return;
       if(target.throwInputFrames>0){this.throwSequence={target,t:0};this.escapeThrow(game);return;}
       this.assistRoute=null;target.assistRoute=null;target.parrying=false;
-      this.throwSequence={target,t:0,dir:this.throwBack?-this.facing:this.facing,hit:{dmg:this.attack.dmg,kb:this.attack.kb,hitstun:this.attack.hitstun,type:'heavy',grab:true,knockdown:true}};
+      target.endCombo();
+      this.throwSequence={target,t:0,dir:this.throwBack?-this.facing:this.facing,hit:{owner:this,attackId:this.attackId,dmg:this.attack.dmg,kb:this.attack.kb,hitstun:this.attack.hitstun,type:'heavy',grab:true,knockdown:true}};
       target.grabbedBy=this;target.attack=null;target.bufferedAttack=null;target.blocking=target.crouching=false;
+      target.dash=null;target.bufferedDash=null;
       target.hitstun=45;target.vx=target.vy=0;target.state='grabbed';target.stateT=0;target.reaction='throw';target.reactionDuration=24;target.reactionDir=this.facing*target.facing;
       this.invuln=30;target.invuln=30;
       this.moveLabel=this.throwBack?'后投 · '+this.attack.name:this.attack.name;
@@ -415,6 +511,7 @@
       return true;
     }
     update(game) {
+      if(this.canAct())this.endCombo();
       if(this.driveRegenDelay>0)this.driveRegenDelay--;
       if(this.driveBoost>0)this.driveBoost--;
       if(this.assistRoute&&--this.assistRoute.frames<=0)this.assistRoute=null;
@@ -439,18 +536,21 @@
         }
       }
       this.stateT++;
+      if(this.attack&&this.stateT===this.attack.startup&&(this.attack.category==='normal'||this.attack.normalThrow))Audio2.sfx.whiff();
       if(this.moveLabelT>0)this.moveLabelT--;
+      if (this.airJumpEffect && --this.airJumpEffect.frames <= 0) this.airJumpEffect = null;
       if(this.attack?.hitFrames?.includes(this.stateT))this.attackHasHit=false;
       if(this.attack?.moveSpeed && this.stateT>=this.attack.startup && this.stateT<this.attack.startup+this.attack.active)this.vx=this.facing*this.attack.moveSpeed;
       this.walkPhase += .055;
       if (this.landingFrames > 0) this.landingFrames--;
       if(this.getupFrames>0&&this.onGround)this.getupFrames--;
       if (!this.onGround) this.airFrames++;
-      if (['rush','uppercut'].includes(this.state) || (this.state === 'special' && this.pendingRush)) {
+      if (this.dash || ['rush','uppercut'].includes(this.state) || (this.state === 'special' && this.pendingRush)) {
         if (this.stateT % 2 === 0) this.trail.push({x:this.x,y:this.y});
         if(this.trail.length>4)this.trail.shift();
       } else this.trail.length=0;
       if (this.bufferedAttack && --this.bufferedAttack.frames <= 0) this.bufferedAttack = null;
+      if(this.bufferedDash&&--this.bufferedDash.frames<=0)this.bufferedDash=null;
       if (this.attack?.launch && this.stateT === this.attack.startup) {
         this.vy = -9; this.vx = this.facing * 2; this.onGround = false;
       }
@@ -468,6 +568,14 @@
 
       if(this.attack?.travelDistance){
         this.vx=this.attack.travelBlocked?0:this.facing*(CombatSpacing.travelAt(this.attack,this.stateT)-CombatSpacing.travelAt(this.attack,this.stateT-1));
+      }
+      if(this.attack?.stepDistance&&this.onGround){
+        const m=this.attack;
+        this.vx=m.stepBlocked?0:this.facing*(StrikeMotion.stepAt(m,this.stateT)-StrikeMotion.stepAt(m,this.stateT-1));
+      }
+      if(this.dash){
+        const d=this.dash;
+        this.vx=d.travelBlocked?0:d.dir*(CombatSpacing.travelAt(d,this.stateT)-CombatSpacing.travelAt(d,this.stateT-1));
       }
 
       // 每个发射时刻独立生成；普通飞行道具每人最多两枚，超必杀允许三枚。
@@ -490,12 +598,19 @@
       // 地面碰撞
       if (this.y >= GROUND) {
         this.y = GROUND;
+        this.jumpsUsed = 0;
+        this.airJumpEffect = null;
         if (!this.onGround && this.state === 'ko') {
           this.vy = 0; this.vx *= 0.3; this.onGround=true;
         } else if (!this.onGround) {
           this.landingFrames = Math.min(9, Math.max(4, Math.round(Math.abs(this.vy))));
           this.airFrames = 0;
-          if(this.knockedDown){this.hitstun=Math.max(this.hitstun,18);this.getupFrames=18;}
+          if(this.knockedDown){
+            this.hitstun=Math.max(this.hitstun,18);this.getupFrames=18;
+            // Grounded knockdowns cannot be re-hit before the defender has a
+            // chance to guard / reverse on wakeup. Air juggles remain hittable.
+            this.invuln=Math.max(this.invuln,19);this.endCombo();
+          }
           this.onGround = true; this.vy = 0;
           if (this.state === 'jump') this.setState('idle');
         }
@@ -509,12 +624,27 @@
       if (this.state === 'ko') this.vx *= 0.92;
 
       // 边界
+      const unclampedX=this.x;
       this.x = U.clamp(this.x, FLOOR_MINX, FLOOR_MAXX);
+      if(this.dash&&unclampedX!==this.x)this.dash.travelBlocked=true;
+      if(this.attack?.stepDistance&&unclampedX!==this.x)this.attack.stepBlocked=true;
+      // Transfer the displacement the wall absorbed to the attacker. Corner
+      // pressure still pushes the fighters apart instead of deleting recoil.
+      if(unclampedX!==this.x&&(this.hitstun>0||this.blockstun>0)&&this.pushbackSource){
+        const source=this.pushbackSource;
+        source.x=U.clamp(source.x-(unclampedX-this.x),FLOOR_MINX,FLOOR_MAXX);
+        if(source.attack?.travelDistance)source.attack.travelBlocked=true;
+        if(source.attack?.stepDistance)source.attack.stepBlocked=true;
+      }
 
       // 攻击状态结束回 idle
+      if(this.dash&&this.stateT>=this.dash.frames){
+        this.dash=null;this.vx=0;this.trail=[];this.setState('idle');
+      }
       if (ATTACK_STATES.includes(this.state) && this.attack) {
         const total = this.attack.startup + this.attack.active + this.attack.recovery;
         if (this.stateT >= total) {
+          if(this.attack.stepDistance&&this.onGround)this.vx=0;
           this.attack = null;
           this.pendingRush = false;
           this.setState(this.onGround ? 'idle' : 'jump');
@@ -548,15 +678,14 @@
         if(this.gaitMoving){
           const phase=((this.stepPhase%turn)+turn)%turn;
           this.gaitSettleFrom=phase;
-          this.gaitSettleTo=([.375,.875,1].find(p=>p*turn>phase+.001)||1)*turn;
-          this.gaitSettleDuration=Math.max(4,Math.min(10,Math.ceil((this.gaitSettleTo-phase)/turn*32)));
+          // Freeze travel phase. Set down the moving foot, then replace the
+          // support foot with a short lifted step rather than a floor slide.
+          this.gaitSettleDuration=12;
           this.gaitSettling=this.gaitSettleDuration;
         }
         if(this.gaitSettling){
           this.gaitSettling--;
-          const p=1-this.gaitSettling/this.gaitSettleDuration,eased=p*p*(3-2*p);
-          this.stepPhase=this.gaitSettleFrom+(this.gaitSettleTo-this.gaitSettleFrom)*eased;
-          if(!this.gaitSettling)this.walkPhase=0;
+          if(!this.gaitSettling){this.walkPhase=0;this.stepPhase=0;}
         }
       }else{
         this.gaitSettling=0;this.stepPhase=0;
@@ -566,15 +695,15 @@
       this.moveLean+=((moving?this.vx*this.facing/(this.def.walkForward||this.def.walk*MOVE_SPEED):0)-this.moveLean)*.22;
     }
 
-    // 绘制
-    draw(ctx) {
+    // Shared animation sampling for rendering and physical contact checks.
+    sampleAnimation() {
       const prog = this.attack ? (this.stateT - this.attack.startup) / Math.max(1, this.attack.active) : this.stateT * 0.1;
       const attackPose = ATTACK_STATES.includes(this.state);
-      const poseState=this.grabbedBy?'hit':this.knockedDown?'ko':this.state==='parry'?'block':this.attack?.pose||this.state;
+      const poseState=this.grabbedBy?'hit':this.knockedDown?'ko':this.dash?(this.dash.kind==='forward'?'walk':'block'):this.state==='parry'?'block':this.attack?.pose||this.state;
       const motion = {
         fighter:this,attack:this.attack,kind:this.attackKind,state:this.state,reaction:this.reaction,reactionDuration:this.reactionDuration,reactionDir:this.reactionDir,
         attackT:this.stateT,attackStartup:this.attack?.startup,attackActive:this.attack?.active,
-        gait: this.stepPhase, blend: this.gaitSettling?1:this.moveBlend, lean: this.moveLean, gaitDirection:this.gaitDirection,
+        gait: this.stepPhase, blend: this.gaitSettling?1:this.moveBlend, lean: this.moveLean, gaitDirection:this.gaitDirection, gaitSettle:this.gaitSettling?1-this.gaitSettling/this.gaitSettleDuration:0,
         moving: this.gaitMoving || this.gaitSettling>0,
         air: !this.onGround && this.state === 'jump',
         airFrames: this.airFrames, vy: this.vy,
@@ -584,6 +713,11 @@
       };
       const artProgress = attackPose&&this.attack ? this.stateT/(this.attack.startup+this.attack.active+this.attack.recovery) : (this.state==='walk'?this.stepPhase:this.stateT*.06);
       const animation=window.Motion60?.sample(this.def,poseState,artProgress,motion);
+      return {animation,motion,poseState,artProgress,attackPose,prog};
+    }
+    // 绘制
+    draw(ctx) {
+      const {animation,motion,poseState,artProgress,attackPose,prog}=this.sampleAnimation();
       if(animation){
         motion.animation=animation;this.animationFrame=animation.frame;
         const drawn=window.DrawnAnimation?.selection(this.def,animation);
@@ -606,6 +740,23 @@
       ctx.beginPath(); ctx.ellipse(this.x, GROUND + 4, shW/2, 6 * SIZE, 0, 0, 7); ctx.fill();
       ctx.restore();
 
+      if(this.dash&&this.stateT<=this.dash.travelEnd){
+        ctx.save();ctx.fillStyle='#e0cba5';ctx.globalAlpha=.3;
+        for(let i=0;i<3;i++){
+          ctx.beginPath();ctx.ellipse(this.x-this.dash.dir*(18+i*14),GROUND-2-i*2,9+i*2,2+i,0,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+      }
+      if (this.airJumpEffect) {
+        const effect = this.airJumpEffect, p = 1 - effect.frames / 16;
+        ctx.save();
+        ctx.globalAlpha = (1 - p) * .8;
+        ctx.strokeStyle = this.def.fxColor || '#bdefff'; ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(effect.x, effect.y + p * 16, 22 + p * 34, 6 + p * 8, 0, 0, Math.PI * 2);
+        ctx.stroke(); ctx.restore();
+      }
+
       for(let i=0;i<this.trail.length;i++) {
         const q=this.trail[i];
         ctx.save();ctx.globalAlpha=.045+.035*i;
@@ -617,7 +768,7 @@
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.scale(this.facing * SCALE, SCALE);
-      const authoredFall=window.DrawnAnimation?.version===7&&window.DrawnAnimation.has(this.def.id);
+      const authoredFall=window.DrawnAnimation?.version>=7&&window.DrawnAnimation.has(this.def.id);
       if (this.state === 'ko'&&!authoredFall) ctx.rotate(this.koDir * this.facing * this.koFall * -1.3);
       if(this.grabbedBy)ctx.rotate(this.throwRotation);
       else if(this.knockedDown&&!authoredFall)ctx.rotate((this.reaction==='sweep'?-.95:-.7)*(this.onGround?(this.getupFrames||0)/18:Math.min(1,this.stateT/14)));

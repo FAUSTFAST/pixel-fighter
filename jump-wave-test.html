@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>二段跳躲波 · 实战判定测试</title>
+<link rel="stylesheet" href="css/jump-wave-test.css?v=1">
+</head>
+<body>
+<main>
+<header><div><span class="eyebrow">PIXEL FIGHTER / COMBAT TEST</span><h1>二段跳，能躲过这道波吗？</h1><p>相同距离、相同发波时间，比较站立、单跳与二段跳。</p></div><a href="index.html">返回游戏 ↗</a></header>
+<section class="test-controls" aria-label="测试选择">
+<label>对手招式 <select id="wave-case"><option value="ground">铁拳 · 地裂震拳</option><option value="crescent">苍月 · 弦月剑气</option></select></label>
+<div class="modes" role="group" aria-label="躲避方式"><button data-mode="stand" aria-pressed="false">站立对照</button><button data-mode="single" aria-pressed="false">单跳对照</button><button data-mode="double" aria-pressed="true">二段跳</button></div>
+</section>
+<div class="screen"><canvas id="replay" width="960" height="540" aria-label="实际角色与冲击波碰撞回放"></canvas><span id="asset-status" role="status">正在加载游戏角色素材…</span></div>
+<section class="transport" aria-label="回放控制">
+<button id="play">暂停</button><button id="restart">重新播放</button><button id="step">下一帧</button>
+<label>速度 <select id="speed"><option value="1">正常</option><option value="0.5" selected>1/2 慢放</option><option value="0.25">1/4 慢放</option></select></label>
+<label class="check"><input type="checkbox" id="boxes" checked>碰撞框</label><label class="check"><input type="checkbox" id="loop" checked>循环</label>
+<div class="timeline"><label for="frame">时间轴</label><input id="frame" type="range" min="0" max="150" value="0"><output id="counter">0 / 150 帧</output></div>
+</section>
+<section id="results" class="results" aria-label="三组测试结果"></section>
+<div class="details"><section><h2>动作时间线</h2><ol id="events"></ol></section><section><h2>本次验证</h2><p id="explanation"></p><p>使用游戏当前角色物理、招式发射和实际碰撞判定；角色关闭无敌，不格挡，也不修改波的速度或大小。动画中的血量与命中结果来自逐帧计算。</p><p class="legend"><span>青色框：角色受击范围</span><span>橙色框：波的攻击范围</span></p></section></div>
+</main>
+<script src="js/utils.js"></script><script src="js/characters.js?v=style-unified1"></script><script src="js/styles.js?v=combat2"></script>
+<script src="js/strike-art.js?v=style-unified1"></script>
+<script src="js/strike-motion.js?v=style-unified1"></script>
+<script src="js/combat-rules.js?v=startup1"></script><script src="js/combat-spacing.js?v=style-unified1"></script><script src="js/stages.js?v=kick-throw1"></script>
+<script src="js/arcade-animation.js?v=style-unified1"></script><script src="js/motion60.js?v=style-unified1"></script>
+<script>window.Audio2={sfx:{jump(){}}};</script>
+<script src="js/fighter.js?v=style-unified1"></script><script src="js/jump-wave-scenario.js?v=startup1"></script><script src="js/jump-wave-replay.js?v=1"></script>
+</body></html>

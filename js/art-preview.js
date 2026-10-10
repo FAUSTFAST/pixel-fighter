@@ -32,9 +32,8 @@
   function frame(now){
     if(previousTime!==null&&!paused)clock+=Math.min(.05,(now-previousTime)/1000)*(slow?.25:1);
     previousTime=now;
-    const ready=Object.values(window.MOVEMENT_ART||{}).filter(a=>a.ready).length;
-    const combatReady=Object.values(window.COMBAT_ART||{}).filter(a=>a.ready).length;
-    document.getElementById('load-status').textContent=`移动图集 ${ready}/6 · 拳脚投图集 ${combatReady}/6`;
+    const art=window.DrawnAnimation;
+    document.getElementById('load-status').textContent=art?.status==='ready'?`固定像素帧 ${art.poseCount} · 无插值`:'正在载入固定动作帧…';
     const t=clock;STAGES[stage].draw(ctx,t,Number(document.getElementById('camera').value));
     ctx.fillStyle='#060c2266';ctx.fillRect(0,0,960,540);
     for(let i=0;i<CHARACTERS.length;i++){

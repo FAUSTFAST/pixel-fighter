@@ -24,11 +24,11 @@ GROUPS = {
 }
 NEUTRAL = {'walk':[0,7,8,15], 'stance':[0,1,2,3], 'air':[1,5], 'punch':[0,7,8,15], 'kick':[0,7], 'special':[0,3], 'reaction':[3,15]}
 
-def inspect(path, sheet, neutral_slots, grid=(4,4), hip_x=None):
+def inspect(path, sheet, neutral_slots, grid=(4,4), hip_x=None, frame_count=None):
     im = Image.open(path).convert('RGBA')
     w,h = im.size
     columns,rows=grid
-    count=columns*rows
+    count=frame_count or columns*rows
     alpha = im.getchannel('A').tobytes()
     if min(alpha) > 0:
         raise ValueError('No transparent background')
@@ -77,12 +77,12 @@ def inspect(path, sheet, neutral_slots, grid=(4,4), hip_x=None):
         grounds.append(y+bh-(i//columns)*h/rows)
     root=median(roots);ground=median(grounds)
     if hip_x is not None:
-        if sheet!='walk' or len(hip_x)!=count:
+        if not sheet.startswith('walk') or len(hip_x)!=count:
             raise ValueError('Hip registration must cover every walking pose')
         # Generated sheet cells are not registered to the same body position.
         # Keep the pelvis stable, retaining the authored limb motion and lean.
         hip_origin=median(hip_x[i]-(i%columns)*w/columns for i in neutral_slots)
-    row_ground=[median(cells[i]['rect'][1]+cells[i]['rect'][3] for i in range(r*columns,(r+1)*columns)) for r in range(rows)]
+    row_ground=[median(cells[i]['rect'][1]+cells[i]['rect'][3] for i in range(r*columns,min(count,(r+1)*columns))) for r in range((count+columns-1)//columns)]
     if sheet=='reaction':
         row_ground[2]=cells[11]['rect'][1]+cells[11]['rect'][3]
     frames=[]
@@ -139,6 +139,18 @@ def main():
                 report.append({'asset':path.name,'status':'cataloged','frames':len(data['frames']),'sourceHeight':data['sourceHeight']})
             except (ValueError,OSError) as error:
                 report.append({'asset':path.name,'status':'needs-art-repair','detail':str(error)})
+        for direction,clip_name in [('Forward','walk'),('Backward','backwalk')]:
+            asset=approved['sheets'].get('walk'+direction)
+            if not asset:
+                continue
+            path=DIR/asset['file']
+            digest=hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest!=asset['sha256']:
+                raise ValueError('Walking sheet changed since visual review')
+            data=inspect(path,'walk'+direction,asset['neutral'],asset['grid'],asset.get('hipX'),asset['count'])
+            clips[clip_name]={'owner':char,'identity':approved['identity'],'revision':digest[:16],
+                'sheet':data['sheet'],'scale':data['scale'],'frames':data['frames']}
+            report.append({'asset':path.name,'status':'cataloged','frames':asset['count'],'sourceHeight':data['sourceHeight']})
         if len(clips)==sum(len(groups) for groups in GROUPS.values()):
             # Airborne legs fold; feet and flying cloth are not a body origin or
             # a height reference. Register all aerial poses to the standing hip.
@@ -156,6 +168,12 @@ def main():
                     x,y=air['hips'][frame['slot']]
                     frame['root']=round(x-hip_offset[0]/air_scale,3)
                     frame['ground']=round(y-hip_offset[1]/air_scale,3)
+            # Locomotion must derive from the exact neutral costume / head / hip
+            # pixels. Separately generated walk sheets remain archived references.
+            for name,direction in [('walk',1),('backwalk',-1)]:
+                idle=clips['idle']
+                clips[name]={**idle,'gaitRig':{'base':'idle','frame':0,'steps':16,'direction':direction,'hip':hip_offset},
+                    'frames':[{**idle['frames'][0],'slot':i} for i in range(16)]}
             manifest['characters'][char]=clips
     issues=[r for r in report if r['status']!='cataloged']
     (DIR/'catalog-report.json').write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n')

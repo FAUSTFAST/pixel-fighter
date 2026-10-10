@@ -3,6 +3,44 @@
   const normals=['light','medium','heavy','lightKick','mediumKick','heavyKick','lowKick','lowMediumKick','sweep'];
   const specials=['special','uppercut','rush','tech','skill'];
   const supers=['super1','super2','super'];
+  const lights=['light','lightKick','lowKick'];
+  // Original frame data for this game's 100 HP scale. Advantage is measured
+  // on the first active frame; later hits gain the remaining active frames.
+  const normalFrames={
+    light:         [4,3,10, 3,-3,4,6],
+    lightKick:     [5,3,12, 1,-4,4,6],
+    lowKick:       [5,3,12, 0,-4,3,6],
+    medium:        [6,3,14, 5,-4,8,7],
+    mediumKick:    [7,3,16, 1,-6,9,8],
+    lowMediumKick: [8,3,17, 0,-6,8,8],
+    heavy:        [10,4,20,5,-6,11,9],
+    heavyKick:    [12,4,24,1,-8,13,10],
+    sweep:        [12,4,28,0,-14,12,11],
+  };
+  const frameOverrides={
+    ryu:{},
+    mei:{medium:{hitAdvantage:3},heavy:{startup:9,hitAdvantage:3},heavyKick:{startup:10,hitAdvantage:3}},
+    tank:{light:{startup:5,dmg:5},lightKick:{startup:7,dmg:5},lowKick:{startup:7,dmg:4},medium:{startup:8,hitAdvantage:3,dmg:10},mediumKick:{startup:9,dmg:11},lowMediumKick:{startup:10,dmg:10},heavy:{startup:12,hitAdvantage:4,dmg:14},heavyKick:{startup:15,dmg:16},sweep:{startup:15,dmg:15}},
+    volt:{medium:{hitAdvantage:3},heavy:{startup:9,hitAdvantage:3},heavyKick:{startup:11}},
+    kaze:{light:{startup:5},lightKick:{startup:6},lowKick:{startup:6},medium:{startup:7},heavy:{startup:11},heavyKick:{startup:12,hitAdvantage:3}},
+    sage:{light:{startup:5},lightKick:{startup:6},lowKick:{startup:6},medium:{startup:7,hitAdvantage:4},heavy:{startup:12,hitAdvantage:3},heavyKick:{startup:13}},
+  };
+  // 少量增加各类招式的准备时间，保持 60 Hz 判定和原有持续 / 收招。
+  // 数值按本作适配，不宣称是 SF6 角色的原始帧表。
+  const normalStartupDelay={light:1,lightKick:1,lowKick:1,medium:1,mediumKick:2,lowMediumKick:2,heavy:2,heavyKick:3,sweep:3};
+  function retimeStartup(m,offset){
+    const startup=Math.max(2,m.startup+offset),delta=startup-m.startup;
+    m.startup=startup;
+    for(const key of ['hitFrames','shots'])if(m[key])m[key]=m[key].map(t=>t+delta);
+    // 这些截止帧相对动作开始；飞行道具自身的激活 / 折返计时不变。
+    for(const key of ['armorUntil','invincible'])if(m[key])m[key]+=delta;
+    return m;
+  }
+  function specialStartupDelay(kind,m){
+    if(kind==='uppercut'||m.grab)return 1;
+    if(m.projectile||m.level==='overhead'||m.effect==='pillar')return 3;
+    return 2;
+  }
   const base={startup:9,active:4,recovery:22,dmg:16,reach:65,hw:50,hh:55,hy:-40,kb:4,hitstun:28,blockstun:13,type:'special',meterGain:15,cost:0,groundOnly:true,pose:'special',category:'special',cancelSuper:3};
   const move=(name,detail,cfg)=>({...base,name,detail,...cfg});
   const profiles={
@@ -12,7 +50,7 @@
         special:move('回旋风镖','回旋手里剑先前飞再折返；轻版起手快，重版射程远。',{startup:11,projectile:true,projShape:'shuriken',projPath:'return',projSpeed:8,projLife:95,dmg:14,pose:'weaponThrow'}),
         uppercut:move('双岚升击','两段对空；OD 版起手无敌，落空有长破绽。',{startup:5,active:12,recovery:27,dmg:10,hitFrames:[5,11],launch:true,knockdown:true,hh:95,hy:-60,pose:'uppercut'}),
         rush:move('贴地风牙','贴地滑踢打下段，可作为连段收尾。',{startup:9,active:8,recovery:22,dmg:15,level:'low',rushSpeed:7,knockdown:true,pose:'lowKick'}),
-        tech:move('螺旋裂风掌','三段贴身掌击，最后一掌可取消三级超必杀。',{startup:7,active:17,recovery:19,dmg:6,kb:.8,hitFrames:[7,13,19],rushSpeed:2.8,pose:'rush'}),
+        tech:move('螺旋裂风掌','三段贴身掌击，最后一掌可取消三级超必杀。',{startup:7,active:17,recovery:19,dmg:6,kb:.8,hitstun:24,hitFrames:[7,13,19],rushSpeed:2.8,pose:'rush'}),
         skill:move('斜空双镖','两枚向上抛出的风镖，适合封锁跳跃。',{startup:15,active:10,shots:[15,22],projectile:true,projShape:'shuriken',projPath:'arc',projVy:-6,projGravity:.16,projSpeed:6,dmg:9,pose:'weaponThrow'}),
         super1:move('岚牙穿云','一级：两枚贯穿风刃，适合普通技确认收尾。',{startup:6,active:12,projectile:true,shots:[6,13],dmg:14,projSpeed:13,projShape:'spear'}),
         super2:move('暴风结界','二级：四段近身风阵，连续封锁身前空间。',{startup:7,active:25,dmg:11,hitFrames:[7,14,21,28],hw:95,hh:110,hy:-52,kb:1,finalKb:12,pose:'heavy'}),
@@ -20,7 +58,7 @@
       assist:{light:['light','light','special'],medium:['medium','heavy',{kind:'tech',od:true},'super1'],heavy:['heavy','driveRush','medium','heavy',{kind:'tech',od:true},'super']}},
     mei:{target:{light:['medium'],medium:['mediumKick']},modern:['light','medium','heavyKick'],names:['绯燕肘','燕舞连踢'],
       moves:{
-        special:move('蝶影穿心','三段前冲掌击，命中后可接三级超必杀。',{startup:8,active:16,recovery:18,hitFrames:[8,14,20],dmg:6,kb:.6,rushSpeed:3.8,pose:'rush'}),
+        special:move('蝶影穿心','三段前冲掌击，命中后可接三级超必杀。',{startup:8,active:16,recovery:18,hitstun:22,hitFrames:[8,14,20],dmg:6,kb:.6,rushSpeed:3.8,pose:'rush'}),
         uppercut:move('飞花升膝','升膝对空；OD 版无敌并增加受击硬直。',{startup:5,active:10,recovery:26,dmg:17,launch:true,knockdown:true,hh:90,hy:-58,pose:'uppercut'}),
         rush:move('燕掠踏肩','突进中段踢，可击破蹲防，起手较慢。',{startup:18,active:6,recovery:23,dmg:18,level:'overhead',rushSpeed:6,pose:'heavyKick'}),
         tech:move('绯刃双环','前后错开的两枚弧线飞刃，牵制不同高度。',{startup:12,active:12,shots:[12,20],projectile:true,projShape:'blade',projPath:'arc',projVy:-4,projGravity:.13,projSpeed:7,dmg:8,pose:'weaponThrow'}),
@@ -39,7 +77,7 @@
         super1:move('撼地怒潮','一级：高速地面震波，需蹲防。',{startup:8,projectile:true,projGround:true,projSpeed:10,projShape:'flame',projRadius:28,level:'low',dmg:29,knockdown:true,pose:'heavy'}),
         super2:move('钢壁破城','二级：三段霸体冲撞，适合重拳确认。',{startup:7,active:22,dmg:16,hitFrames:[7,15,23],kb:1,rushSpeed:5,armor:2,armorUntil:28,pose:'rush'}),
         super:move('巨岳断层摔','三级：高伤指令投；只抓自由站地对手，不能连段取消。',{startup:5,active:4,recovery:45,dmg:60,reach:4,hw:84,hh:80,hy:-40,grab:true,knockdown:true,pose:'throw'})},
-      assist:{light:['light','light','special'],medium:['medium','heavy',{kind:'rush',od:true},'super1'],heavy:['heavy','driveRush','medium','heavy',{kind:'rush',od:true},'super2']}},
+      assist:{light:['light','light','uppercut'],medium:['medium','heavy',{kind:'rush',od:true},'super1'],heavy:['heavy','driveRush','medium','heavy',{kind:'rush',od:true},'super2']}},
     volt:{target:{light:['mediumKick'],medium:['heavy']},modern:['light','mediumKick','heavy'],names:['磁暴肘','闪电中踢'],
       moves:{
         special:move('脉冲雷核','上下摆动的雷核，用轨迹变化牵制跳跃。',{startup:10,projectile:true,projPath:'wave',projShape:'electric',projAmplitude:42,projSpeed:8,dmg:14}),
@@ -83,25 +121,50 @@
     c.moves.lowMediumKick={...c.moves.mediumKick,name:'下段'+p.names[1],level:'low',pose:'lowKick',hy:-15,hh:20};
     Object.assign(c.moves,p.moves);
     for(const k of normals){
-      const m=c.moves[k];m.category='normal';m.cost=0;m.cancellable=k!=='sweep';m.cancelInto=p.target[k]||[];m.meterGain=14;m.groundOnly=false;
+      const m=c.moves[k],[startup,active,recovery,hitAdvantage,blockAdvantage,dmg,kb]=normalFrames[k];
+      Object.assign(m,{startup,active,recovery,hitAdvantage,blockAdvantage,dmg,kb},frameOverrides[c.id][k]);
+      retimeStartup(m,normalStartupDelay[k]);
+      m.hitstun=m.active+m.recovery+m.hitAdvantage;
+      m.blockstun=m.active+m.recovery+m.blockAdvantage;
+      m.category='normal';m.cost=0;
+      m.cancellable=k!=='sweep'&&k!=='lowKick'&&(k!=='heavyKick'||['mei','kaze'].includes(c.id));
+      m.cancelInto=p.target[k]||[];m.chainInto=lights.includes(k)?lights:[];m.chainLimit=3;
+      m.lightStarter=lights.includes(k);m.starterScaling=k==='lowMediumKick'?.2:0;
+      m.cancelWindow=8;m.meterGain=10;m.groundOnly=false;
       m.pose=m.pose||(['light','heavy'].includes(k)?k:'heavy');
-      if(k==='light'||k==='lightKick'||k==='lowKick'){m.hitstun=17;m.blockstun=9;m.kb=1.8;m.recovery=7;}
-      if(k==='heavy'||k==='heavyKick'){m.hitstun=30;m.blockstun=16;m.kb=3;m.recovery=18;}
       m.command={light:'轻拳',medium:'中拳',heavy:'重拳',lightKick:'轻脚',mediumKick:'中脚',heavyKick:'重脚',lowKick:'↓ + 轻脚',lowMediumKick:'↓ + 中脚',sweep:'↓ + 重脚'}[k];
-      m.detail=k==='sweep'?'下段击倒，不可取消。':`可取消必杀 / 超必杀 / 斗气冲刺${m.cancelInto.length?'；目标连段：'+m.cancelInto.map(n=>c.moves[n].name).join(' / '):''}。`;
+      m.detail=[k==='sweep'?'下段击倒，不可取消':m.cancellable?'可取消必杀 / 超必杀 / 斗气冲刺':'不可取消必杀 / 超必杀 / 斗气冲刺',
+        m.chainInto.length?'轻攻击可互相连打，最多三招':'',
+        m.cancelInto.length?'目标连段：'+m.cancelInto.map(n=>c.moves[n].name).join(' / '):'',
+        m.starterScaling?'起手后续伤害额外修正 20%':''].filter(Boolean).join('；')+'。';
     }
     for(const k of specials){
       const m=c.moves[k];m.effect=m.effect||c.moves.super.effect||{ryu:'wind',mei:'petal',tank:'impact',volt:'electric',kaze:'slash',sage:'flame'}[c.id];m.projColor=c.fxColor;
+      retimeStartup(m,specialStartupDelay(k,m));
+      // Paid multi-hit followups retain their precise normal link after the
+      // one-frame jab adjustment, including the heavy-strength OD variant.
+      if(c.id==='ryu'&&k==='tech'||c.id==='mei'&&k==='special')m.odHitstunBonus=7;
       m.command={special:'↓↘→ + 拳',uppercut:'→↓↘ + 拳',rush:'↓↘→ + 脚',tech:'↓↙← + 拳',skill:'↓↙← + 脚'}[k]+(c.id==='volt'&&k==='tech'?' / ←蓄→ + 拳':'');
       if(c.id==='tank'&&k==='tech')m.command+=' / →↘↓↙← + 拳';
     }
-    supers.forEach((k,i)=>Object.assign(c.moves[k],{category:'super',cost:(i+1)*100,saLevel:i+1,meterGain:0,cancelSuper:0,invincible:k==='super'?12:5,command:['↓↘→↓↘→ + 拳','↓↙←↓↙← + 拳','↓↘→↓↘→ + 脚'][i],effect:c.moves.special.effect,projColor:c.fxColor}));
+    supers.forEach((k,i)=>{
+      const m=c.moves[k];
+      Object.assign(m,{category:'super',cost:(i+1)*100,saLevel:i+1,meterGain:0,cancelSuper:0,invincible:k==='super'?12:5,command:['↓↘→↓↘→ + 拳','↓↙←↓↙← + 拳','↓↘→↓↘→ + 脚'][i],effect:c.moves.special.effect,projColor:c.fxColor});
+      retimeStartup(m,m.projectile?3:2);
+    });
     c.moves.throw.command='轻拳＋轻脚 / 投键';c.moves.throw.category='throw';
-    c.moves.driveRush=move('斗气冲刺','自由状态消耗 1 格；普通技接触后取消消耗 3 格。下一普通技 +4 帧硬直。',{category:'drive',startup:1,active:14,recovery:0,noHit:true,moveSpeed:9,pose:'rush',effect:'drive',cancellable:false,meterGain:0});
+    c.moves.driveRush=move('斗气冲刺','自由状态消耗 1 格；普通技接触后取消消耗 3 格。下一普通技 +4 帧硬直，取消冲刺使后续伤害额外修正 15%。',{category:'drive',startup:1,active:14,recovery:0,noHit:true,moveSpeed:9,pose:'rush',effect:'drive',cancellable:false,meterGain:0});
     c.moves.impact=move('斗气迸放','消耗 1 格，两段霸体，投技可破；慢起手重击。',{category:'drive',startup:26,active:3,recovery:30,dmg:22,armor:2,armorUntil:28,hitstun:55,reach:78,hw:65,kb:1,pose:'heavy',effect:'drive',driveCost:1,meterGain:0});
     c.moves.driveRush.command='→→（招架中 / 普通技接触后）或冲刺键';c.moves.impact.command='重拳＋重脚 / 迸放键';
     c.plan={ryu:'回旋风镖控场，中拳→重拳确认螺旋掌；双岚升击对空。',mei:'轻拳→中拳→中脚压制，OD 蝶影接超必杀；中段踏肩破解蹲防。',tank:'地裂震拳逼近，霸体肩撞抢回合；指令投抓防守，三级投不用于连段。',volt:'雷枪蓄力牵制，地雷封路；闪隙突刺与斗气冲刺快速确认。',kaze:'长剑中距离截击，中拳→重脚接二段斩；镜刃读近身出手。',sage:'火种、焰印与炎柱延迟控场；近身用中重掌确认火环或炎蛇。'}[c.id];
   }
-  window.CombatRules={normals,specials,supers,isNormal:k=>normals.includes(k),isSpecial:k=>specials.includes(k),isSuper:k=>supers.includes(k)};
+  function advantage(m,blocked=false,contact=m.startup){
+    return (blocked?m.blockstun:m.hitstun)-(m.startup+m.active+m.recovery-contact);
+  }
+  function damageScale(moveCount,lightStarter,penalty=0,floor=.1){
+    const base=moveCount===1?1:moveCount===2&&!lightStarter?1:1-(moveCount-1)*.1;
+    return Math.max(floor,base-penalty);
+  }
+  window.CombatRules={normals,lights,specials,supers,advantage,damageScale,retimeStartup,isNormal:k=>normals.includes(k),isSpecial:k=>specials.includes(k),isSuper:k=>supers.includes(k)};
   window.ATTACK_STATES=[...normals,'throw',...specials,...supers,'driveRush','impact'];
 })();

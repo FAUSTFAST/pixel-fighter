@@ -48,7 +48,7 @@
     difficulty(ctx, t, sel) {
       bg(ctx);
       U.textOutline(ctx,'选择难度', W/2, 120, 44, '#ffd166', '#7a2a00');
-      const ds=[{n:'简单',d:'AI 反应慢'},{n:'普通',d:'均衡挑战'},{n:'困难',d:'AI 凶狠'}];
+      const ds=[{n:'简单',d:'慢反应 · 短连段'},{n:'普通',d:'走位 · 命中确认'},{n:'困难',d:'惩罚 · 多段追击'}];
       ds.forEach((m,i)=>{const y=210+i*90,on=sel===i;
         panel(ctx,W/2-200,y,400,72,on);
         U.text(ctx,m.n,W/2-40,y+45,28,on?'#ffd166':'#ccd','center');
