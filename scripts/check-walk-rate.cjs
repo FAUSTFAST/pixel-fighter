@@ -2,7 +2,7 @@
 // version. User chose slower drawings with unchanged world speed, accepting slip.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
 const {harness}=require('./gameplay-harness.cjs'),{nativeHarness,root}=require('./native-game-art.cjs');
-const baselineCommit='a23cec4709b0e54130b5124e5eb3f400dda99caa';
+const baselineCommit='18dbfd0c47e960850052a7e068bc1b992d6de790';
 const sources={fighter:execFileSync('git',['show',baselineCommit+':js/fighter.js'],{cwd:root}).toString()};
 (async()=>{
  const native=nativeHarness(91);await native.s.DrawnAnimation.loading;const art=native.s.DrawnAnimation;assert.equal(art.status,'ready');
@@ -18,7 +18,7 @@ const sources={fighter:execFileSync('git',['show',baselineCommit+':js/fighter.js
    for(const [i,h] of runs.entries()){const previous=h.f.stepPhase;h.tick(1,hz);if(h.f.gaitMoving)totals[i]+=(h.f.stepPhase-previous+Math.PI*2)%(Math.PI*2);}
    const old=runs[0].f,f=runs[1].f;
    for(const key of ['x','y','vx','vy','facing','state','onGround'])assert.equal(f[key],old[key],'world movement changed: '+key);worldPositionChecks++;
-   assert.ok(Math.abs(totals[1]-totals[0]*.75)<1e-8,'actual gait cycle must advance at 0.75 of released version');
+   assert.ok(Math.abs(totals[1]-totals[0]*(backward?1:2/3))<1e-8,'forward gait advances at 2/3; backward gait stays identical to the released version');
    assert.equal(f.facing,side?-1:1);
    const sel=art.selection(f.def,f.sampleAnimation().animation);
    if(!f.gaitMoving||!sel.meta.support){plant=null;continue;}
@@ -34,6 +34,6 @@ const sources={fighter:execFileSync('git',['show',baselineCommit+':js/fighter.js
   maxLiveSoleDrift=Math.max(maxLiveSoleDrift,worst);soleRuns.push({character:runs[1].f.def.id,side,backward,hz,maxLiveSoleDrift:+worst.toFixed(3)});movementRuns++;
   for(const h of runs){h.s.Input.clear();h.tick(Math.ceil(40*hz/60),hz);assert.equal(h.f.gaitMoving,false);assert.equal(h.f.gaitSettling,0);assert.equal(art.selection(h.f.def,h.f.sampleAnimation().animation).clip,'idle');}
  }
- const result={passed:true,baselineCommit,animationRate:.75,movementRate:1,movementRuns,worldPositionChecks,soleSamples,maxLiveSoleDrift:+maxLiveSoleDrift.toFixed(3),footPlanting:'Intentional user-approved drift: drawings slowed without slowing world movement; no foot locks, frame warps or art edits.',soleRuns};
- const out=path.join(root,'output/walk-rate');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'check-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify({...result,soleRuns:undefined}));
+ const result={passed:true,baselineCommit,animationRates:{forward:.5,backward:.75},relativeRates:{forward:2/3,backward:1},movementRate:1,movementRuns,worldPositionChecks,soleSamples,maxLiveSoleDrift:+maxLiveSoleDrift.toFixed(3),footPlanting:'Intentional user-approved drift: drawings slowed without slowing world movement; no foot locks, frame warps or art edits.',soleRuns};
+ const out=path.join(root,'output/forward-walk-rate');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'check-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify({...result,soleRuns:undefined}));
 })().catch(e=>{console.error(e);process.exitCode=1;});
