@@ -1,6 +1,6 @@
 # Pixel Fighter · 像素格斗
 
-原生 JavaScript / Canvas 本地格斗游戏，无需 npm 依赖。双击 `启动游戏.command` 启动后台服务并打开游戏；也可运行 `python3 -m http.server 8765 --bind 127.0.0.1`，打开 `http://127.0.0.1:8765/?v=stage-depth1`。
+原生 JavaScript / Canvas 本地格斗游戏，无需 npm 依赖。双击 `启动游戏.command` 启动后台服务并打开游戏；也可运行 `python3 -m http.server 8765 --bind 127.0.0.1`，打开 `http://127.0.0.1:8765/?v=neon-native1`。
 
 ## 当前版本：B 版原画完整恢复
 
@@ -24,6 +24,12 @@ GitHub 文件列表显示的是**每个文件最后一次修改的提交**。保
 `node scripts/check-stage-depth.cjs` 使用真实全景验证七张地图、21 个镜头位置、45 个粒子视差样本、远景高频细节下降、滤镜备用路径及战斗区域未被虚化。与修改前的 300 帧实际键盘操作对照中，移动、攻击、二段跳和镜头结果一致，13 个角色与战斗模块字节不变。原始地图 PNG 保留。
 
 `node scripts/render-stage-depth.cjs` 和 `python3 scripts/encode-stage-depth.py` 输出七张地图的原版游戏对照回放：`output/stage-depth/replay/stage-depth.gif`，左侧为修改前，右侧为景深开启后的画面。
+
+## 霓虹夜街招牌风格统一
+
+移除后贴的纯色广告框、系统字体与矩形光条，直接复用全景原画中的五处霓虹招牌与灯带。字形、金属边框、灯管、遮挡与原有反光保留；在加载时提取原画发光像素，运行时加入缓慢明暗呼吸与沿灯管扫过的流光。动画只作用于原有发光像素，并随建筑整体移动，不修改原始地图 PNG。其他场景、角色、战斗与操作保持原值。
+
+`node scripts/check-city-neon.cjs` 验证 9658 个原画采样像素、12 个霓虹夜街时间 / 镜头组合、其他六张地图的 72 个逐像素一致视图，以及 360 帧实际键盘输入的战斗对照。`node scripts/render-city-neon.cjs` 与 `python3 scripts/encode-city-neon.py` 生成十秒原版游戏对照回放，保存在 `output/neon-sign/replay/neon-sign.gif`。
 
 ## 前进、后退动画播放速度
 

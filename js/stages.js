@@ -26,11 +26,60 @@
         const c=layer.getContext('2d');c.imageSmoothingEnabled=false;
         c.drawImage(panorama,240,0,960,540,0,0,640,360);
         c.save();c.scale(2/3,2/3);window.StageDepth?.draw(c,depth,0);c.restore();
-        art[id]={ready:true,layer,panorama,depth};
+        art[id]={ready:true,layer,panorama,depth,neon:id==='city'?prepareCityNeon(panorama):null};
       };
       img.onerror=()=>{art[id].failed=true;};
       img.src='assets/stages/'+id+'-panorama-v3.png';
     }
+  }
+
+  // 只提取原画招牌的发光像素；框架、字形、遮挡和灯管连接仍使用原图。
+  // 坐标属于 1440 宽全景，和建筑采用相同的镜头位移。
+  function prepareCityNeon(panorama){
+    const panels=[
+      {x:511,y:32,w:19,h:78,phase:0},
+      {x:976,y:35,w:17,h:60,phase:1.4},
+      {x:936,y:124,w:23,h:83,phase:2.1},
+      {x:1321,y:25,w:36,h:67,phase:2.8},
+      {x:1321,y:101,w:35,h:81,phase:4.2,blue:true}
+    ];
+    return panels.map(panel=>{
+      const light=document.createElement('canvas');light.width=panel.w;light.height=panel.h;
+      const dim=document.createElement('canvas');dim.width=panel.w;dim.height=panel.h;
+      const lc=light.getContext('2d'),dc=dim.getContext('2d');
+      const pixels=panorama.getContext('2d').getImageData(panel.x,panel.y,panel.w,panel.h);
+      const darkness=dc.createImageData(panel.w,panel.h);
+      for(let i=0;i<pixels.data.length;i+=4){
+        const [r,g,b]=pixels.data.subarray(i,i+3);
+        let weight=Math.max(0,Math.min(1,(panel.blue?b-r-24:Math.min(r,b)-g-25)/70));
+        if(r>180&&g>170&&b>210)weight=Math.max(weight,.7);
+        pixels.data[i+3]=darkness.data[i+3]=Math.round(weight*255);
+      }
+      lc.putImageData(pixels,0,0);dc.putImageData(darkness,0,0);
+      return {...panel,light,dim};
+    });
+  }
+
+  function cityNeon(ctx,t){
+    ctx.save();ctx.imageSmoothingEnabled=false;
+    for(const panel of art.city?.neon||[]){
+      const x=panel.x-240,y=panel.y;
+      const pulse=.5+.5*Math.sin(t*.95+panel.phase);
+      ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.06+.20*(1-pulse);
+      ctx.drawImage(panel.dim,x,y);
+      // 低频呼吸与柔和流光，仅照亮原画的灯管 / 字样，不盖上新的矩形屏幕。
+      ctx.globalCompositeOperation='screen';ctx.globalAlpha=.04+.08*pulse;
+      ctx.drawImage(panel.light,x,y);
+      const head=((t*20+panel.phase*17)%(panel.h+36))-18;
+      for(let row=0;row<panel.h;row+=2){
+        const strength=Math.max(0,1-Math.abs(row-head)/18);
+        if(!strength)continue;
+        ctx.globalAlpha=.28*strength*strength;
+        const height=Math.min(2,panel.h-row);
+        ctx.drawImage(panel.light,0,row,panel.w,height,x,y+row,panel.w,height);
+      }
+    }
+    ctx.restore();
   }
 
   function atmosphere(ctx,id,t,front=false,camera=0,distant=false) {
@@ -104,13 +153,7 @@
       }
     }else if(id==='city'){
       person(ctx,184,386,t,'#766089',0);person(ctx,207,386,t,'#557b83',2);person(ctx,229,386,t,'#856653',4);
-      // 同一块招牌交替文字与移动光条，无高频闪烁。
-      ctx.fillStyle='#121e36';ctx.fillRect(684,174,88,49);
-      ctx.strokeStyle='#8971b7';ctx.lineWidth=2;ctx.strokeRect(684,174,88,49);
-      ctx.fillStyle='#ef7ed6';ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillText(Math.floor(t/5)%2?'夜市 OPEN':'NEON 24H',728,197);
-      ctx.save();ctx.beginPath();ctx.rect(690,204,76,12);ctx.clip();
-      ctx.fillStyle='#74d6dd';for(let i=0;i<5;i++)ctx.fillRect(688+((t*14+i*21)%100),207,10,3);ctx.restore();
-      ctx.globalAlpha=.15+.08*Math.sin(t);ctx.fillStyle='#df70c6';ctx.fillRect(690,397,65,2);
+      cityNeon(ctx,t);
     }else if(id==='beach'){
       for(let i=0;i<4;i++)bird(ctx,((i*237+t*(8+i))%1250)-120,135+i*19,t+i,'#d6c7b1');
       person(ctx,733,381,t,'#786c73',0);person(ctx,752,381,t,'#698187',3);
