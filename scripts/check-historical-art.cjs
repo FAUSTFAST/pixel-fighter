@@ -38,7 +38,7 @@ const old=file=>execFileSync('git',['show',reference.commit+':'+file],{cwd:root,
    }
   }
  }
- const unchanged=['assets/characters/animation-v8/manifest.json','js/characters.js','js/fighter.js','js/input.js','js/controls.js','js/combat-rules.js','js/ai.js','js/ui.js','js/panels.js','js/stages.js','js/settings.js','js/strike-art.js','js/strike-motion.js','js/motion60.js'];
+ const unchanged=['assets/characters/animation-v8/manifest.json','js/characters.js','js/input.js','js/controls.js','js/combat-rules.js','js/ai.js','js/ui.js','js/panels.js','js/stages.js','js/settings.js','js/strike-art.js','js/strike-motion.js','js/motion60.js'];
  for(const file of unchanged)assert.ok(fs.readFileSync(path.join(root,file)).equals(execFileSync('git',['show',checkpoint+':'+file],{cwd:root,maxBuffer:16*1024*1024})),file+' gameplay changed');
  // The separately authorized visible-contact fix changes only melee resolution
  // and its geometry. Protect all other mechanics and movement in these files.
@@ -47,7 +47,15 @@ const old=file=>execFileSync('git',['show',reference.commit+':'+file],{cwd:root,
   const outside=code=>{const a=code.indexOf(start),b=code.indexOf(end,a);assert.ok(a>=0&&b>a);return code.slice(0,a)+code.slice(b);};
   assert.equal(outside(current),outside(baseline),file+' changed outside visible contact');
  }
+ // The user-authorized 0.75 walking playback change is confined to gait
+ // timing, its rate constant and a read-only gallery getter. Physics stays exact.
+ {
+  const file='js/fighter.js',baseline=execFileSync('git',['show',checkpoint+':'+file],{cwd:root}).toString();
+  const current=fs.readFileSync(path.join(root,file),'utf8');
+  const outside=source=>{const a=source.indexOf('    updateGait(distance) {'),b=source.indexOf('    // Shared animation sampling',a);assert.ok(a>=0&&b>a);return (source.slice(0,a)+source.slice(b)).replace(/^  const WALK_ANIMATION_RATE.*\n/m,'').replace(/^    static get walkAnimationRate.*\n/m,'');};
+  assert.equal(outside(current),outside(baseline),'physics or attacks changed outside walking animation timing');
+ }
  assert.equal(execFileSync('git',['diff',checkpoint,'--name-only','--','assets/characters/animation-v7','assets/characters/animation-v8'],{cwd:root}).toString(),'');
- const result={passed:true,sourceCommit:reference.commit,characters:6,clips:132,comparedNativeFrames:compared,originalDrawings:drawings,originalSheets:originalFiles.size,unchangedModules:unchanged.length,limitedContactChanges:['resolveMelee','geometry'],proof:'pixel equality with Git B renderer and PNGs; unchanged combat parameters, movement, input and UI; authorized visible-contact fix only'};
+ const result={passed:true,sourceCommit:reference.commit,characters:6,clips:132,comparedNativeFrames:compared,originalDrawings:drawings,originalSheets:originalFiles.size,unchangedModules:unchanged.length,limitedContactChanges:['resolveMelee','geometry'],limitedWalkChanges:['updateGait','walkAnimationRate'],proof:'pixel equality with Git B renderer and PNGs; unchanged combat parameters, world movement, input and UI; authorized visible-contact and walking playback changes only'};
  fs.mkdirSync(path.join(root,'output/art-restoration/full'),{recursive:true});fs.writeFileSync(path.join(root,'output/art-restoration/full/historical-art-check.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));
 })().catch(error=>{console.error(error);process.exitCode=1;});

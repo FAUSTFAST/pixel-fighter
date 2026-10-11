@@ -31,7 +31,7 @@
     const elapsed=Math.min(.05,(now-previous)/1000);previous=now;
     const def=CHARACTERS[Number(root.querySelector('#motion-character').value)],name=root.querySelector('#motion-action').value,m=def.moves[name];
     const walking=name==='walk'||name==='backwalk',backward=name==='backwalk';
-    const cycleTicks=walking?(backward?def.strideBackward/def.walkBackward:def.stride/def.walkForward):60;
+    const cycleTicks=walking?(backward?def.strideBackward/def.walkBackward:def.stride/def.walkForward)/Fighter.walkAnimationRate:60;
     if(playing){accumulator+=elapsed*60*(60/cycleTicks)*Number(root.querySelector('#motion-speed').value);while(accumulator>=1){frame=(frame+1)%60;accumulator--;}}
     const canvas=root.querySelector('canvas'),ctx=canvas.getContext('2d');
     ctx.fillStyle='#0a1422';ctx.fillRect(0,0,720,420);

@@ -10,6 +10,7 @@
   const SIZE = 2;           // 人物与战斗判定同步放大
   const SCALE = 2.1 * SIZE;
   const MOVE_SPEED = 1.3; // 旧定义的回退值，新角色使用独立前后步速。
+  const WALK_ANIMATION_RATE = 0.75; // Only the walking drawings slow down; world movement stays unchanged.
   const AIR_JUMP_SCALE = 0.8; // 第二跳稍低，最高点仍留在战斗画面内。
   const ATTACK_STATES = window.ATTACK_STATES || ['light','heavy','special','uppercut','rush','tech','skill','super'];
 
@@ -113,6 +114,7 @@
   }
 
   class Fighter {
+    static get walkAnimationRate() { return WALK_ANIMATION_RATE; }
     constructor(def, x, facing, playerLabel) {
       this.def = def;
       this.name = def.name;
@@ -673,14 +675,14 @@
         this.gaitSettling=0;
         const stride=this.gaitDirection<0?this.def.strideBackward:this.def.stride;
         // Resume the support-foot phase instead of jumping back to pose zero.
-        this.stepPhase=(this.stepPhase+travel*turn/(stride||104))%turn;
+        this.stepPhase=(this.stepPhase+travel*turn/(stride||104)*WALK_ANIMATION_RATE)%turn;
       }else if(canSettle){
         if(this.gaitMoving){
           const phase=((this.stepPhase%turn)+turn)%turn;
           this.gaitSettleFrom=phase;
           // Freeze travel phase. Set down the moving foot, then replace the
           // support foot with a short lifted step rather than a floor slide.
-          this.gaitSettleDuration=12;
+          this.gaitSettleDuration=Math.round(12/WALK_ANIMATION_RATE);
           this.gaitSettling=this.gaitSettleDuration;
         }
         if(this.gaitSettling){
