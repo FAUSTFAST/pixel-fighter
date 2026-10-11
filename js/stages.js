@@ -20,43 +20,51 @@
         const scale=Math.max(1440/img.width,540/img.height)*framing;
         const width=img.width*scale,height=img.height*scale;
         p.drawImage(img,(1440-width)/2,framing>1?0:(540-height)/2,width,height);
-        // 菜单缩略图仍显示舞台中央的 16:9 视口。
+        const depth=window.StageDepth?.prepare(id,panorama);
+        // 菜单缩略图显示舞台中央的景深效果与 16:9 视口。
         const layer=document.createElement('canvas');layer.width=640;layer.height=360;
         const c=layer.getContext('2d');c.imageSmoothingEnabled=false;
         c.drawImage(panorama,240,0,960,540,0,0,640,360);
-        art[id]={ready:true,layer,panorama};
+        c.save();c.scale(2/3,2/3);window.StageDepth?.draw(c,depth,0);c.restore();
+        art[id]={ready:true,layer,panorama,depth};
       };
       img.onerror=()=>{art[id].failed=true;};
       img.src='assets/stages/'+id+'-panorama-v3.png';
     }
   }
 
-  function atmosphere(ctx,id,t,front=false) {
+  function atmosphere(ctx,id,t,front=false,camera=0,distant=false) {
     ctx.save();
-    const count=front?9:(id==='city'?65:24);
+    const count=distant?12:front?9:(id==='city'?65:24);
+    const parallax=distant?.28:front?1.3:.7;
+    const wrap=x=>((x-camera*parallax)%1120+1120)%1120-80;
+    if(distant)ctx.globalAlpha=.28;
     for(let i=0;i<count;i++) {
       const seed=i*137.508, speed=front?1.4:1;
       if(id==='city'||id==='station') {
-        const x=(seed*7-t*38*speed+9600)%960,y=(i*73+t*210*speed)%540;
+        const x=wrap(seed*7-t*38*speed),y=distant?100+(i*73+t*70)%220:(i*73+t*210*speed)%540;
         ctx.fillStyle=front?'#a0c9de70':'#879dc538';
         ctx.fillRect(Math.round(x),Math.round(y),1,front?10:6);
       } else if(id==='volcano') {
-        const x=(seed*9+Math.sin(t+i)*20)%960,y=540-((i*37+t*(15+i%4)*speed)%540);
+        const x=wrap(seed*9+Math.sin(t+i)*20),y=distant?100+(i*37+t*9)%220:540-((i*37+t*(15+i%4)*speed)%540);
         ctx.fillStyle=i%3?'#ffad6390':'#ffe5b4b0';
         ctx.fillRect(Math.round(x),Math.round(y),front?3:2,front?3:2);
       } else if(id==='snow') {
-        const x=(seed*11+t*12*speed+Math.sin(t*.6+i)*14)%960,y=(i*31+t*14*speed)%540;
+        const x=wrap(seed*11+t*12*speed+Math.sin(t*.6+i)*14),y=distant?90+(i*31+t*7)%230:(i*31+t*14*speed)%540;
         ctx.fillStyle=front?'#f4f7ff90':'#daeaff70';
         ctx.fillRect(Math.round(x),Math.round(y),front?3:2,front?3:2);
       } else if(id==='dojo'||id==='garden') {
-        const x=(seed*11+t*22*speed)%960,y=(i*31+t*10*speed+Math.sin(t+i)*9)%510;
+        const x=wrap(seed*11+t*22*speed),y=distant?100+(i*31+t*5)%220:(i*31+t*10*speed+Math.sin(t+i)*9)%510;
         ctx.fillStyle=i%3?'#e7a5c4a0':'#fff0d5b0';
         ctx.fillRect(Math.round(x),Math.round(y),front?4:2,2);
         if(front)ctx.fillRect(Math.round(x)+1,Math.round(y)-1,2,1);
-      } else if(id==='beach'&&!front) {
+      } else if(id==='beach'&&!front&&!distant) {
         const x=180+(i*83)%640,y=308+(i*13)%68;
         ctx.globalAlpha=.15+.15*Math.sin(t*2+i);
         ctx.fillStyle='#ffe9b0';ctx.fillRect(x,y,5+i%9,1);
+      } else if(id==='beach'&&(front||distant)) {
+        const x=wrap(seed*9+t*(front?17:5)),y=distant?130+(i*19)%150:490+(i*17)%45;
+        ctx.fillStyle=front?'#ffdfaa60':'#ffdba340';ctx.fillRect(Math.round(x),Math.round(y),front?3:1,1);
       }
     }
     ctx.restore();
@@ -126,13 +134,15 @@
     camera=Math.max(-240,Math.min(240,Number.isFinite(camera)?camera:0));
     const sourceX=Math.round(240+camera);
     ctx.drawImage(art[id].panorama,sourceX,0,960,540,0,0,960,540);
+    window.StageDepth?.draw(ctx,art[id].depth,camera);
+    atmosphere(ctx,id,t,false,camera,true);
     scenery(ctx,id,t,camera);
     // 顶部暗部留给 HUD，舞台中部保留角色剪影的对比。
     const shade=ctx.createLinearGradient(0,0,0,540);
     shade.addColorStop(0,'#060b2590');shade.addColorStop(.25,'#080c2010');
     shade.addColorStop(.7,'#05091925');shade.addColorStop(1,'#05081840');
     ctx.fillStyle=shade;ctx.fillRect(0,0,960,540);
-    atmosphere(ctx,id,t);
+    atmosphere(ctx,id,t,false,camera);
     ctx.restore();return true;
   }
 
@@ -267,7 +277,7 @@
   for(const stage of STAGES) {
     stage.worldWidth=1440;stage.cameraMin=-240;stage.cameraMax=240;
     stage.drawForeground=(ctx,t,camera=0)=>{
-      ctx.save();ctx.translate(-camera*.16,0);atmosphere(ctx,stage.id,t,true);ctx.restore();
+      ctx.save();window.StageDepth?.foreground(ctx);atmosphere(ctx,stage.id,t,true,camera);ctx.restore();
     };
   }
   window.STAGE_ART = art;

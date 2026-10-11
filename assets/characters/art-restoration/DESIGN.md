@@ -60,10 +60,12 @@
 将本目录配置合并到运行时目录中。三张使用该加载器的 HTML 页面更新缓存版本。
 
 `check-historical-art.cjs` 逐像素比较全部曝光档与直接执行 Git B 版裁剪器得到的画面，
-并检查 13 个战斗参数、输入、AI、UI、场景、动作采样等模块与修复前检查点字节一致。
+并检查 12 个战斗参数、输入、AI、UI、场景、动作采样等模块与修复前检查点字节一致。
 另检查 `game.js` 除 `resolveMelee` 外、`combat-spacing.js` 除 `geometry` 外
 均与检查点一致；这两个函数仅包含单独授权的接触修复。
 `fighter.js` 除 `updateGait`、步法播放率常量和预览只读 getter 外与检查点一致。
+地图景深属于后续单独授权的视觉调整；`check-stage-depth.cjs` 检查原始地图未改、
+角色及战斗模块不变、战斗区域不虚化，且实际键盘操作与镜头结果保持一致。
 不能把 `js/fighter.js`、`js/game.js` 或整个项目替换为历史版本。
 
 `contact-contract.json` 锁定修复前 756 个有效普通攻击命中场景。
