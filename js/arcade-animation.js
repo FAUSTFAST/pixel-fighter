@@ -1,10 +1,14 @@
 // Fixed authored pixel frames: no bitmap deformation or interpolated drawings.
 (function(){
-  const ROOT='assets/characters/animation-v8/',VERSION='historical-contact-b3',IDENTITY_VERSION='identity-v1',RES=2;
+  const ROOT='assets/characters/animation-v8/',VERSION='air-poses2',IDENTITY_VERSION='identity-v1',RES=2;
   const RESTORED_ROOT='assets/characters/art-restoration/',HISTORICAL_COMMIT='aadfccb3140210730936c185ad2fc82647404dd1';
+  const AIR_ROOT='assets/characters/air-normals/';
   const identities=Object.freeze({ryu:'blue-ninja-burgundy-scarf',mei:'magenta-kungfu-black-ponytail',tank:'human-boxer-red-gloves',volt:'yellow-jacket-cyan-scarf',kaze:'ivory-samurai-purple-ponytail',sage:'silver-hair-purple-mage'});
   const ready=new Map(),failures=[];
   const labels={idle:'待机',walk:'前进步法',backwalk:'后退步法',crouch:'下蹲',guard:'站立防御',guardLow:'蹲防',jump:'前跳',backjump:'后跳',airPunch:'空中拳',airKick:'空中脚',jab:'前手拳',heavy:'重拳 / 斩击',kick:'站立踢击',lowKick:'低踢 / 扫腿',cast:'发射动作',rise:'上升必杀',rush:'突进必杀',throw:'投技',head:'上段受击',body:'腹部受击',fall:'倒地',getup:'起身'};
+  const baseNames=Object.keys(labels);
+  const airLabels={airLightPunch:'空中轻拳',airMediumPunch:'空中中拳',airHeavyPunch:'空中重拳',airLightKick:'空中轻脚',airMediumKick:'空中中脚',airHeavyKick:'空中重脚'};
+  Object.assign(labels,airLabels);
   const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
   let status='loading',poseCount=0;
   function loadImage(name,revision,sourceRoot=ROOT){
@@ -43,8 +47,10 @@
         !/^[a-f0-9]{16}$/.test(clip.revision)||!Number.isFinite(clip.scale)||clip.scale<=0||
         !Array.isArray(clip.frames)||clip.frames.length<4||clip.frames.length>64||clip.authored!==true)
         throw new Error('固定逐帧图集形象不匹配：'+id+'/'+name);
-      if(clip.sourceRoot&&(clip.sourceRoot!==RESTORED_ROOT||clip.historicalCommit!==HISTORICAL_COMMIT))
+      if(clip.sourceRoot&&(![RESTORED_ROOT,AIR_ROOT].includes(clip.sourceRoot)||clip.historicalCommit!==HISTORICAL_COMMIT))
         throw new Error('历史画风参考不匹配：'+id+'/'+name);
+      if(airLabels[name]&&(clip.sourceRoot!==AIR_ROOT||clip.frames.length!==10||clip.timeline?.length!==10||clip.strikeBand?.length!==2))
+        throw new Error('独立空中招式目录不完整：'+id+'/'+name);
       if(['walk','backwalk'].includes(name)&&
         (clip.cycleFrames!==16||clip.direction!==(name==='walk'?1:-1)||clip.stopVariants?.length!==16))
         throw new Error('步法 / 收脚逐帧目录不完整：'+id+'/'+name);
@@ -86,7 +92,8 @@
       return true;
     };
     if(m){
-      if(m.grab&&clips.throw)clip='throw';
+      if(m.airNormal&&clips[m.physicalContact?.clip])clip=m.physicalContact.clip;
+      else if(m.grab&&clips.throw)clip='throw';
       else if(m.counter&&p<.32)clip='guard';
       else if((m.launch||pose==='uppercut')&&clips.rise)clip='rise';
       else if(anim.airborne&&clips[/Kick|sweep/i.test(anim.name)?'airKick':'airPunch'])clip=/Kick|sweep/i.test(anim.name)?'airKick':'airPunch';
@@ -173,7 +180,7 @@
     const selected=selection({id:profile.id},{name:profile.kind,attack:move,phase:StrikeMotion.phase(move,time),airborne:air,reach:1});
     if(!selected)return null;
     const bands={jab:[-46,-23],heavy:[-46,-23],kick:[-42,-10],lowKick:[-14,1],airPunch:[-65,-18],airKick:[-65,-8]};
-    const band=bands[selected.clip];if(!band)return null;
+    const band=selected.data.strikeBand||bands[selected.clip];if(!band)return null;
     const sprite=selected.sprite;
     if(!sprite.strikeBounds)sprite.strikeBounds={};
     if(!(selected.clip in sprite.strikeBounds)){
@@ -196,11 +203,34 @@
     if(!ready.has(attacker.def.id)||!ready.has(defender.def.id))return {x:box.x+box.w/2,y:box.y+box.h/2};
     const a=collisionSprite(attacker),b=collisionSprite(defender);
     if(!a||!b)return {x:box.x+box.w/2,y:box.y+box.h/2};
+    // Independent air sheets include very thin blade / toe pixels. Check their
+    // actual screen-grid raster rather than rounding local coordinates onto a
+    // texel that might disappear when mirrored at a fractional world position.
+    if(attacker.attack?.airNormal)return airRasterContact(attacker,defender,box,a,b);
     // Sample the actual opaque pixels at the striking extremity. One world
     // pixel tolerance allows the pixel grid edges to meet without a visible gap.
     for(let y=box.y;y<box.y+box.h;y++)for(let x=box.x;x<box.x+box.w;x++){
       if(!solid(a,(x-attacker.x)*attacker.facing/4.2,(y-attacker.y)/4.2))continue;
       for(const dx of [-1,0,1])if(solid(b,(x+dx-defender.x)*defender.facing/4.2,(y-defender.y)/4.2))return {x:x+dx/2,y};
+    }
+    return null;
+  }
+  const airContactCanvases=[];
+  function airRasterContact(attacker,defender,box,a,b){
+    const width=Math.ceil(box.w)+6,height=Math.ceil(box.h)+6;
+    const originX=Math.floor(box.x)-3,originY=Math.floor(box.y)-3;
+    const pixels=[attacker,defender].map((fighter,i)=>{
+      const canvas=airContactCanvases[i]||(airContactCanvases[i]=document.createElement('canvas'));
+      canvas.width=width;canvas.height=height;
+      const ctx=canvas.getContext('2d',{willReadFrequently:true}),sprite=i?b:a;
+      ctx.imageSmoothingEnabled=false;ctx.translate(fighter.x-originX,fighter.y-originY);ctx.scale(fighter.facing*4.2,4.2);
+      if(sprite.flip)ctx.scale(-1,1);
+      ctx.drawImage(sprite.canvas,sprite.flip?-sprite.x-sprite.w:sprite.x,sprite.y,sprite.w,sprite.h);
+      return ctx.getImageData(0,0,width,height).data;
+    });
+    for(let y=3;y<height-3;y++)for(let x=3;x<width-3;x++){
+      if(pixels[0][(y*width+x)*4+3]<=96)continue;
+      for(const dx of [-1,0,1])if(pixels[1][(y*width+x+dx)*4+3]>96)return {x:originX+x+dx/2,y:originY+y};
     }
     return null;
   }
@@ -212,8 +242,15 @@
     const restored=await response.json();
     if(restored.identityVersion!==IDENTITY_VERSION||restored.sourceCommit!==HISTORICAL_COMMIT||
       Object.keys(restored.characters||{}).length!==6||Object.keys(identities).some(id=>
-        !restored.characters[id]||Object.keys(restored.characters[id]).sort().join(',')!==Object.keys(labels).sort().join(',')))throw new Error('历史画风恢复范围不匹配');
+        !restored.characters[id]||Object.keys(restored.characters[id]).sort().join(',')!==baseNames.slice().sort().join(',')))throw new Error('历史画风恢复范围不匹配');
     for(const id of Object.keys(identities))Object.assign(manifest.characters[id],restored.characters[id]);
+    const airResponse=await fetch(AIR_ROOT+'manifest.json?v='+VERSION);
+    if(!airResponse.ok)throw new Error('独立空中招式目录加载失败');
+    const air=await airResponse.json();
+    if(air.identityVersion!==IDENTITY_VERSION||air.sourceCommit!==HISTORICAL_COMMIT||
+      Object.keys(air.characters||{}).length!==6||Object.keys(identities).some(id=>
+       !air.characters[id]||Object.keys(air.characters[id]).sort().join(',')!==Object.keys(airLabels).sort().join(',')))throw new Error('独立空中招式参考不匹配');
+    for(const id of Object.keys(identities))Object.assign(manifest.characters[id],air.characters[id]);
     await Promise.all(Object.entries(manifest.characters).map(([id,clips])=>prepareCharacter(id,clips).catch(error=>{failures.push(id);console.warn(error);})));status=ready.size===6?'ready':'fallback';
   }).catch(error=>{status='fallback';console.warn(error);});
   window.DrawnAnimation={draw,selection,touches,contactPoint,contactGeometry,collisionSprite,solid,loading,sprite:(id,clip,index)=>ready.get(id)?.[clip]?.sprites[index],version:8,identityVersion:IDENTITY_VERSION,has:id=>ready.has(id),get status(){return status;},get poseCount(){return poseCount;},get failures(){return [...failures];},get charactersReady(){return ready.size;}};

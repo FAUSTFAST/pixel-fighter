@@ -149,6 +149,7 @@
       this.jumpsUsed = 0;
       this.airJumpEffect = null;
       this.landingFrames = 0;
+      this.airLandingFrames = 0;
       this.trail = [];
       this.armorLeft=0;this.counterTriggered=false;this.moveLabelT=0;
       this.attack = null;            // 当前招式对象
@@ -197,12 +198,13 @@
         dmg: m.dmg * wk, kb: m.hitFrames && this.stateT>=m.hitFrames[m.hitFrames.length-1] ? (m.finalKb??m.kb) : m.kb, hitstun: m.hitstun, type: m.type, grab:!!m.grab,
         owner:this,attackId:this.attackId,kind:this.attackKind,lightStarter:m.lightStarter,starterScaling:m.starterScaling,damagePenalty:m.damagePenalty,
         groundCombo:!m.knockdown||!!m.hitFrames&&prog<m.hitFrames[m.hitFrames.length-1],level:m.level,knockdown:!!m.knockdown&&(!m.hitFrames||prog>=m.hitFrames[m.hitFrames.length-1]),normalThrow:!!m.normalThrow,blockstun:m.blockstun,scaleFloor:m.scaleFloor,driveDamage:m.category==='drive'?1:.25,reaction:m.reaction,launch:!!m.launch,
+        ...(m.airNormal?{airHit:m.airHit,airFeedback:m.airFeedback}:{}),
       };
     }
 
     canAct() {
       return this.hitstun <= 0 && this.blockstun <= 0 && !this.stunned &&
-             !this.dash &&
+             !this.dash && !this.airLandingFrames &&
              !['ko','hit','grabbed'].includes(this.state) &&
              !ATTACK_STATES.includes(this.state);
     }
@@ -247,9 +249,12 @@
     hasCancelWindow(){
       return !!this.attack&&this.attackContact&&this.stateT>=this.contactFrame&&this.stateT-this.contactFrame<=(this.attack.cancelWindow??10);
     }
+    moveFor(kind) {
+      return (!this.onGround&&CombatRules.airMove(this.def,kind))||this.def.moves[kind];
+    }
     canStartAttack(kind) {
-      const next=this.def.moves[kind];
-      if(!next||this.grabbedBy||this.hitstun>0||this.blockstun>0||this.stunned||this.state==='ko')return false;
+      const next=this.moveFor(kind);
+      if(!next||this.airLandingFrames||this.grabbedBy||this.hitstun>0||this.blockstun>0||this.stunned||this.state==='ko')return false;
       if(next.groundOnly&&!this.onGround&&!(next.category==='super'&&this.attack?.launch&&this.attackContact))return false;
       if(this.canAct())return true;
       if(this.attack&&this.attackKind==='driveRush'&&this.stateT>=3)return next.category==='normal';
@@ -309,7 +314,7 @@
       if(opts.assist&&opts.assist.index>0&&!this.foe?.hitstun&&!this.foe?.blockstun&&!(this.attack&&this.attackKind==='driveRush')){
         this.bufferedAttack=null;this.assistRoute=null;return false;
       }
-      const source=this.def.moves[kind],m={...source};
+      const source=this.moveFor(kind),m={...source};
       const cancelling=this.hasCancelWindow();
       const targetCancel=cancelling&&this.attack.category==='normal'&&(this.attack.cancelInto||[]).includes(kind);
       const lightChain=cancelling&&(this.attack.chainInto||[]).includes(kind);
@@ -341,9 +346,10 @@
       this.reaction=null;this.attack=m;this.attackKind=kind;this.throwBack=!!opts.back;this.attackHasHit=false;this._specialWeak=false;
       this.armorLeft=m.armor||0;this.counterTriggered=false;
       this.moveLabel=(m.od?'OD · ':'')+(m.saLevel?'SA'+m.saLevel+' · ':'')+m.name;this.moveLabelT=55;
-      this.state=kind;this.stateT=0;this.vx=0;this.pendingRush=!!(m.rush||m.rushSpeed);
+      this.state=kind;this.stateT=0;if(!m.airNormal)this.vx=0;this.pendingRush=!!(m.rush||m.rushSpeed);
       if(m.invincible)this.invuln=m.invincible;
-      if(opts.assist)this.assistRoute={button:opts.assist.button,index:opts.assist.index+1,frames:90};
+      if(m.airNormal)this.assistRoute=null;
+      else if(opts.assist)this.assistRoute={button:opts.assist.button,index:opts.assist.index+1,frames:90};
       return true;
     }
 
@@ -423,7 +429,11 @@
         this.drive=Math.min(6,this.drive+.4);this.moveLabel=this.parryFrames<=2?'精准招架':'招架';this.moveLabelT=35;
         return {dmg:0,blocked:true,parried:true};
       }
+      if(!this.onGround&&!blocked&&hit.airHit){
+        hit={...hit,airVy:hit.airHit.vy,airReaction:hit.airHit.reaction,knockdown:!!hit.knockdown||!!hit.airHit.knockdown};
+      }
       this.bufferedAttack=null;this.assistRoute=null;this.attackConnected=false;this.attackContact=false;this.parrying=false;
+      this.airLandingFrames=0;
       this.pendingComboPenalty=0;this.driveBoost=0;
       this.dash=null;this.bufferedDash=null;this.trail=[];
       const counter=this.attack?.counter && this.stateT>=3 && this.stateT<=18 && !this.counterTriggered;
@@ -472,9 +482,9 @@
       this.hitstun = hit.hitstun;
       this.vx = fromDir * hit.kb;
       this.pushbackSource=hit.owner||this.foe;
-      this.reaction=hit.grab?'throw':hit.launch?'launch':hit.knockdown?(hit.level==='low'?'sweep':'knockdown'):!this.onGround?'air':hit.reaction|| (hit.type==='light'?'head':'heavy');
+      this.reaction=hit.airReaction||(hit.grab?'throw':hit.launch?'launch':hit.knockdown?(hit.level==='low'?'sweep':'knockdown'):!this.onGround?'air':hit.reaction|| (hit.type==='light'?'head':'heavy'));
       this.reactionDir=fromDir*this.facing;this.reactionDuration=Math.max(1,hit.hitstun);
-      this.vy=hit.launch?-10:hit.knockdown?-7:this.onGround?0:-4;
+      this.vy=hit.airVy??(hit.launch?-10:hit.knockdown?-7:this.onGround?0:-4);
       if(!this.onGround){this.juggleHits++;if(this.juggleHits>6)this.vy=Math.max(3,this.vy);}else this.juggleHits=0;
       this.knockedDown=!!hit.knockdown;
       if (this.vy < 0) this.onGround = false;
@@ -524,6 +534,7 @@
         this.drive=Math.min(6,this.drive+(this.burnout?.008:.009));if(this.drive===6)this.burnout=false;
       }
       if(this.throwInputFrames>0)this.throwInputFrames--;
+      if(this.airLandingFrames>0)this.airLandingFrames--;
       if(this.grabbedBy){this.stateT++;return;}
       if(this.throwSequence){
         const q=this.throwSequence,v=q.target;q.t++;
@@ -616,6 +627,13 @@
             this.invuln=Math.max(this.invuln,19);this.endCombo();
           }
           this.onGround = true; this.vy = 0;
+          if(this.attack?.airNormal){
+            // An airborne strike ends on landing; it never becomes a grounded
+            // active hitbox or borrows the grounded step / cancel routes.
+            this.airLandingFrames=this.attack.landingRecovery;
+            this.attack=null;this.pendingRush=false;this.assistRoute=null;this.vx=0;
+            this.setState('idle');
+          }
           if (this.state === 'jump') this.setState('idle');
         }
         if (this.state !== 'ko') this.vy = 0;

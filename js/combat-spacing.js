@@ -59,6 +59,11 @@
   }
   // 共享几何：判定框、动画终点、效果范围、出招表使用相同计算。
   function geometry(m,width=68,t=m.startup,air=false){
+    air=air||!!m.airNormal;
+    if(m.airNormal){
+      const drawn=window.DrawnAnimation?.contactGeometry?.(m,t,true);
+      if(drawn)return drawn;
+    }
     const contact=window.StrikeMotion?.contact(m,t,air);
     if(contact){
       // A small envelope around the authored fist / toe / blade. The far edge

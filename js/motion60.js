@@ -129,6 +129,30 @@
     if(t>=m.startup+m.active)return;
     const color=m.effect==='drive'?'#65ffb7':f.def.fxColor;
     ctx.save();ctx.translate(f.x,f.y);ctx.scale(f.facing,1);ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;
+    if(m.airNormal){
+      if(active){
+        // Pixel accents follow the exact exposed fist / foot. They never
+        // transform the original drawing or create another damage volume.
+        const limb=window.DrawnAnimation?.contactGeometry?.(m,t,true)||g;
+        const x=Math.round(limb.far)-4,y=Math.round(limb.y),effect=m.airEffect;
+        ctx.globalAlpha=.55;
+        if(effect==='jab'){
+          for(let i=0;i<2;i++)ctx.fillRect(x-12-i*8,y-3+i*6,7,2);
+        }else if(effect==='palm'){
+          for(const [dx,dy] of [[-18,0],[-10,-8],[-10,8]])ctx.fillRect(x+dx,y+dy,6,3);
+        }else if(effect==='hammer'){
+          for(let i=0;i<4;i++)ctx.fillRect(x-5-i*5,y-18+i*6,3,6);
+        }else if(effect==='toe'){
+          for(let i=0;i<3;i++)ctx.fillRect(x-7-i*5,y+2+i*4,5,2);
+        }else if(effect==='sweep'){
+          for(let i=0;i<6;i++){const a=-Math.PI*.6+i*Math.PI*.18;ctx.fillRect(x-16+Math.round(Math.cos(a)*14),y+Math.round(Math.sin(a)*14),3,3);}
+        }else if(effect==='blast'){
+          for(let i=0;i<5;i++){ctx.fillRect(x-12-i*9,y-4-i*3,7,3);ctx.fillRect(x-12-i*9,y+4+i*3,7,3);}
+        }
+        ctx.globalAlpha=.8;ctx.fillStyle='#fff6df';ctx.fillRect(x,y-1,3,3);
+      }
+      ctx.restore();return;
+    }
     if(m.effect==='pillar'){
       ctx.globalAlpha=active?.6:.22;
       ctx.fillRect(g.near,-4,g.w,4);

@@ -158,6 +158,30 @@
     c.moves.driveRush.command='→→（招架中 / 普通技接触后）或冲刺键';c.moves.impact.command='重拳＋重脚 / 迸放键';
     c.plan={ryu:'回旋风镖控场，中拳→重拳确认螺旋掌；双岚升击对空。',mei:'轻拳→中拳→中脚压制，OD 蝶影接超必杀；中段踏肩破解蹲防。',tank:'地裂震拳逼近，霸体肩撞抢回合；指令投抓防守，三级投不用于连段。',volt:'雷枪蓄力牵制，地雷封路；闪隙突刺与斗气冲刺快速确认。',kaze:'长剑中距离截击，中拳→重脚接二段斩；镜刃读近身出手。',sage:'火种、焰印与炎柱延迟控场；近身用中重掌确认火环或炎蛇。'}[c.id];
   }
+  // Air normals are derived only when used; the grounded move catalog stays exact.
+  // Each strength selects its own approved-art exposure sheet and contact pixels.
+  const airProfiles={
+    light:{startupOffset:-1,active:3,recovery:9,hitstun:16,blockstun:8,kb:2,type:'light',reaction:'head',airEffect:'jab',landingRecovery:3,airHit:{vy:-2},airFeedback:{hitstop:3,shake:3},detail:'快速空中点拳，适合短距离截击。'},
+    medium:{startupOffset:-1,active:4,recovery:12,hitstun:24,blockstun:12,kb:3,type:'heavy',reaction:'body',airEffect:'palm',landingRecovery:4,airHit:{vy:-3.5},airFeedback:{hitstop:5,shake:5},detail:'空中掌击，命中硬直较长，低空跳入可衔接地面普通技。'},
+    heavy:{startupOffset:-3,active:5,recovery:17,hitstun:27,blockstun:15,kb:4.5,type:'heavy',reaction:'heavy',airEffect:'hammer',landingRecovery:6,airHit:{vy:6,knockdown:true,reaction:'knockdown'},airFeedback:{hitstop:8,shake:10},detail:'打落重拳，空对空命中把对手向下打落；地面命中不强制击倒。'},
+    lightKick:{startupOffset:-1,active:4,recovery:10,hitstun:18,blockstun:9,kb:2.5,type:'light',reaction:'body',airEffect:'toe',landingRecovery:4,airHit:{vy:-2.5},airFeedback:{hitstop:4,shake:4},detail:'快速空中点踢，持续稍长，适合试探跳入。'},
+    mediumKick:{startupOffset:-2,active:5,recovery:14,hitstun:26,blockstun:13,kb:4,type:'heavy',reaction:'body',airEffect:'sweep',landingRecovery:5,airHit:{vy:-4.5},airFeedback:{hitstop:6,shake:6},detail:'空中横踢，持续与硬直较长，适合跳入后接地面连段。'},
+    heavyKick:{startupOffset:-4,active:6,recovery:19,hitstun:30,blockstun:16,kb:9,type:'heavy',reaction:'heavy',airEffect:'blast',landingRecovery:8,airHit:{vy:-6,knockdown:true,reaction:'launch'},airFeedback:{hitstop:9,shake:12},detail:'空中重踢，推开距离大；空对空命中把对手吹飞并击倒。'},
+  };
+  const airNames={light:'轻拳',medium:'中拳',heavy:'重拳',lightKick:'轻脚',mediumKick:'中脚',heavyKick:'重脚'};
+  const airAliases={lowKick:'lightKick',lowMediumKick:'mediumKick',sweep:'heavyKick'};
+  const airClips={light:'airLightPunch',medium:'airMediumPunch',heavy:'airHeavyPunch',lightKick:'airLightKick',mediumKick:'airMediumKick',heavyKick:'airHeavyKick'};
+  function airMove(def,kind){
+    const key=airAliases[kind]||kind,profile=airProfiles[key],source=def.moves[key];
+    if(!profile||!source)return null;
+    const kick=key.endsWith('Kick');
+    return {...source,...profile,name:'空中'+airNames[key],command:'空中 + '+airNames[key],
+      startup:Math.max(3,source.startup+profile.startupOffset),airNormal:true,airKind:key,groundOnly:false,level:'overhead',
+      physicalContact:{id:def.id,kind:key,clip:airClips[key],kick},
+      stepDistance:0,travelDistance:0,hitFrames:undefined,knockdown:false,launch:false,
+      cancellable:false,cancelInto:[],chainInto:[],cancelWindow:0,
+      detail:profile.detail+'需站防；落地收招 '+profile.landingRecovery+'F，不能取消必杀或斗气冲刺。'};
+  }
   function advantage(m,blocked=false,contact=m.startup){
     return (blocked?m.blockstun:m.hitstun)-(m.startup+m.active+m.recovery-contact);
   }
@@ -165,6 +189,6 @@
     const base=moveCount===1?1:moveCount===2&&!lightStarter?1:1-(moveCount-1)*.1;
     return Math.max(floor,base-penalty);
   }
-  window.CombatRules={normals,lights,specials,supers,advantage,damageScale,retimeStartup,isNormal:k=>normals.includes(k),isSpecial:k=>specials.includes(k),isSuper:k=>supers.includes(k)};
+  window.CombatRules={normals,lights,specials,supers,airNormals:Object.keys(airProfiles),airMove,advantage,damageScale,retimeStartup,isNormal:k=>normals.includes(k),isSpecial:k=>specials.includes(k),isSuper:k=>supers.includes(k)};
   window.ATTACK_STATES=[...normals,'throw',...specials,...supers,'driveRush','impact'];
 })();

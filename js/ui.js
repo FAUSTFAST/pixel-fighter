@@ -222,7 +222,13 @@
     ctx.save();ctx.fillStyle='rgba(3,7,18,.94)';ctx.fillRect(0,0,W,H);
     U.textOutline(ctx,'暂停 · 角色出招表',W/2,42,26,'#ffd166','#182032');
     const labelKey=k=>({' ':'空格',ArrowUp:'↑',ArrowDown:'↓',ArrowLeft:'←',ArrowRight:'→'}[k]||k.toUpperCase());
-    ['p1','p2'].forEach((who,i)=>U.text(ctx,CombatControls.describe(who),28+i*470,68,10,'#bdcce0','left','normal'));
+    ['p1','p2'].forEach((who,i)=>{
+      const binding=Input.MAP[who];
+      const description=Input.MODES[who]==='modern'?CombatControls.describe(who):
+        `${who.toUpperCase()} 经典：${labelKey(binding.light)}轻拳 ${labelKey(binding.medium)}中拳 ${labelKey(binding.heavy)}重拳 · ${labelKey(binding.lightKick)}轻脚 ${labelKey(binding.mediumKick)}中脚 ${labelKey(binding.heavyKick)}重脚 · ${labelKey(binding.throw)}投`;
+      U.text(ctx,description,28+i*470,68,10,'#bdcce0','left','normal');
+    });
+    U.text(ctx,'经典指令：轻 / 中 / 重均可；OD：同指令＋同时按两个拳键或两个脚键。方向相对角色朝向。',W/2,81,10,'#9db0c8','center','normal');
     [f1,f2].forEach((f,index)=>{
       const x=28+index*470;
       ctx.fillStyle='#142033';U.rr(ctx,x,85,444,360,8);
@@ -232,16 +238,20 @@
         const y=136+i*34;
         U.text(ctx,m.name||key,x+14,y,13,'#f3d6a1','left');
         const binding=Input.MAP[index===0?'p1':'p2'];
-        const command={lightKick:'轻脚 '+labelKey(binding.lightKick),heavyKick:'重脚 '+labelKey(binding.heavyKick),throw:labelKey(binding.light)+'+'+labelKey(binding.lightKick)+' / '+labelKey(binding.throw)}[key]||(m.command||'').replace('H或L',binding.special.toUpperCase());
-        U.text(ctx,command,x+170,y,12,'#e3ecf7','left','normal');
+        let command={lightKick:'轻脚 '+labelKey(binding.lightKick),heavyKick:'重脚 '+labelKey(binding.heavyKick),throw:labelKey(binding.light)+'+'+labelKey(binding.lightKick)+' / '+labelKey(binding.throw)}[key]||(m.command||'').replace('H或L',binding.special.toUpperCase());
+        const alternatives=command.split(' / '),family=alternatives[0].match(/ \+ ([拳脚])$/)?.[1];
+        if(family&&alternatives.every(part=>part.endsWith(' + '+family))){
+          command=alternatives.map(part=>part.slice(0,-4)).join(' / ')+' + 轻/中/重'+family;
+        }
+        U.text(ctx,command,x+160,y,11,'#e3ecf7','left','normal');
         // 出招表短注解，详细攻略放在页内弹窗。
         const note=(m.detail||'').split('；')[0];
         U.text(ctx,note.slice(0,33),x+14,y+15,10,'#9db0c8','left','normal');
       });
     });
-    U.text(ctx,'↓+脚打下段，需蹲防；↓+重脚扫腿击倒。后+投后摔；被抓7帧内按投拆投，指令投不可拆。',W/2,470,12,'#c8d3e0','center','normal');
+    U.text(ctx,'↓+轻脚/中脚打下段，需蹲防；↓+重脚扫腿击倒。后+投后摔；被抓7帧内按投拆投，指令投不可拆。',W/2,470,12,'#c8d3e0','center','normal');
     U.text(ctx,'必杀免费 · OD 2 格斗气 · SA 100 / 200 / 300 · P 继续 / Esc 回首页',W/2,495,14,'#ffd166','center');
-    U.text(ctx,'F2 切换经典 / 现代 · 完整连段路线见「出招表」',W/2,520,12,'#91a5c0','center','normal');
+    U.text(ctx,'F2 操作模式 · 空中轻拳脚快，中拳脚跳入；空对空重拳打落 / 重脚吹飞 · 详见「出招表」',W/2,520,12,'#91a5c0','center','normal');
     ctx.restore();
   };
 

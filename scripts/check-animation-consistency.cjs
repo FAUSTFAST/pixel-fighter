@@ -37,7 +37,7 @@ assert.equal(left.facing,-1,'Restore facing after landing');
 let selections = 0;
 for (const def of context.CHARACTERS) {
   const clips = manifest.characters[def.id];
-  assert.equal(Object.keys(clips).length, 22);
+  assert.equal(Object.keys(clips).length, 28);
   const approved = lock.characters[def.id];
   for(const [name,clip] of Object.entries(clips)){
     assert.equal(clip.authored,true);assert.equal(clip.scale,.5);
@@ -69,11 +69,20 @@ for (const def of context.CHARACTERS) {
       attackT:m.startup,fighter:{onGround:false}});
     assert.match(context.DrawnAnimation.selection(def,anim).clip,/^air(Punch|Kick)$/);
   }
+  for(const name of context.CombatRules.airNormals){
+    const m=context.CombatRules.airMove(def,name);
+    for(let t=0;t<m.startup+m.active+m.recovery;t++){
+      const anim=context.Motion60.sample(def,name,0,{attack:m,kind:name,attackT:t,fighter:{onGround:false}});
+      const selected=context.DrawnAnimation.selection(def,anim);
+      assert.equal(selected.clip,m.physicalContact.clip);
+      assert.equal(selected.data.frames.length,10);selections++;
+    }
+  }
   const cast=context.DrawnAnimation.selection(def,{name:'special',attack:{projectile:true},phase:.4});
   assert.equal(cast.clip,'cast');assert.equal(cast.index,3);
   const airCast=context.DrawnAnimation.selection(def,{name:'special',attack:{projectile:true},airborne:true,phase:.4});
   assert.equal(airCast.clip,'airPunch');
 }
-console.log(JSON.stringify({characters:6,clips:132,selections,
+console.log(JSON.stringify({characters:6,clips:168,selections,
   checks:['syntax','identity','fixed PNG anchor registration','jump phases','landing','air normals','projectile release'],
   result:'passed',limitation:'Does not verify browser rendering or image aesthetics.'}));

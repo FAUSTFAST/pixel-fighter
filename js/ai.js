@@ -15,7 +15,7 @@
   };
   const blank=()=>({move:0,up:false,down:false,block:false});
   const pickRange=range=>U.randi(range[0],range[1]);
-  const reach=(f,kind)=>CombatSpacing.maxReach(f.def.moves[kind],f.width);
+  const reach=(f,kind)=>CombatSpacing.maxReach(f.moveFor(kind),f.width);
 
   class AI {
     constructor(fighter,difficulty=.85){
@@ -50,12 +50,12 @@
       return pool.find(c=>(roll-=c.weight)<0)||pool.at(-1)||null;
     }
     affordable(self,kind,opts={}){
-      const m=self.def.moves[kind];if(!m||!self.canStartAttack(kind)||self.meter<(m.cost||0))return false;
+      const m=self.moveFor(kind);if(!m||!self.canStartAttack(kind)||self.meter<(m.cost||0))return false;
       const cost=kind==='driveRush'?(self.attack?.category==='normal'?3:1):m.driveCost||(opts.od?2:0);
       return !cost||!self.burnout&&self.drive>=cost;
     }
     inRange(self,seen,kind,extra=0){
-      const m=self.def.moves[kind],dist=Math.abs(seen.x-self.x);
+      const m=self.moveFor(kind),dist=Math.abs(seen.x-self.x);
       if(kind==='driveRush')return dist>70&&dist<m.travelDistance+Math.max(...this.style.poke.map(k=>reach(self,k)))+14;
       if(m.grab)return seen.onGround&&!seen.hitstun&&!seen.blockstun&&dist<reach(self,kind)+34-8;
       if(m.projectile){
@@ -68,7 +68,7 @@
       if(!this.affordable(self,kind,opts))return blank();
       this.recent.push(kind);if(this.recent.length>7)this.recent.shift();
       this.intent=blank();this.decisionCd=pickRange(this.profile.decision);
-      const m=self.def.moves[kind];
+      const m=self.moveFor(kind);
       if(m.projectile){this.projectileCd=this.profile.projectileCd;this.footwork=0;this.strategy='approach';this.strategyFrames=60;}
       if(kind==='driveRush')this.driveCd=150;
       if(kind==='throw')return {...blank(),throw:true,move:opts.back?-self.facing:0};
@@ -164,7 +164,7 @@
         if(Math.random()<chance)return {...blank(),up:true,move:dist>180?self.facing:0};
       }
       if(self.canAct()&&self.vy>-2&&self.y>seen.y-135&&this.decisionCd===0){
-        const options=['lightKick','mediumKick','heavyKick','light'].filter(k=>this.inRange(self,seen,k));
+        const options=CombatRules.airNormals.filter(k=>this.inRange(self,seen,k));
         if(options.length)return this.emit(self,options[U.randi(0,options.length-1)]);
       }
       return {...blank(),move:dist>120?self.facing:0};

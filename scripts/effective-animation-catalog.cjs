@@ -10,6 +10,12 @@ function effectiveCatalog(){
   if(Object.keys(clips).sort().join(',')!==Object.keys(base.characters[id]).sort().join(','))throw Error('Incomplete restoration '+id);
   Object.assign(base.characters[id],clips);
  }
+ const air=JSON.parse(fs.readFileSync(path.join(root,'assets/characters/air-normals/manifest.json')));
+ if(air.sourceCommit!==restored.sourceCommit||air.identityVersion!==base.identityVersion)throw Error('Unexpected air art reference');
+ for(const [id,clips] of Object.entries(air.characters)){
+  if(Object.keys(clips).length!==6||!base.characters[id])throw Error('Incomplete air catalog');
+  Object.assign(base.characters[id],clips);
+ }
  return base;
 }
 module.exports={effectiveCatalog};

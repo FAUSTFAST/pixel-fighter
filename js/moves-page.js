@@ -42,7 +42,17 @@
         const preparation=m.category==='special'?`起手：轻 ${m.startup-(key==='uppercut'?1:2)} / 中 ${m.startup} / 重 ${m.startup+2} F；OD 沿用对应强度。`:`起手约 ${Math.round(m.startup*1000/60)} ms。`;
         for(const text of [m.name,command,modern,resource,frames,advantage,(m.noHit?'':preparation)+(m.detail||'')+(window.CombatSpacing&&!m.projectile&&!m.noHit?' 最远打击 '+Math.round(CombatSpacing.maxReach(m))+' px。':'')+(m.stepDistance?' 蹬步 '+m.stepDistance+' px，拳脚需实际接触。':'')+(m.travelDistance?' 自由突进 '+m.travelDistance+' px（中版，遇敌 / 场边停止）。':'')]){const td=document.createElement('td');td.textContent=text;row.appendChild(td);}table.appendChild(row);
       }
-      wrap.appendChild(table);section.appendChild(wrap);host.appendChild(section);
+      wrap.appendChild(table);section.appendChild(wrap);
+      const airTitle=document.createElement('h3');airTitle.textContent='空中拳脚 · 独立招式';section.appendChild(airTitle);
+      const airHelp=document.createElement('p');airHelp.textContent='跳跃中使用原有拳脚键；轻攻击快，中攻击适合跳入接地面招式，重拳打落空中对手，重脚吹飞空中对手。空中按下方向仍使用对应空中脚，不会变成地面下段或扫腿。保留跳跃惯性，落地后结束攻击并进入短收招；不能在出招中发动二段跳。';section.appendChild(airHelp);
+      const airWrap=document.createElement('div');airWrap.className='table';const airTable=document.createElement('table');
+      const airHead=document.createElement('tr');for(const text of ['空中招式','经典输入','现代输入','资源','发生 / 持续 / 收招','命中 / 防御帧差','特点']){const th=document.createElement('th');th.textContent=text;airHead.appendChild(th);}airTable.appendChild(airHead);
+      for(const key of CombatRules.airNormals){
+        const m=CombatRules.airMove(c,key),index=c.modernNormals.indexOf(key),row=document.createElement('tr');
+        const modern=index<0?'经典专用':'空中 + '+['轻攻击','中攻击','重攻击'][index];
+        for(const text of [m.name,m.command+(window.Input?' ('+pair(key)+')':''),modern,'免费',`${m.startup} / ${m.active} / ${m.recovery} F`,'随落地时机变化',m.detail+`命中硬直 ${m.hitstun}F，防御硬直 ${m.blockstun}F。`]){const td=document.createElement('td');td.textContent=text;row.appendChild(td);}airTable.appendChild(row);
+      }
+      airWrap.appendChild(airTable);section.appendChild(airWrap);host.appendChild(section);
     }
   };
   const host=document.getElementById('roster');if(host)renderMovesRoster(host);

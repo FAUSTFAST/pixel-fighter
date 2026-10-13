@@ -19,7 +19,7 @@ function renderedContact(a,b,box,art){
 (async()=>{
  const native=nativeHarness();await native.s.DrawnAnimation.loading;const art=native.s.DrawnAnimation;
  assert.equal(art.status,'ready');const h=harness(53);h.s.DrawnAnimation=art;h.s.CombatControls.collect=(f,intent)=>intent;h.s.CombatControls.read=neutral;
- const summary=[];let matches=0,hits=0,whiffs=0,preserved=0,additional=0;
+ const summary=[];let matches=0,hits=0,whiffs=0,preserved=0,additional=0,airHits=0,formerSharedAirHits=0,preservedAirHits=0,changedAirWhiffs=0;
  for(let character=0;character<6;character++)for(const kind of h.s.CombatRules.normals)for(const facing of [1,-1])for(const airborne of [false,true])for(const distance of [68,95,125,160,200,300]){
   const g=h.fight(character,.85,distance);g.pve=false;g.training=true;
   g.f1=new h.s.Fighter(h.s.CHARACTERS[character],400,facing,'P1');g.f2=new h.s.Fighter(h.s.CHARACTERS[(character+1)%6],400+facing*distance,-facing,'P2');
@@ -34,8 +34,13 @@ function renderedContact(a,b,box,art){
   for(let frame=0;frame<duration+12;frame++)h.tick();
   assert.ok(count<=1,'one damage event per normal');if(distance===300)assert.equal(count,0,'out-of-range strikes always whiff');
   const wasHit=preservedHits.has(JSON.stringify([a.def.id,kind,facing,airborne,distance]));
-  if(wasHit){assert.equal(count,1,`${a.def.id}/${kind}/${facing}/${distance}: lost checkpoint hit`);preserved++;}
-  else if(count)additional++;
+  // Grounded combat still obeys the original contact contract. Six independent
+  // air techniques now use their own PNG extremities instead of the former
+  // shared long air fist / foot. Verify those against real raster contact above
+  // and the six-technique suite, rather than imposing the old shared reach.
+  if(wasHit&&!airborne){assert.equal(count,1,`${a.def.id}/${kind}/${facing}/${distance}: lost grounded checkpoint hit`);preserved++;}
+  else if(!wasHit&&count)additional++;
+  if(airborne){airHits+=count;if(wasHit){formerSharedAirHits++;if(count)preservedAirHits++;else changedAirWhiffs++;}}
   if(count)hits++;else whiffs++;matches++;
   summary.push({character:a.def.id,kind,facing,airborne,distance,hits:count});
  }
@@ -51,6 +56,6 @@ function renderedContact(a,b,box,art){
   assert.equal(clips[name].cycleFrames,16);assert.equal(clips[name].authored,true);
   for(const meta of clips[name].frames){assert.equal(meta.ground%160,144);assert.equal(meta.root%192,96);}
  }
- const result={passed:true,matches,hits,whiffs,preservedHitCases:preserved,additionalVisibleHitCases:additional,trajectories,walkPoses:Object.values(manifest.characters).reduce((n,c)=>n+c.walk.frames.length+c.backwalk.frames.length,0)};
+ const result={passed:true,matches,hits,whiffs,preservedGroundedHitCases:preserved,additionalVisibleHitCases:additional,airHits,formerSharedAirHits,preservedAirHits,changedAirWhiffs,airReach:'Independent PNG extremities; short kicks and tucked heavy kicks have distinct contact ranges.',trajectories,walkPoses:Object.values(manifest.characters).reduce((n,c)=>n+c.walk.frames.length+c.backwalk.frames.length,0)};
  fs.mkdirSync(path.join(root,'output/contact'),{recursive:true});fs.writeFileSync(path.join(root,'output/contact/check-results.json'),JSON.stringify({...result,cases:summary},null,2));console.log(JSON.stringify(result));
 })().catch(e=>{console.error(e);process.exitCode=1;});

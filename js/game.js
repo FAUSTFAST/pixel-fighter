@@ -96,7 +96,7 @@
     f.lastDamageScale=1;f.lastHitDamage=0;f.pendingComboPenalty=0;f.pushbackSource=null;
     f._hpGhost=1; f.flashT=0; f.armorLeft=0; f.counterTriggered=false; f.moveLabelT=0;
     f.walkPhase=0;f.stepPhase=0;f.gaitDirection=1;f.gaitMoving=false;f.gaitSettling=0;f.gaitSettleFrom=0;f.gaitSettleTo=0;f.gaitSettleDuration=8;f.drawnFrame=null; f.moveBlend=0; f.moveLean=0; f.airFrames=0; f.landingFrames=0;
-    f.jumpsUsed=0;f.jumpDirection=0;f.airJumpEffect=null;
+    f.jumpsUsed=0;f.jumpDirection=0;f.airJumpEffect=null;f.airLandingFrames=0;
     f.reaction=null;f.getupFrames=0;f.reactionDuration=20;f.animationFrame=0;f.grabbedBy=null;f.throwSequence=null;f.throwRotation=0;f.throwInputFrames=0;f.knockedDown=false;
   }
 
@@ -242,6 +242,17 @@
       const direction=a.x<=b.x?1:-1;
       let overlap=(a.width+b.width)/2-Math.abs(a.x-b.x);
       if(overlap<=0)return;
+      // A descending air strike can first overlap a body vertically, without
+      // advancing into it on this frame. Separate the attacker only: a neutral
+      // defender must not be shoved before actual hit / guard recoil.
+      for(const [f,other,previousOther,toward] of [[a,b,previousB,direction],[b,a,previousA,-direction]]){
+        if(f.attack?.airNormal&&other.hitstun<=0&&other.blockstun<=0&&Math.abs(other.x-previousOther)<1e-7){
+          const gap=(f.width+other.width)/2;
+          let stop=other.x-toward*gap;
+          if(stop < -150||stop > 1110)stop=other.x+toward*gap;
+          f.x=U.clamp(stop,-150,1110);f.vx=0;return;
+        }
+      }
       // Committed attacks / dashes stop at the other body. Their approach must
       // not shove a motionless opponent before a hit or block actually occurs.
       for(const [f,previous,toward] of [[a,previousA,direction],[b,previousB,-direction]]){
@@ -317,8 +328,8 @@
     else registerCombatText(attacker,hx,hy,res.dmg,res.blocked,false);
     if (!res.blocked) {
       attacker.meter = Math.min(attacker.maxMeter, attacker.meter + (attacker.attack.meterGain??6));
-      G.hitstop = hb.type==='special'?10:(hb.type==='heavy'?6:3);
-      G.shake = hb.type==='special'?14:(hb.type==='heavy'?8:4);
+      G.hitstop = hb.airFeedback?.hitstop??(hb.type==='special'?10:(hb.type==='heavy'?6:3));
+      G.shake = hb.airFeedback?.shake??(hb.type==='special'?14:(hb.type==='heavy'?8:4));
       if (hb.type==='special') Audio2.sfx.hitSpecial();
       else if (hb.type==='heavy') Audio2.sfx.hitHeavy();
       else Audio2.sfx.hitLight();
