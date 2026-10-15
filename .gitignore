@@ -4,3 +4,12 @@ __pycache__/
 assets/characters/animation-v7/catalog-cache.json
 assets/characters/animation-v7/manifest.pending.json
 output/
+node_modules/
+npm-debug.log*
+.env
+.env.*
+!.env.example
+*.p12
+*.pfx
+*.mobileprovision
+*.key

@@ -1,0 +1,10 @@
+'use strict';
+const { execFileSync } = require('node:child_process');
+const source = process.env.GITHUB_REPOSITORY, target = process.env.RELEASE_REPO, runId = process.env.RUN_ID;
+if (!/^[\w.-]+\/[\w.-]+$/.test(target || '') || target.toLowerCase() === source?.toLowerCase()) throw new Error('Use a separate release-only repository');
+if (!/^\d+$/.test(runId || '')) throw new Error('Invalid build run ID');
+const api = route => JSON.parse(execFileSync('gh', ['api', route], { encoding: 'utf8' }));
+if (!api(`repos/${source}`).private) throw new Error('Source is still public: obtain owner confirmation and make it private first');
+const run = api(`repos/${source}/actions/runs/${runId}`);
+if (run.conclusion !== 'success' || run.path !== '.github/workflows/desktop-build.yml' || run.repository.full_name !== source) throw new Error('Require a successful build from this repository and desktop-build.yml');
+console.log('Source visibility and build provenance checked. No source will be uploaded.');

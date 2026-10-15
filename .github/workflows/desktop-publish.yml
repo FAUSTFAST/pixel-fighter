@@ -1,0 +1,47 @@
+name: Desktop publish (manual approval only)
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful Desktop build run ID
+        required: true
+      release_repository:
+        description: Separate PUBLIC release-only repository (owner/name)
+        required: true
+      version:
+        description: Package version, for example 1.0.0
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  publish:
+    # Configure required reviewers on this environment BEFORE using this workflow.
+    environment: desktop-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Enforce separate release destination and private source repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_REPO: ${{ inputs.release_repository }}
+          RUN_ID: ${{ inputs.build_run_id }}
+        run: |
+          node desktop/release-guard.cjs
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: desktop-release-bundle
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ github.token }}
+          path: release
+      - name: Create a draft release containing packages only
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_REPOSITORY_TOKEN }}
+          RELEASE_REPO: ${{ inputs.release_repository }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: node desktop/publish-draft.cjs

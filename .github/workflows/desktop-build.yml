@@ -1,0 +1,77 @@
+name: Desktop build
+on:
+  workflow_dispatch:
+  push:
+    tags: ['desktop-v*']
+permissions:
+  contents: read
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+          - os: macos-latest
+            platform: mac
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check release tag matches package version
+        run: |
+          node -e "if(process.env.GITHUB_REF_TYPE==='tag' && process.env.GITHUB_REF_NAME!=='desktop-v'+require('./package.json').version) throw Error('Tag must match package.json version')"
+      - run: npm run desktop:prepare
+      - run: npm run desktop:test
+      - run: npm run desktop:regression
+      - run: npm run desktop:build:${{ matrix.platform }}
+      - run: npm run desktop:verify -- --platform=${{ matrix.platform }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: |
+            output/desktop/releases/*.zip
+            output/desktop/releases/*.dmg
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: desktop-audit-${{ matrix.platform }}
+          path: |
+            output/desktop/resource-manifest-*.json
+            output/desktop/production-regression.json
+            output/desktop/verification-*.json
+          retention-days: 30
+  collect:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: desktop-*
+          path: collected
+      - name: Collect only end-user packages, never source or audit data
+        shell: bash
+        run: |
+          mkdir release
+          find collected/desktop-win collected/desktop-mac -type f \( -name '*.zip' -o -name '*.dmg' \) -exec cp '{}' release/ \;
+          test "$(find release -type f | wc -l)" -eq 3
+          cd release
+          sha256sum *.zip *.dmg > SHA256SUMS.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: desktop-release-bundle
+          path: release/
+          if-no-files-found: error
+          retention-days: 30
