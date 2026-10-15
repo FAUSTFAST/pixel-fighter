@@ -13,7 +13,7 @@ module.exports = {
   publish: null,
   mac: {
     target: [{ target: 'dmg', arch: ['universal'] }],
-    category: 'public.app-category.action-games', minimumSystemVersion: '12.0',
+    category: 'public.app-category.action-games', minimumSystemVersion: '13.0',
     identity: '-', hardenedRuntime: true, notarize: false,
     entitlements: path.join(__dirname, 'entitlements.mac.plist'),
     entitlementsInherit: path.join(__dirname, 'entitlements.mac.plist'),

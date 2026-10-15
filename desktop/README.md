@@ -76,7 +76,7 @@ npm run desktop:verify -- --platform=win
 ## 系统支持与签名
 
 - Windows 10/11 x64：便携包，未做 Authenticode 签名，SmartScreen 可能提示未知发布者。完整运行时随包提供。
-- macOS 12+：所有 13 个 Mach-O 二进制都含 arm64 与 x86_64；ZIP 用 `ditto --keepParent --sequesterRsrc` 保存权限与框架符号链接。
+- macOS 13+：所有 13 个 Mach-O 二进制都含 arm64 与 x86_64；ZIP 用 `ditto --keepParent --sequesterRsrc` 保存权限与框架符号链接。
 - 当前机器没有 Apple Developer ID 身份。应用仅做 ad-hoc 临时签名，`codesign --verify --deep --strict` 通过，**没有 Developer ID 签名或 Apple 公证**。本机构建后能启动，不表示互联网下载后一定能双击启动。下载包带隔离属性时，Gatekeeper 可能阻止打开；确认来源和 SHA256 后，按 macOS 的“隐私与安全性 → 仍要打开”等明确批准流程处理。不要关闭系统 Gatekeeper。
 - 正式可信分发需要用户提供自己的 Developer ID Application 证书并完成 notarization/staple；Windows 可信发布需要自己的代码签名身份。证书、密码和 Apple API 私钥只能放受保护的 CI secrets/keychain，不能提交 Git。
 - 当前配置明确禁用公证、启用临时签名。获得证书后需另行审核改为正式签名配置，缩减临时签名所需的 `disable-library-validation` 权限，再重新构建验证；不要仅放一个证书就声称已经公证。
