@@ -62,7 +62,10 @@ function verify(platform) {
   const release = config.directories.output;
   const manifest = JSON.parse(fs.readFileSync(path.join(output, `resource-manifest-${platform}.json`)));
   const version = manifest.version.replace(/\.0$/, '');
-  const result = { platform, version: manifest.version, passed: true, osExecutionTest: false };
+  const result = { platform, version: manifest.version, passed: true, osExecutionTest: false,
+    sourceSnapshot: { commit: manifest.commit, preparedAt: manifest.generatedAt }, artifacts: [] };
+  const artifactNames = platform === 'win' ? [`Pixel-Fighter-Windows-x64-v${version}.zip`] :
+    [`Pixel-Fighter-macOS-Universal-v${version}.zip`, `Pixel-Fighter-macOS-Universal-v${version}.dmg`];
   if (platform === 'win') {
     const unpacked = path.join(release, 'win-unpacked');
     const exe = fs.readFileSync(path.join(unpacked, 'Pixel Fighter.exe'));
@@ -81,13 +84,19 @@ function verify(platform) {
   } else {
     assert.equal(process.platform, 'darwin');
     const app = path.join(release, 'mac-universal/Pixel Fighter.app');
-    result.asarFiles = inspectASAR(path.join(app, 'Contents/Resources/app.asar'), manifest);
+    const appASAR = path.join(app, 'Contents/Resources/app.asar');
+    result.asarFiles = inspectASAR(appASAR, manifest);
+    const asarSHA256 = hash(fs.readFileSync(appASAR));
+    const minimumOS = execFileSync('/usr/bin/plutil', ['-extract', 'LSMinimumSystemVersion', 'raw', path.join(app, 'Contents/Info.plist')], { encoding: 'utf8' }).trim();
+    assert.equal(minimumOS, config.mac.minimumSystemVersion, 'minimum macOS matches build configuration');
+    result.minimumSystemVersion = minimumOS;
     result.machOBinaries = machOArchitectures(app);
     execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', app]);
     const checkDir = fs.mkdtempSync(path.join(output, 'zip-check-'));
     execFileSync('/usr/bin/ditto', ['-x', '-k', path.join(release, `Pixel-Fighter-macOS-Universal-v${version}.zip`), checkDir]);
     const restored = path.join(checkDir, 'Pixel Fighter.app');
     execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', restored]);
+    assert.equal(hash(fs.readFileSync(path.join(restored, 'Contents/Resources/app.asar'))), asarSHA256, 'ZIP contains the verified game ASAR');
     assert.ok(fs.statSync(path.join(restored, 'Contents/MacOS/Pixel Fighter')).mode & 0o111);
     assert.ok(fs.lstatSync(path.join(restored, 'Contents/Frameworks/Electron Framework.framework/Versions/Current')).isSymbolicLink());
     const dmg = path.join(release, `Pixel-Fighter-macOS-Universal-v${version}.dmg`);
@@ -98,10 +107,16 @@ function verify(platform) {
       assert.ok(fs.existsSync(path.join(mount, 'Pixel Fighter.app/Contents/MacOS/Pixel Fighter')));
       assert.equal(fs.readlinkSync(path.join(mount, 'Applications')), '/Applications');
       execFileSync('/usr/bin/codesign', ['--verify', '--deep', '--strict', path.join(mount, 'Pixel Fighter.app')]);
+      assert.equal(hash(fs.readFileSync(path.join(mount, 'Pixel Fighter.app/Contents/Resources/app.asar'))), asarSHA256, 'DMG contains the verified game ASAR');
     } finally { execFileSync('/usr/bin/hdiutil', ['detach', mount]); }
     result.zipPermissionsAndSymlinks = true; result.dmgApplicationsLink = true;
     result.note = 'Universal Mach-O and ad-hoc signature verified, ZIP re-extracted, DMG mounted read-only. No Developer ID/notarization. OS launch is recorded separately.';
   }
+  for (const name of artifactNames) {
+    const file = path.join(release, name);
+    result.artifacts.push({ file: name, bytes: fs.statSync(file).size, sha256: hash(fs.readFileSync(file)) });
+  }
+  result.verifiedAt = new Date().toISOString();
   fs.writeFileSync(path.join(output, `verification-${platform}.json`), JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result));
 }
