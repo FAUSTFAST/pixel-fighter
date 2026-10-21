@@ -1,5 +1,6 @@
 // 首页与攻略均为当前页面内的界面；打开攻略时冻结对战和输入。
 (function(){
+  if(window.MoveDemoSession)return;
   const modes=['pvp','pve','training','settings'];
   const home=document.createElement('section');home.id='home-screen';home.setAttribute('aria-label','游戏主菜单');
   home.innerHTML=`<div class="home-hero"><small class="eyebrow">THE NEXT ROUND IS YOURS</small><h1>PIXEL<br>FIGHTER<span>像 素 格 斗</span></h1><p>选择你的斗士，打出自己的风格。</p><div class="home-tags"><span>6 名斗士</span><span>7 座舞台</span><span>本地格斗</span></div></div>
@@ -58,13 +59,13 @@
       choose(Math.max(0,CHARACTERS.findIndex(c=>c.id===GAME.f1?.def.id)));
       guide.showModal();guide.querySelector('.guide-body').scrollTop=0;
     },
-    closeGuide(){if(!this.isOpen)return;this.isOpen=false;guide.close();Input.clear();GAME.paused=previousPause;document.getElementById('game').focus();}
+    closeGuide(){if(!this.isOpen)return;window.MoveDemo?.close();this.isOpen=false;guide.close();Input.clear();GAME.paused=previousPause;document.getElementById('game').focus();}
   };
   document.getElementById('guide').addEventListener('click',()=>AppPanels.openGuide());
   guide.querySelector('#guide-close').addEventListener('click',()=>AppPanels.closeGuide());
   guide.addEventListener('cancel',e=>{e.preventDefault();AppPanels.closeGuide();});
   window.addEventListener('keydown',e=>{
-    if(AppPanels.isOpen){e.stopImmediatePropagation();if(e.key==='Escape'){e.preventDefault();AppPanels.closeGuide();}return;}
+    if(AppPanels.isOpen){e.stopImmediatePropagation();if(e.key==='Escape'){e.preventDefault();if(window.MoveDemo?.isOpen)MoveDemo.close();else AppPanels.closeGuide();}return;}
     if(Settings.isOpen||home.hidden)return;
     if(e.target.closest?.('button')&&!home.contains(e.target))return;
     if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','w','s','a','d','Enter'].includes(e.key)){

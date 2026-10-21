@@ -1,7 +1,7 @@
 'use strict';
 const path = require('node:path');
 const ORIGIN = 'pf-game://game';
-const CSP = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self' blob: data:; font-src 'self' data:; base-uri 'none'; object-src 'none'; frame-src 'none'; form-action 'none'";
+const CSP = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self' blob: data:; font-src 'self' data:; base-uri 'none'; object-src 'none'; frame-src 'self'; form-action 'none'";
 
 // This protocol can only address the staged public directory, never source or OS files.
 function resolveRequest(input, publicRoot) {

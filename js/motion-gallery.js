@@ -27,7 +27,7 @@
     root.querySelector('#motion-frame').addEventListener('input',e=>{playing=false;frame=Number(e.target.value);root.querySelector('#motion-play').textContent='播放';});
   }
   function draw(now){
-    if(!root||!window.AppPanels?.isOpen||!root.querySelector('details').open){previous=now;return;}
+    if(!root||!window.AppPanels?.isOpen||window.MoveDemo?.isOpen||!root.querySelector('details').open){previous=now;return;}
     const elapsed=Math.min(.05,(now-previous)/1000);previous=now;
     const def=CHARACTERS[Number(root.querySelector('#motion-character').value)],name=root.querySelector('#motion-action').value,m=def.moves[name];
     const walking=name==='walk'||name==='backwalk',backward=name==='backwalk';

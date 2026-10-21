@@ -14,7 +14,7 @@ async function prepare() {
   const html = await fs.readFile(path.join(root, 'index.html'), 'utf8');
   const scripts = [...html.matchAll(/<script\s+src="([^"?]+)(?:\?[^" ]*)?"\s*>\s*<\/script>/g)].map(match => match[1]);
   const styles = [...html.matchAll(/<link[^>]+href="([^"?]+)(?:\?[^" ]*)?"/g)].map(match => match[1]);
-  if (scripts.length !== 24 || scripts.some(file => !/^js\/[\w-]+\.js$/.test(file))) throw new Error('Review changed HTML entry points before packaging');
+  if (scripts.length !== 25 || scripts.some(file => !/^js\/[\w-]+\.js$/.test(file))) throw new Error('Review changed HTML entry points before packaging');
   const manifests = ['animation-v8', 'art-restoration', 'air-normals'];
   const catalogs = await Promise.all(manifests.map(name => fs.readFile(path.join(root, 'assets/characters', name, 'manifest.json'), 'utf8').then(JSON.parse)));
   const assets = new Set(manifests.map(name => `assets/characters/${name}/manifest.json`));

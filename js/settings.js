@@ -1,4 +1,5 @@
 (function(){
+  if(window.MoveDemoSession)return;
   const storageKey='pixel-fighter-settings-v1';
   const defaults=JSON.parse(JSON.stringify(Input.MAP));
   const actions={left:'向左',right:'向右',up:'跳跃',down:'下蹲',light:'轻拳 / 现代轻',medium:'中拳 / 现代中',heavy:'重拳 / 现代重',lightKick:'轻脚（经典）',mediumKick:'中脚（经典）',heavyKick:'重脚（经典）',throw:'投 / 拆投',special:'SP 必杀（现代）',assist:'辅助（现代）',impact:'斗气迸放',parry:'斗气招架',driveRush:'斗气冲刺'};

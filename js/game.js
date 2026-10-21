@@ -112,8 +112,8 @@
   }
 
   // ---------- 命中特效 ----------
-  function spawnHit(x, y, big, blocked) {
-    G.effects.push({ x, y, t: 0, life: big?16:12, big, blocked });
+  function spawnHit(x, y, big, blocked, specialStyle) {
+    G.effects.push({ x, y, t: 0, life: big?16:12, big, blocked, specialStyle });
   }
 
   // ---------- 战斗更新 ----------
@@ -126,7 +126,7 @@
     if (G.roundState === 'fight') {
       for (const [who, fighter] of [['p1', f1], ['p2', f2]]) {
         if (who === 'p2' && G.pve) continue;
-        intents[who]=CombatControls.collect(fighter,CombatControls.read(who,fighter),who);
+        intents[who]=window.MoveDemoSession?MoveDemoSession.intent(who):CombatControls.collect(fighter,CombatControls.read(who,fighter),who);
       }
     }
     if (G.hitstop > 0) { G.hitstop--; return; }
@@ -202,7 +202,7 @@
 
     // KO 判定
     if(G.training){
-      if(f1.hp<=0||f2.hp<=0){
+      if(!window.MoveDemoSession&&(f1.hp<=0||f2.hp<=0)){
         if(++G.trainingResetT>=60)startFight();
       }else G.trainingResetT=0;
     }else if ((f1.hp<=0 || f2.hp<=0) && G.roundState==='fight') {
@@ -313,7 +313,7 @@
     if (res.countered) {
       attacker.takeHit({dmg:defender.attack.dmg,kb:10,hitstun:32,type:'special'},-fromDir,false);
       defender.meter=Math.min(defender.maxMeter,defender.meter+12);
-      spawnHit(defender.x,defender.y-100,true,false);
+      spawnHit(defender.x,defender.y-100,true,false,defender.def.id);
       G.hitstop=10;G.shake=10;Audio2.sfx.hitSpecial();return;
     }
     if (res.ignored) return;
@@ -323,7 +323,7 @@
     // 特效 + 定格 + 震屏 + 攒气
     const hx=contact?.x??U.clamp(hb.x+hb.w/2,Math.max(hb.x,db.x),Math.min(hb.x+hb.w,db.x+db.w));
     const hy=contact?.y??U.clamp(hb.y+hb.h/2,Math.max(hb.y,db.y),Math.min(hb.y+hb.h,db.y+db.h));
-    spawnHit(hx, hy, hb.type!=='light', res.blocked);
+    spawnHit(hx, hy, hb.type!=='light', res.blocked, ['special','super'].includes(attacker.attack.category)?attacker.def.id:undefined);
     if(res.parried)G.effects.push({kind:'text',x:hx,y:hy,t:0,life:35,vy:-1,text:'PARRY',color:'#85bfff',size:22});
     else registerCombatText(attacker,hx,hy,res.dmg,res.blocked,false);
     if (!res.blocked) {
@@ -350,7 +350,7 @@
       if (target.state==='ko' || target.invuln > 0 || target.trainingInvincible) continue;
       const res = p.hitTarget(target);
       if (res) {
-        spawnHit(p.x, p.y, true, res.blocked);
+        spawnHit(p.x, p.y, true, res.blocked, p.owner.def.id);
         registerCombatText(p.owner, p.x, p.y, res.dmg, res.blocked, p.weak);
         G.hitstop = 6; G.shake = 10;
         if (res.blocked) Audio2.sfx.block(); else Audio2.sfx.hitSpecial();
@@ -488,6 +488,7 @@
         ctx.restore();
         continue;
       }
+      if(window.Motion60?.drawImpact(ctx,e))continue;
       const p = e.t/e.life;
       ctx.save();
       ctx.globalAlpha = 1-p;
@@ -626,6 +627,12 @@
   }
 
   function step() {
+    // A guide demo owns a separate window and GAME, while reusing every real
+    // fight update / collision / reaction below. Never poll player inputs there.
+    if(window.MoveDemoSession){
+      if(MoveDemoSession.beforeStep(G)){G.t+=STEP;updateFight(STEP);updateEffects();MoveDemoSession.afterStep(G);}
+      Input.endFrame();return;
+    }
     window.Gamepads?.poll();
     if(window.Settings?.isOpen || window.AppPanels?.isOpen){Input.endFrame();return;}
     if (!G.paused) G.t += STEP;
@@ -654,7 +661,8 @@
   }
 
   function loop(now) {
-    accumulator += Math.min(0.1, Math.max(0, (now - last) / 1000));
+    const rate=window.MoveDemoSession?(MoveDemoSession.playing?MoveDemoSession.speed:0):1;
+    accumulator += Math.min(0.1, Math.max(0, (now - last) / 1000))*rate;
     last = now;
     while (accumulator + 1e-9 >= STEP) {
       step();
@@ -673,6 +681,7 @@
       case SCENE.RESULT: UI.result(ctx, G.t, G.winner.name, G.winner.def); break;
     }
     window.MotionGallery?.draw(now);
+    window.MoveDemo?.draw();
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -709,6 +718,7 @@
 
   // 切到其他窗口/标签页时暂停，避免玩家回来后发现角色已被打败。
   function pauseWhenUnfocused() {
+    if(window.MoveDemoSession)return;
     if (G.scene === SCENE.FIGHT) { G.paused = true; clearCombatBuffer(); }
   }
   window.addEventListener('blur', pauseWhenUnfocused);

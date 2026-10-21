@@ -52,7 +52,7 @@
   }
   function dialogInput(dialog,s){
     if(s.edge.has('b1')||s.edge.has('b9')||s.edge.has('b8')){
-      if(window.Settings?.isOpen)Settings.close();else window.AppPanels?.closeGuide();return;
+      if(window.MoveDemo?.isOpen)MoveDemo.close();else if(window.Settings?.isOpen)Settings.close();else window.AppPanels?.closeGuide();return;
     }
     const controls=visibleControls(dialog);if(!controls.length)return;
     let el=document.activeElement,i=controls.indexOf(el);
@@ -122,7 +122,7 @@
     if(lost)stopFight();
     refreshUI();
     const snapshots=new Map(pads.map(p=>[p.index,sample(p)]));
-    const dialog=document.querySelector('dialog[open]');
+    const dialog=window.MoveDemo?.isOpen?document.getElementById('move-demo-dialog'):document.querySelector('dialog[open]');
     const nextContext=[window.GAME?.scene,window.GAME?.paused,dialog?.id,Input.MODES.p1,Input.MODES.p2].join(':');
     if(context!==nextContext){context=nextContext;blocked=true;Input.setGamepadKeys([]);Input.clearMotions();}
     if(document.hidden||!document.hasFocus()){blocked=true;Input.setGamepadKeys([]);return;}

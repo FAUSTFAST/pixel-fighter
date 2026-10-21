@@ -66,7 +66,7 @@ npm run desktop:verify -- --platform=win
 - Electron 44.7.2 / electron-builder 26.15.3；保留现有 60 Hz 游戏循环，不改招式、碰撞、动画、输入或视觉参数。
 - 生产 JS 使用 Terser 压缩、局部变量名混淆。保留全局 API、属性名和脚本顺序，禁用不安全数学优化，不生成 Source Map。没有使用字符串虚拟机、动态 eval 等易破坏功能的重度混淆。
 - HTML/CSS、图集、JSON 逐字节复制；根据三个实际动画 manifest 的覆盖顺序提取最终图集，同时保留角色 fallback 图、七张舞台图及 Web Audio 配乐脚本。新增素材/入口后应重新审核 `prepare.cjs` 和依赖闭包测试。
-- ASAR 只包含 225 个运行文件：桌面入口/协议、最小包元数据，以及 24 个脚本、HTML/CSS、196 个运行资源。没有原 Git 历史、测试、开发文档、审阅图、绘图工程或历史废弃图集；法律要求的 Electron/Chromium 许可证仍保留。
+- ASAR 只包含 226 个运行文件：桌面入口/协议、最小包元数据，以及 25 个脚本、HTML/CSS、196 个运行资源。出招表的对敌演示只加载包内同源页面；Electron 沙箱与外网隔离保持启用。没有原 Git 历史、测试、开发文档、审阅图、绘图工程或历史废弃图集；法律要求的 Electron/Chromium 许可证仍保留。
 - **ASAR 是归档，不是加密。压缩与混淆不能彻底阻止逆向，运行必需的 JS 和图片仍可被提取。** 不要把密钥、服务端验证或商业秘密放进客户端。
 - Renderer 无 Node.js、无 preload/IPC 桥，开启 sandbox、contextIsolation、webSecurity；限制导航、新窗口、下载和权限。自定义安全本地协议支持 JSON fetch/Canvas；CSP 不允许外部脚本、eval 或在线连接，HTTP(S)/WebSocket 请求另行拦截。
 - 所有运行资源离线打包；没有 CDN、遥测或自动下载更新。首次键盘/鼠标交互按原逻辑解锁音频。设置存入桌面应用自己的 Chromium 用户数据目录，与浏览器版分开。
