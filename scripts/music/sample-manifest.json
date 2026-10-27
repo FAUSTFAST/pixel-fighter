@@ -1,0 +1,626 @@
+[
+  {
+    "instrument": "guitar",
+    "source_path": "LICENSE.txt",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/LICENSE.txt",
+    "local_path": "samples/guitar/LICENSE.txt",
+    "bytes": 7048,
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "README.txt",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/README.txt",
+    "local_path": "samples/guitar/README.txt",
+    "bytes": 597,
+    "sha256": "9d0f723bf48f9e0aae245360aed45eb4328f3f881cd6f34afe4eeabf66f09e43"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/A2_s2_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/A2_s2_01.flac",
+    "local_path": "samples/guitar/samples/bridge/A2_s2_01.flac",
+    "bytes": 1562167,
+    "sha256": "c8daba82351b3ab772e76c9e22f9a980ac80ff599492790a7732245ccac7574e"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/A2_s2_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/A2_s2_02.flac",
+    "local_path": "samples/guitar/samples/bridge/A2_s2_02.flac",
+    "bytes": 1605478,
+    "sha256": "7320bdc42c869022d940944bce6f0baa41ce425bab70b063b5a2121a31c9f6d0"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/B3_s5_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/B3_s5_01.flac",
+    "local_path": "samples/guitar/samples/bridge/B3_s5_01.flac",
+    "bytes": 1005050,
+    "sha256": "047f86b03f6cdc6313299a77ac66ac3b36d41bcf89b6063203f86ae8dcef87da"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/B3_s5_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/B3_s5_02.flac",
+    "local_path": "samples/guitar/samples/bridge/B3_s5_02.flac",
+    "bytes": 1008619,
+    "sha256": "b585dbf3efc303ed18d941e879e060fa40819a1198c854b7d41088417c121e02"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/B4_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/B4_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/B4_s6_01.flac",
+    "bytes": 626856,
+    "sha256": "8750f1105ae3326024db1c8f7592f87722d564e7099a8a0c6ab3155bbfd6e4c2"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/B4_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/B4_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/B4_s6_02.flac",
+    "bytes": 625638,
+    "sha256": "8328d17c73222c32cc11ef641a03aaa8a9503b7be176f7480647f309b5c1c96a"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/C3_s2_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/C3_s2_01.flac",
+    "local_path": "samples/guitar/samples/bridge/C3_s2_01.flac",
+    "bytes": 958235,
+    "sha256": "24b1923cba7bc1d3905a0e486ea1143486a4325206c6e9aa90698b91c8df1b6f"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/C3_s2_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/C3_s2_02.flac",
+    "local_path": "samples/guitar/samples/bridge/C3_s2_02.flac",
+    "bytes": 1056153,
+    "sha256": "29fb4607ef6f3493c09d464ee83632087ae814d0761913cbde21da55de8ca6a3"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/C5_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/C5_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/C5_s6_01.flac",
+    "bytes": 611710,
+    "sha256": "a0ba54246478a81f6c3d66f7149c6ff9d01be8ad88938689212cbfb855c672df"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/C5_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/C5_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/C5_s6_02.flac",
+    "bytes": 620236,
+    "sha256": "7780ad8650d4edfafc0ce38586aa6bbdccfb8f4b6d01ca690c96d0ab0b810b49"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/D3_s3_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/D3_s3_01.flac",
+    "local_path": "samples/guitar/samples/bridge/D3_s3_01.flac",
+    "bytes": 1531744,
+    "sha256": "f0acdcabb29151675b13e75f7df6694a7353f423fed6a13c78e2b043bc4b4c3b"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/D3_s3_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/D3_s3_02.flac",
+    "local_path": "samples/guitar/samples/bridge/D3_s3_02.flac",
+    "bytes": 1582930,
+    "sha256": "07979ff925ad7606dbb24465f08da11d9c7a0183971550cfe5071b2f2fcec296"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/D5_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/D5_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/D5_s6_01.flac",
+    "bytes": 519882,
+    "sha256": "1f640839e80a915e4c38a75d96cd0b9c6c756f9ecea626815dd335c17c0817bc"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/D5_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/D5_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/D5_s6_02.flac",
+    "bytes": 548970,
+    "sha256": "64b45733ab4c37848a865d5b1912e9959e877844f3e3f6ecdc469d9c25ce215c"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E2_s1_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E2_s1_01.flac",
+    "local_path": "samples/guitar/samples/bridge/E2_s1_01.flac",
+    "bytes": 1451689,
+    "sha256": "0b354f559b0e8065830d2c5f02c4fed33edab67d928adf5e6bc458a9dc1d97cf"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E2_s1_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E2_s1_02.flac",
+    "local_path": "samples/guitar/samples/bridge/E2_s1_02.flac",
+    "bytes": 1709836,
+    "sha256": "03f25b1aacaead5941e6a57849ba89357225bcd0a4265f91771eb8b3d93841e6"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E3_s3_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E3_s3_01.flac",
+    "local_path": "samples/guitar/samples/bridge/E3_s3_01.flac",
+    "bytes": 965477,
+    "sha256": "9e5faff6c9502df5a32a63c4ed5f08eca0c058b4e6456c8f2867b95680850915"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E3_s3_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E3_s3_02.flac",
+    "local_path": "samples/guitar/samples/bridge/E3_s3_02.flac",
+    "bytes": 1024912,
+    "sha256": "4365906beb488a91f821345e52877d68c5110cd6709198a6eeb212a788b16acc"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E4_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E4_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/E4_s6_01.flac",
+    "bytes": 812875,
+    "sha256": "113204726cc74223356e9d6773204a687e9ba57288057aa741f40ab719f54a86"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/E4_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/E4_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/E4_s6_02.flac",
+    "bytes": 868899,
+    "sha256": "d73753e026c09e3563f42db4d709f821fe6545a75d90d5242650e463acf31b74"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/F5_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/F5_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/F5_s6_01.flac",
+    "bytes": 470932,
+    "sha256": "f96ac3ae399b17e0e1418dd440c271f0ed886c46c178d5931acce80a44f006c3"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/F5_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/F5_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/F5_s6_02.flac",
+    "bytes": 616985,
+    "sha256": "76edfa74083b0f19f801d2f3aa5415d9f2449ca345ceaaf4d08044c2b3a6bf53"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/G3_s4_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/G3_s4_01.flac",
+    "local_path": "samples/guitar/samples/bridge/G3_s4_01.flac",
+    "bytes": 1344813,
+    "sha256": "2d9f6edeb90387b2ada70009c7b83c04cd2c03b464d6e1a6826577891d1be4b3"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/G3_s4_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/G3_s4_02.flac",
+    "local_path": "samples/guitar/samples/bridge/G3_s4_02.flac",
+    "bytes": 1223722,
+    "sha256": "61a8a0180034e64186f68a3e364f69e5da7306fc34410d298133f2bf4b9e53c7"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/G4_s6_01.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/G4_s6_01.flac",
+    "local_path": "samples/guitar/samples/bridge/G4_s6_01.flac",
+    "bytes": 792646,
+    "sha256": "a907b48090b4223b64f539b8a82d27940130a632705c72b4a548845a09fff946"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "samples/bridge/G4_s6_02.flac",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/samples/bridge/G4_s6_02.flac",
+    "local_path": "samples/guitar/samples/bridge/G4_s6_02.flac",
+    "bytes": 867440,
+    "sha256": "969856173cf37577693d3b0fe301bfabc097101ef84378de0b9544969a4cfa93"
+  },
+  {
+    "instrument": "guitar",
+    "source_path": "EGuitarFSBS-clean bridge 20260807.sfz",
+    "url": "https://raw.githubusercontent.com/freepats/electric-guitar-FSBS-clean/192cf0d9bf2c4ba6ead8e3524ba3f78818e4fe91/EGuitarFSBS-clean%20bridge%2020260807.sfz",
+    "local_path": "samples/guitar/EGuitarFSBS-clean bridge 20260807.sfz",
+    "bytes": 11012,
+    "sha256": "d1c5f7bdb688a4968aa8861b21dec9115f2ce37a8399b414222c4a732df0557b"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/LICENSE",
+    "local_path": "samples/bass/LICENSE",
+    "bytes": 7048,
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_a2_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_a2_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_a2_f_rr1.wav",
+    "bytes": 562742,
+    "sha256": "8b3f1c8a284f5a709bdd03c55f5cadfdf99b1061a7db4757f97fa4cb7ebc45ed"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_a2_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_a2_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_a2_f_rr2.wav",
+    "bytes": 599120,
+    "sha256": "fb40f0254f7291f0ca570813c20806f92e0c8c09e6cdc5b3ee04cc6212eca1de"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_b2_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_b2_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_b2_f_rr1.wav",
+    "bytes": 669432,
+    "sha256": "56965ad27a27812c05ff665ac2d57bad043559da8bdfbf9de62a3d809843973e"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_b2_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_b2_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_b2_f_rr2.wav",
+    "bytes": 642192,
+    "sha256": "bb3d2d2ed6d96338c5620735aa7435b7b3d0b964ea733b74ae501d8b229b80b6"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_c3_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_c3_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_c3_f_rr1.wav",
+    "bytes": 896874,
+    "sha256": "c56da8845c26d44fc810571cae8b65f1152e5e2bf66c74d18d449920d669c44a"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_c3_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_c3_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_c3_f_rr2.wav",
+    "bytes": 743684,
+    "sha256": "7e7fafe40aefe4795368c5ef045c9197ed74c703fb782d83fae7e46e4363cc4b"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_d3_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_d3_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_d3_f_rr1.wav",
+    "bytes": 680036,
+    "sha256": "558d0ea98612c0b7bcea3f50116fdc1e60197131355a610d712211e9597d7847"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_d3_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_d3_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_d3_f_rr2.wav",
+    "bytes": 644232,
+    "sha256": "62bc66d230d204afd350812b5e0483c51cbae88bcb9adfaf6931cb82a2da6793"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_e2_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_e2_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_e2_f_rr1.wav",
+    "bytes": 509096,
+    "sha256": "9374dbfc20c0257ce02347129ecf093db7a3a79915b4a3aee4f72a11f973c049"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_e2_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_e2_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_e2_f_rr2.wav",
+    "bytes": 496800,
+    "sha256": "7236ec224de91313412d2cf757afaa1aefcca864fc5948ae284176b92b50905a"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_e3_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_e3_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_e3_f_rr1.wav",
+    "bytes": 617036,
+    "sha256": "9d19468d3aa4a9de69240bac137a5fddaf105b210020899ed16038c6407bf81b"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_e3_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_e3_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_e3_f_rr2.wav",
+    "bytes": 667370,
+    "sha256": "545dea5db1028c7afa6138c368100f63fb890f7868effc3c71e0e767a2d4b1d5"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_g2_f_rr1.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_g2_f_rr1.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_g2_f_rr1.wav",
+    "bytes": 707336,
+    "sha256": "8aab4280e1957ba2a97adc107cc30fcd1d4b5a8e43b53b05227f49ceb41c9d9b"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Samples/big_little_pluck_g2_f_rr2.wav",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Samples/big_little_pluck_g2_f_rr2.wav",
+    "local_path": "samples/bass/Samples/big_little_pluck_g2_f_rr2.wav",
+    "bytes": 656256,
+    "sha256": "07da18319b845d0b959bf20dee15e9b62b227231fc7cf0da2a4109149a106a2c"
+  },
+  {
+    "instrument": "bass",
+    "source_path": "Programs/maps/f_map.sfz",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-little-bass/4e92bdf54dcd2d6cfad968cc90542d5461c9b9fc/Programs/maps/f_map.sfz",
+    "local_path": "samples/bass/Programs/maps/f_map.sfz",
+    "bytes": 25515,
+    "sha256": "5019fb68299f541b61146933557d3721f5f5de90e56e22966064eea823bd0f1c"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "LICENSE",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/LICENSE",
+    "local_path": "samples/drums/LICENSE",
+    "bytes": 7048,
+    "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/crash_17/cr/oh/cr_vl4_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/crash_17/cr/oh/cr_vl4_rr1.flac",
+    "local_path": "samples/drums/Samples/crash_17/cr/oh/cr_vl4_rr1.flac",
+    "bytes": 638717,
+    "sha256": "84150bf1f6842d3cb7738c579ac06bdfb5319a5ab180a4b7663e8058fd0a0e46"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/crash_17/cr/oh/cr_vl4_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/crash_17/cr/oh/cr_vl4_rr2.flac",
+    "local_path": "samples/drums/Samples/crash_17/cr/oh/cr_vl4_rr2.flac",
+    "bytes": 622353,
+    "sha256": "24e1d0b6ee0e87de85637f0e1591bda6ec1cb528713b276ffaf285a2801cc843"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/crash_17/cr/oh/cr_vl5_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/crash_17/cr/oh/cr_vl5_rr1.flac",
+    "local_path": "samples/drums/Samples/crash_17/cr/oh/cr_vl5_rr1.flac",
+    "bytes": 707073,
+    "sha256": "511907df68befff63a39df0693868ca8026f46bbd5d0c8e4d1b9cdfedea65504"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/crash_17/cr/oh/cr_vl5_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/crash_17/cr/oh/cr_vl5_rr2.flac",
+    "local_path": "samples/drums/Samples/crash_17/cr/oh/cr_vl5_rr2.flac",
+    "bytes": 682038,
+    "sha256": "cdf24a74429f440e349dad04cdba58067906e6230da28c4b9e4338e74ceb012e"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/cl/oh/ht_cl_vl4_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/cl/oh/ht_cl_vl4_rr1.flac",
+    "local_path": "samples/drums/Samples/hihat_14/cl/oh/ht_cl_vl4_rr1.flac",
+    "bytes": 76535,
+    "sha256": "b74820cef0d6c58259a0cb4af2a3fc36116e9f50941b5b0becc58b36319ed585"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/cl/oh/ht_cl_vl4_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/cl/oh/ht_cl_vl4_rr2.flac",
+    "local_path": "samples/drums/Samples/hihat_14/cl/oh/ht_cl_vl4_rr2.flac",
+    "bytes": 77512,
+    "sha256": "d32da9b09fd0b12067aca1476c3fffc5fea05afbbe655b363c1698b15cf3c19a"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/cl/oh/ht_cl_vl5_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/cl/oh/ht_cl_vl5_rr1.flac",
+    "local_path": "samples/drums/Samples/hihat_14/cl/oh/ht_cl_vl5_rr1.flac",
+    "bytes": 81414,
+    "sha256": "7828b550006e5396b4656f4b156450cec6f87526fac28318312d6afd2b022398"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/cl/oh/ht_cl_vl5_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/cl/oh/ht_cl_vl5_rr2.flac",
+    "local_path": "samples/drums/Samples/hihat_14/cl/oh/ht_cl_vl5_rr2.flac",
+    "bytes": 76845,
+    "sha256": "3c2970ab898a09e1f2293259436e03d6d776a359c423da48db7589510ae9e0cc"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/open/oh/ht_open_vl4_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/open/oh/ht_open_vl4_rr1.flac",
+    "local_path": "samples/drums/Samples/hihat_14/open/oh/ht_open_vl4_rr1.flac",
+    "bytes": 434876,
+    "sha256": "b18ffabde59181aa4f19b90c78a5904d30e94ee4826a50de16015239ab86acf5"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/open/oh/ht_open_vl4_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/open/oh/ht_open_vl4_rr2.flac",
+    "local_path": "samples/drums/Samples/hihat_14/open/oh/ht_open_vl4_rr2.flac",
+    "bytes": 452274,
+    "sha256": "dbdb0091453b63d37439570f84ee58dccb2d1682cf094870bf826f65995386a1"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/open/oh/ht_open_vl5_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/open/oh/ht_open_vl5_rr1.flac",
+    "local_path": "samples/drums/Samples/hihat_14/open/oh/ht_open_vl5_rr1.flac",
+    "bytes": 460632,
+    "sha256": "429fac3437e0aa119308bf825c3c81097aa42baae70101e74b219abe48116f39"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/hihat_14/open/oh/ht_open_vl5_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/hihat_14/open/oh/ht_open_vl5_rr2.flac",
+    "local_path": "samples/drums/Samples/hihat_14/open/oh/ht_open_vl5_rr2.flac",
+    "bytes": 456293,
+    "sha256": "a35400a972690253b5e8a17228ecacbd06f81963d4dfee49f2c5cf6fe47a304e"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/kick_24/kick/kick/k_vl6_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/kick_24/kick/kick/k_vl6_rr1.flac",
+    "local_path": "samples/drums/Samples/kick_24/kick/kick/k_vl6_rr1.flac",
+    "bytes": 38793,
+    "sha256": "0025799f5ec071c8452e3da95853a55c42937398d089e958362a61ebe613457f"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/kick_24/kick/kick/k_vl6_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/kick_24/kick/kick/k_vl6_rr2.flac",
+    "local_path": "samples/drums/Samples/kick_24/kick/kick/k_vl6_rr2.flac",
+    "bytes": 38880,
+    "sha256": "540a8b75433927df05c69bef27017f301aa6d515fec738544d17045809c94ba3"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/kick_24/kick/kick/k_vl7_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/kick_24/kick/kick/k_vl7_rr1.flac",
+    "local_path": "samples/drums/Samples/kick_24/kick/kick/k_vl7_rr1.flac",
+    "bytes": 39003,
+    "sha256": "a2ec22a813e71a53660438fdafa83c649886ffaaccb6bbff4f49853b0146c115"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/kick_24/kick/kick/k_vl7_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/kick_24/kick/kick/k_vl7_rr2.flac",
+    "local_path": "samples/drums/Samples/kick_24/kick/kick/k_vl7_rr2.flac",
+    "bytes": 39106,
+    "sha256": "df76e9b5cd8131d14e85263a8353697c7798bbdd7248b3af4135a8d19780e736"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/center/top/sn_center_vl8_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/center/top/sn_center_vl8_rr1.flac",
+    "local_path": "samples/drums/Samples/snare_14/center/top/sn_center_vl8_rr1.flac",
+    "bytes": 45943,
+    "sha256": "9b9996fd46e2d9c208a1080f53311db324423641a28c8657292242cbf99cce57"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/center/top/sn_center_vl8_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/center/top/sn_center_vl8_rr2.flac",
+    "local_path": "samples/drums/Samples/snare_14/center/top/sn_center_vl8_rr2.flac",
+    "bytes": 45990,
+    "sha256": "b3e7d98ffae41f48cd10c05d8acd5c8741abca9c58a61b8f9fbdf56b5c65a506"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/center/top/sn_center_vl9_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/center/top/sn_center_vl9_rr1.flac",
+    "local_path": "samples/drums/Samples/snare_14/center/top/sn_center_vl9_rr1.flac",
+    "bytes": 46415,
+    "sha256": "bce1459c07e2960252e8b7d67bbcd725c5333848bfa997828221f231781cf848"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/center/top/sn_center_vl9_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/center/top/sn_center_vl9_rr2.flac",
+    "local_path": "samples/drums/Samples/snare_14/center/top/sn_center_vl9_rr2.flac",
+    "bytes": 46247,
+    "sha256": "bc20f04dfcde5030c113c5a0e768f8423962ae693522a2877a9f39ac4cdb6655"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/rimshot/top/sn_rims_vl5_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/rimshot/top/sn_rims_vl5_rr1.flac",
+    "local_path": "samples/drums/Samples/snare_14/rimshot/top/sn_rims_vl5_rr1.flac",
+    "bytes": 41084,
+    "sha256": "ca54acdfb20c1f8cbbf997598c7a8bc5d94333e4a7a2d7c7413cdeea56ab1f44"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/rimshot/top/sn_rims_vl5_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/rimshot/top/sn_rims_vl5_rr2.flac",
+    "local_path": "samples/drums/Samples/snare_14/rimshot/top/sn_rims_vl5_rr2.flac",
+    "bytes": 40482,
+    "sha256": "55b938ae52250fd65b147856fa6f9ec5547a7d4239c4da81373b191abaa7abab"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/rimshot/top/sn_rims_vl6_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/rimshot/top/sn_rims_vl6_rr1.flac",
+    "local_path": "samples/drums/Samples/snare_14/rimshot/top/sn_rims_vl6_rr1.flac",
+    "bytes": 41601,
+    "sha256": "8e6bc770239c31e4c0545ae6147abf2cf396923283ff5ebeecaf02318cf3c1c8"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/snare_14/rimshot/top/sn_rims_vl6_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/snare_14/rimshot/top/sn_rims_vl6_rr2.flac",
+    "local_path": "samples/drums/Samples/snare_14/rimshot/top/sn_rims_vl6_rr2.flac",
+    "bytes": 40998,
+    "sha256": "2d5aac175ff581aba367455261c23401a63af32a397fcceecd013b797c6ad9b6"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_14/center/oh/t14_vl5_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_14/center/oh/t14_vl5_rr1.flac",
+    "local_path": "samples/drums/Samples/tom_14/center/oh/t14_vl5_rr1.flac",
+    "bytes": 120911,
+    "sha256": "6291e1080fe2579239ace581c2f37dcb500053cf062c914c06d4fb39c2308c75"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_14/center/oh/t14_vl5_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_14/center/oh/t14_vl5_rr2.flac",
+    "local_path": "samples/drums/Samples/tom_14/center/oh/t14_vl5_rr2.flac",
+    "bytes": 114417,
+    "sha256": "5e7a0cac2de2ef817bf36088c1274d2fa1b7ff3c61d1b96a4f0de7fef5a4727e"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_14/center/oh/t14_vl6_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_14/center/oh/t14_vl6_rr1.flac",
+    "local_path": "samples/drums/Samples/tom_14/center/oh/t14_vl6_rr1.flac",
+    "bytes": 114096,
+    "sha256": "ee95f890c47e6af89b18faeb1b381ca49a5418d0d3dd32dc3c49288663857993"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_14/center/oh/t14_vl6_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_14/center/oh/t14_vl6_rr2.flac",
+    "local_path": "samples/drums/Samples/tom_14/center/oh/t14_vl6_rr2.flac",
+    "bytes": 121353,
+    "sha256": "6bc1773b0ae80d8686029cdca2ab39770d878e0a18bb19507afee6119e7f6d8e"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_18/center/oh/t18_vl6_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_18/center/oh/t18_vl6_rr1.flac",
+    "local_path": "samples/drums/Samples/tom_18/center/oh/t18_vl6_rr1.flac",
+    "bytes": 95542,
+    "sha256": "e47f1c55541a76e2eadc9d7abdfd19dd29eb17d2fcaf378ba69fd6a6e1fdfa13"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_18/center/oh/t18_vl6_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_18/center/oh/t18_vl6_rr2.flac",
+    "local_path": "samples/drums/Samples/tom_18/center/oh/t18_vl6_rr2.flac",
+    "bytes": 94791,
+    "sha256": "a2f955206e74d366f0fd904130b3e64cc87ab799e91781b3bb2ba76cb0ff14b5"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_18/center/oh/t18_vl7_rr1.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_18/center/oh/t18_vl7_rr1.flac",
+    "local_path": "samples/drums/Samples/tom_18/center/oh/t18_vl7_rr1.flac",
+    "bytes": 99414,
+    "sha256": "a8c209356e6b823ee2fc567845484fa8a02ed5cd34c2b35126551b1e7c4455e4"
+  },
+  {
+    "instrument": "drums",
+    "source_path": "Samples/tom_18/center/oh/t18_vl7_rr2.flac",
+    "url": "https://raw.githubusercontent.com/sfzinstruments/karoryfer.big-rusty-drums/f07ce00df34a46b6b08375be56fe116cf15782bc/Samples/tom_18/center/oh/t18_vl7_rr2.flac",
+    "local_path": "samples/drums/Samples/tom_18/center/oh/t18_vl7_rr2.flac",
+    "bytes": 97096,
+    "sha256": "74733c8e504c74c8ce6d464e85b03bbec445721744675bf87508b696c8c2be6d"
+  }
+]

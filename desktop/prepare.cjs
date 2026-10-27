@@ -29,6 +29,7 @@ async function prepare() {
   }
   // These are the actual IDs loaded by stages.js, including the three appended stages.
   for (const id of ['dojo', 'city', 'beach', 'volcano', 'station', 'snow', 'garden']) assets.add(`assets/stages/${id}-panorama-v3.png`);
+  assets.add('assets/audio/break-of-dawn-v1.mp3');
   // Only the disposable staging directory is replaced. Never modify game source/assets.
   await fs.rm(staged, { recursive: true, force: true });
   const records = [];

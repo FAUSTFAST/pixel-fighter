@@ -32,11 +32,11 @@
       <label><span>游戏音效</span><input id="setting-sfx" type="checkbox"></label>
       <label><span>命中震屏</span><input id="setting-shake" type="checkbox"></label>
       <label class="volume-row"><span>总音量 <output id="volume-value"></output></span><input id="setting-volume" type="range" min="0" max="100" step="1"></label>
-    </div><div class="music-library"><div class="music-library-heading"><h3>舞台原声</h3><span>7 首原创战斗配乐</span></div>
-      <label class="match-row">选择舞台<select id="music-track"></select></label>
+    </div><div class="music-library"><div class="music-library-heading"><h3>游戏原声</h3><span>首页主题曲 + 7 首舞台配乐</span></div>
+      <label class="match-row">选择配乐<select id="music-track"></select></label>
       <div class="music-track-card"><span class="music-disc" aria-hidden="true">♫</span><div><strong id="music-track-title"></strong><p id="music-track-description"></p><small id="music-track-tempo"></small></div></div>
       <div class="music-preview-actions"><button id="music-preview" class="primary-button">试听配乐</button><button id="music-restore">恢复场景配乐</button></div>
-      <p id="music-preview-status" role="status" aria-live="polite">选择地图试听，关闭设置后恢复当前场景音乐。</p>
+      <p id="music-preview-status" role="status" aria-live="polite">选择配乐试听，关闭设置后恢复当前场景音乐。首页首次点击或按键后播放主题曲。</p>
     </div></section>
     <section id="keys-settings"><h2>经典 / 现代操作</h2><div class="control-mode-grid">${['p1','p2'].map(w=>`<label class="control-mode-card">${w.toUpperCase()} 操作方式<select id="control-${w}"><option value="classic">经典 · 六键拳脚与搓招</option><option value="modern">现代 · 简化必杀与辅助连段</option></select></label>`).join('')}</div>
       <p class="settings-help">经典：轻中重拳脚＋指令技。现代：轻中重攻击，方向＋SP 必杀；按住辅助连按轻／中／重，逐段推进专属连段。现代手动搓招为全伤害，快捷必杀为 80%。</p>
@@ -47,8 +47,8 @@
   window.Gamepads?.mount(dialog.querySelector("#gamepad-settings"));
   const message=dialog.querySelector('#settings-message');
   const musicSelect=dialog.querySelector('#music-track');
-  for(const [id,track] of Object.entries(Audio2.music.tracks)){
-    if(id==='menu')continue;
+  for(const id of ['menu',...Object.keys(Audio2.music.tracks).filter(id=>id!=='menu')]){
+    const track=Audio2.music.tracks[id];
     const option=document.createElement('option');option.value=id;option.textContent=track.stage;musicSelect.appendChild(option);
   }
   const sceneTrack=()=>GAME.scene==='fight'?GAME.stage.id:'menu';
@@ -56,12 +56,12 @@
     const track=Audio2.music.tracks[musicSelect.value];
     dialog.querySelector('#music-track-title').textContent='《'+track.title+'》';
     dialog.querySelector('#music-track-description').textContent=track.genre;
-    dialog.querySelector('#music-track-tempo').textContent=track.bpm+' BPM · 32 小节 · 主段 / 副歌 / 间奏';
+    dialog.querySelector('#music-track-tempo').textContent=track.bpm+' BPM · '+(track.description||'32 小节 · 主段 / 副歌 / 间奏');
   }
   function restoreSceneMusic(){
     previewing=false;
     if(Audio2.isMusicOn())Audio2.music.play(sceneTrack());
-    dialog.querySelector('#music-preview-status').textContent='选择地图试听，关闭设置后恢复当前场景音乐。';
+    dialog.querySelector('#music-preview-status').textContent='选择配乐试听，关闭设置后恢复当前场景音乐。';
     dialog.querySelector('#music-preview').textContent='试听配乐';
   }
   function previewMusic(){
@@ -173,7 +173,7 @@
     saveAudio(){values.music=Audio2.isMusicOn();values.sfx=Audio2.isSfxOn();save();},
     open(){if(this.isOpen)return;this.isOpen=true;previousPause=GAME.paused;GAME.paused=true;Input.clear();
       for(const f of [GAME.f1,GAME.f2])if(f){f.bufferedAttack=null;f.assistRoute=null;}
-      values.music=Audio2.isMusicOn();values.sfx=Audio2.isSfxOn();recording=null;message.textContent='';musicSelect.value=GAME.scene==='fight'?GAME.stage.id:'dojo';showTrack();sync();renderMatchSettings();selectSection(GAME.training||GAME.pve?'match':'audio');dialog.showModal();},
+      values.music=Audio2.isMusicOn();values.sfx=Audio2.isSfxOn();recording=null;message.textContent='';musicSelect.value=sceneTrack();showTrack();sync();renderMatchSettings();selectSection(GAME.training||GAME.pve?'match':'audio');dialog.showModal();},
     close(){if(!this.isOpen)return;if(previewing)restoreSceneMusic();this.isOpen=false;recording=null;dialog.close();Input.clear();GAME.paused=previousPause;document.getElementById('game').focus();}
   };
   for(const who of ['p1','p2'])dialog.querySelector('#control-'+who).addEventListener('change',e=>{

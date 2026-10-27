@@ -1,5 +1,5 @@
 // ============================================================
-// audio.js — 程序化音效与背景音乐(Web Audio API,无需素材文件)。
+// audio.js — 程序化音效、舞台乐谱与本地录音主题曲(Web Audio API)。
 // 首次用户交互后解锁 AudioContext(浏览器自动播放策略要求)。
 // ============================================================
 (function () {
@@ -27,7 +27,7 @@
   // 首次交互解锁
   function unlock() {
     if (!ensure()) return;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state === 'suspended') ctx.resume().catch(()=>{});
   }
   ['keydown', 'pointerdown'].forEach(ev =>
     window.addEventListener(ev, unlock, { capture: true }));
@@ -104,6 +104,7 @@
   const MUSIC_LEVEL=.42;
   let curTrack=null,requestedTrack='menu',step=0,nextNoteTime=0;
   let noiseBuffer=null,reverbBuffer=null,driveCurve=null;
+  const recordings=new Map();
   const midi=n=>440*Math.pow(2,(n-69)/12);
   const PRESETS={
     shamisen:{wave:'sawtooth',cut:4800,end:850,attack:.002,release:.10,pluck:true},
@@ -260,15 +261,49 @@
     const tick=60/curTrack.bpm/4;
     while(nextNoteTime<ctx.currentTime+.12){musicStep(nextNoteTime);nextNoteTime+=tick;}
   }
+  function playRecording(tk){
+    const bus=ctx.createGain();bus.gain.value=1;bus.connect(musicGain);
+    const session={bus,sources:new Set(),nodes:[bus],state:'loading'};
+    musicNode=session;
+    const {src,loopStart,loopEnd}=tk.recording;
+    // Share one download/decode across re-entry, mute toggles and the sound library.
+    if(!recordings.has(src)){
+      const loading=fetch(src).then(response=>{
+        if(!response.ok)throw new Error('主题曲载入失败：'+response.status);
+        return response.arrayBuffer();
+      }).then(bytes=>ctx.decodeAudioData(bytes)).catch(error=>{
+        recordings.delete(src);throw error;
+      });
+      recordings.set(src,loading);
+    }
+    recordings.get(src).then(buffer=>{
+      // A slow load must not restart the menu track after entering a fight/muting.
+      if(musicNode!==session||!musicOn||curTrack!==tk)return;
+      if(!(loopStart>=0&&loopStart<loopEnd&&loopEnd<=buffer.duration))throw new Error('主题曲循环区间无效');
+      const source=ctx.createBufferSource();source.buffer=buffer;source.loop=true;
+      source.loopStart=loopStart;source.loopEnd=loopEnd;source.connect(bus);
+      source.onended=()=>{session.sources.delete(source);source.disconnect();};
+      session.sources.add(source);session.state='ready';
+      const now=ctx.currentTime;
+      bus.gain.setValueAtTime(0,now);bus.gain.linearRampToValueAtTime(1,now+.08);
+      source.start(now);
+    }).catch(error=>{
+      if(musicNode!==session)return;
+      session.state='error';console.warn('首页主题曲暂不可用，可在设置中重新试听。',error);
+    });
+  }
   const Music={
     tracks:TRACKS,
+    get status(){return !musicNode?'stopped':musicNode.state==='error'?'error':musicNode.state==='loading'?'loading':ctx.state==='running'?'playing':'waiting';},
     play(trackId){
       requestedTrack=TRACKS[trackId]?trackId:'menu';
       if(!musicOn)return;
       if(!ensure())return;
       const tk=TRACKS[requestedTrack];
-      if(curTrack===tk&&musicTimer)return;
-      this.stop();curTrack=tk;step=0;musicNode=createMusicSession(tk);nextNoteTime=ctx.currentTime+.04;
+      if(curTrack===tk&&musicNode)return;
+      this.stop();curTrack=tk;
+      if(tk.recording){playRecording(tk);return;}
+      step=0;musicNode=createMusicSession(tk);nextNoteTime=ctx.currentTime+.04;
       musicTimer=setInterval(scheduleMusic,25);scheduleMusic();
     },
     stop(){

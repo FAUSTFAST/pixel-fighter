@@ -29,7 +29,8 @@ test('staging preserves exact HTML, CSS, PNGs and complete manifest dependency c
   for (const [id, base] of Object.entries(catalogs[0].characters)) for (const clip of Object.values({ ...base, ...catalogs[1].characters[id], ...catalogs[2].characters[id] })) {
     assert.ok(fs.existsSync(path.join(staged, 'public', clip.sourceRoot || 'assets/characters/animation-v8/', clip.sheet + '.png')));
   }
-  assert.equal(report.assets.length, 196);
+  assert.equal(report.assets.length, 197);
+  assert.ok(report.assets.includes('assets/audio/break-of-dawn-v1.mp3'));
   assert.ok(!actual.some(file => /(?:\.map$|\.git\/|review\.png|drawings\.json|reference\/|scripts\/|\.md$|node_modules\/)/.test(file)));
   for (const file of ['index.html', ...report.scripts, 'css/ui.css']) {
     const text = fs.readFileSync(path.join(staged, 'public', file), 'utf8');
